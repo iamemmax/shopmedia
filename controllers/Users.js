@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../config/email");
-
+const passport = reqiure("passport")
 
 // @desc: create account
 // @Route: /api/users/register
@@ -190,3 +190,5 @@ exports.activateUser = asyncHandler(async (req, res) => {
 // @desc: login account
 // @Route: /api/users/register
 // @Acess: public
+
+exports.activateUser = asyncHandler(async (req, res) => {})
