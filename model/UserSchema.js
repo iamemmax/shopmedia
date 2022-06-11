@@ -36,6 +36,7 @@ const UserSchema = new mongoose.Schema({
     default: "customers",
     enum: ["admin", "customers"],
   },
+  pic:[],
   status: {
     type: Boolean,
     default: false,

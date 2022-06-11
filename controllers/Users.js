@@ -5,7 +5,9 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../config/email");
 const passport = require("passport");
-
+const sharp = require("sharp")
+const fs = require("fs");
+const cloudinary = require("../config/cloudinary")
 // @desc: create account
 // @Route: /api/users/register
 // @Acess: public
@@ -408,7 +410,8 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 
 //@desc: change password
 //@access: private
-//@route: /api/user/password/:id
+//@method: put
+//@route: /api/users/password/:id
 exports.ChangePassword = asyncHandler(async (req, res) => {
   let { oldpassword, password, confirm_password } = req.body;
     if(!oldpassword|| !password|| !confirm_password){
@@ -474,4 +477,60 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
   }
 });
 
+//@desc: update user profile img
+//@access: private
+//@method: put
+//@route: /api/users/upload-profile-img
+exports.uploadProfilePic = asyncHandler(async(req, res)=>{
+  if(!req.file){
+    res.status(401)
+    throw new Error("please choose a file")
+  }
 
+  console.log(req.file)
+  const users = await userSchema.findById(req.params.id)
+   if(users.pic.length < 0){
+     await cloudinary.uploader.destroy(users[0].img_id)
+
+   }
+   
+  try {
+    await sharp(req.file.path)
+    .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
+    .resize(200, 200)
+    .png({quality:90, force: true})
+    // .toFile(`./public/img/user${req.file.filename}.png`);
+    
+    let uploadImg = await cloudinary.uploader.upload(req.file.path)
+
+    fs.unlinkSync(req.file.path);
+    if(uploadImg){
+      let profileImg = {
+        img_id:uploadImg.public_id,
+        img:uploadImg.secure_url
+      }
+      console.log(profileImg)
+      let updateProfile = await userSchema.findOneAndUpdate({_id:req.params.id}, {$set:{pic:[profileImg]}}, {new:true})
+
+      if(updateProfile){
+        res.status(201).json({
+          message:"profile img updated successfully"
+        })
+      }else{
+        fs.unlinkSync(req.file.path);
+        res.status(401)
+    throw new Error("unable to update profile")
+
+      }
+    }else{
+      fs.unlinkSync(req.file.path);
+
+    }
+        
+     
+  } catch (error) {
+    fs.unlinkSync(req.file.path);
+    res.status(401)
+    throw new Error(error.message)
+  }
+})

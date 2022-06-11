@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const upload = require("../config/upload")
 
-let { createUser, activateUser,  loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword } = require("../controllers/Users");
+let { createUser, activateUser,  loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic } = require("../controllers/Users");
+
 
 //@desc create account
 router.route("/register").post(createUser);
@@ -20,5 +22,6 @@ router.post("/forget-password", forgetPassword)
 //@desc reset password 
 router.post("/reset-password/:id/:token", resetPassword)
 router.put("/change-password/:id/", ChangePassword)
+router.put("/upload-profile-img/:id", upload.single("pic"), uploadProfilePic)
 
 module.exports = router;
