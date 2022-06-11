@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-let { createUser, activateUser,  loginUser, logoutUser } = require("../controllers/Users");
+let { createUser, activateUser,  loginUser, logoutUser,forgetPassword } = require("../controllers/Users");
 
 //@desc create account
 router.route("/register").post(createUser);
@@ -14,5 +14,8 @@ router.route("/login").post(loginUser);
 
 //@desc logout account
 router.get("/logout", logoutUser)
+
+//@desc forget password 
+router.post("/forget-password", forgetPassword)
 
 module.exports = router;

@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../config/email");
-const passport = require("passport")
+const passport = require("passport");
 
 // @desc: create account
 // @Route: /api/users/register
@@ -85,53 +85,50 @@ exports.createUser = asyncHandler(async (req, res) => {
             let token = buffer.toString("hex");
             if (err) console.log(err);
 
-          let newUser = await new userSchema({
-            username,
-            email,
-            fullname,
-            password: hash,
-            phone_no,
-            company_name,
-          }).save();
-
-         
-          
-          if (newUser) {
-            let { _id, username, email, fullname, phone_no, company_name } =
-              newUser;
-            let user = {
-              _id,
+            let newUser = await new userSchema({
               username,
               email,
               fullname,
+              password: hash,
               phone_no,
               company_name,
-            };
+            }).save();
 
-            
-            let verifyUser = await new tokenSchema({
-              email,
-              token,
-            }).save()
+            if (newUser) {
+              let { _id, username, email, fullname, phone_no, company_name } =
+                newUser;
+              let user = {
+                _id,
+                username,
+                email,
+                fullname,
+                phone_no,
+                company_name,
+              };
 
-                sendEmail(
-                  email,
-                  "shopmedia registration",
-                  `
+              let verifyUser = await new tokenSchema({
+                email,
+                token,
+              }).save();
+
+              sendEmail(
+                email,
+                "shopmedia registration",
+                `
                 <a href="http://localhost:5000/api/users/verify/${_id}/${token}">
                 verify account
               </a>;
                 `
-                );
-              
-                return res.status(201).json({
-                  res: "ok",
-              message: "registration successfull",
-              user,
-            });
-          }
+              );
+
+              return res.status(201).json({
+                res: "ok",
+                message: "Please click link sent to your email to complete your registration",
+                user,
+              });
+            }
+          });
         });
-      });
       });
     }
   } catch (error) {
@@ -139,7 +136,6 @@ exports.createUser = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
-
 
 // @desc: verify account
 // @Route: /api/users/verify/:id/:token
@@ -185,11 +181,6 @@ exports.activateUser = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc: forget password
-// @Route: /api/users/forgot-password
-// @Acess: public
-
-
 // @desc: login account
 // @Route: /api/users/login
 // @Acess: public
@@ -227,7 +218,6 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   //   );
   // }
 
-
   passport.authenticate("local", function (err, user) {
     if (err) {
       return next(err);
@@ -245,16 +235,15 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
         throw new Error("Email or password not correct");
       }
 
-      let { _id, username, email, fullname, phone_no, company_name } =
-      user;
-    let users = {
-      _id,
-      username,
-      email,
-      fullname,
-      phone_no,
-      company_name,
-    };
+      let { _id, username, email, fullname, phone_no, company_name } = user;
+      let users = {
+        _id,
+        username,
+        email,
+        fullname,
+        phone_no,
+        company_name,
+      };
       return res.status(201).json({
         message: `logged in ${req.user.username}`,
         isAuthenticated: true,
@@ -270,8 +259,8 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
 // @Acess: public
 
 exports.logoutUser = (req, res) => {
-  req.logOut(function(err){
-    if(err)console.log(err);
+  req.logOut(function (err) {
+    if (err) console.log(err);
 
     req.session.destroy(() => {
       res.clearCookie("connect.sid", {
@@ -284,3 +273,68 @@ exports.logoutUser = (req, res) => {
     });
   });
 };
+
+// @desc: forget password
+// @Route: /api/users/forgot-password
+// @Acess: public
+
+exports.forgetPassword = asyncHandler(async (req, res) => {
+  let { email } = req.body;
+  if (!email) {
+    res.status(401);
+    throw new Error("this field is require");
+  }
+
+  // check if user enter valid email
+  function validateEmail(email) {
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(email);
+  }
+  if (!validateEmail(email)) {
+    res.status(401);
+    throw new Error("please enter a valid email");
+  }
+
+  const user = await userSchema.findOne({ email: email });
+  if (user) {
+    crypto.randomBytes(48, async (err, buffer) => {
+      let token = buffer.toString("hex");
+      if (err) console.log(err);
+
+      sendEmail(
+        email,
+        "shopmedia forget-password",
+        `
+        <div>
+        <h2>Reset your password for Shopmedia.ng</h2>
+        <br>
+        <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
+        <a href="http://localhost:5000/api/users/reset-password/${user._id}/${token}">
+        http://localhost:5000/api/users/reset-password/${user._id}/${token}
+        </a>;
+        <p>If you didn’t ask to reset your password, you can ignore this email.
+        <br>
+
+        Thanks,
+        <br>
+        
+        Shopmedia.ng</p>
+        </div>
+
+    `
+      );
+      res.status(201).json({
+        message:
+          " Please following the instructions sent to your email to complete reseting your password.",
+      });
+    });
+  } else {
+    res.status(401);
+    throw new Error(
+      "There is no user record corresponding to this identifier. The user may have been deleted"
+    );
+  }
+});
+
+
