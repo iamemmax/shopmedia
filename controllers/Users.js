@@ -205,18 +205,7 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     throw new Error("please enter a valid email");
   }
 
-  //  // @desc check if user enter strong password
-  //  function validatePassword(password) {
-  //   const regex =
-  //     /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
-  //   return regex.test(password);
-  // }
-  // if (!validatePassword(password)) {
-  //   res.status(401);
-  //   throw new Error(
-  //     "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
-  //   );
-  // }
+  
 
   passport.authenticate("local", function (err, user) {
     if (err) {
@@ -405,8 +394,8 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 });
 }else{
   res.status(401);
-  throw new Error("invalid or expired link");
-  return
+  throw new Error("Try resetting your password again <br/> Your request to reset your password has expired or the link has already been used");
+  
 }
 }
 
@@ -417,5 +406,72 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     }
 })
 
+//@desc: change password
+//@access: private
+//@route: /api/user/password/:id
+exports.ChangePassword = asyncHandler(async (req, res) => {
+  let { oldpassword, password, confirm_password } = req.body;
+    if(!oldpassword|| !password|| !confirm_password){
+      res.status(401);
+      throw new Error("please fill all field");
+    }
+
+   // @desc check if user enter strong password
+   function validatePassword(password) {
+    const regex =
+      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
+    return regex.test(password);
+  }
+  if (!validatePassword(password)) {
+    res.status(401);
+    throw new Error(
+      "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
+    );
+  }
+  if (password !== confirm_password) {
+    res.status(401);
+    throw new Error("password not match");
+  }
+  const user = await userSchema.findOne({ _id: req.params.id });
+  if (user) {
+    try {
+      bcrypt.compare(oldpassword, user.password, (err, isMatch) => {
+        if (!isMatch) {
+          res.send("old password not matched");
+        }
+        if (isMatch) {
+          bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(password, salt, async (errr, hash) => {
+              
+            
+              let update = await userSchema.findOneAndUpdate(
+                { _id: req.params.id },
+                { $set: { password: hash || user.password } },
+                { new: true }
+              );
+              if (!update) {
+                // res.send("unable to update pass");
+                res.status(401).json({
+                  message: "unable to update  password ",
+                });
+              } else {
+                res.status(201).json({
+                  message: " password updated successfully",
+
+                });
+              }
+            });
+          });
+        }
+      });
+    } catch (error) {
+      res.status(501);
+      throw new Error(error.message);
+    }
+  } else {
+    res.status(401);
+    throw new Error("user not found");
+  }
+});
 
 
