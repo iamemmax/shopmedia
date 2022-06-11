@@ -302,32 +302,41 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
       let token = buffer.toString("hex");
       if (err) console.log(err);
 
-      sendEmail(
-        email,
-        "shopmedia forget-password",
+     let updateUser = await userSchema.findOneAndUpdate({email:email}, {$set:{token:token}},{new:true})
+
+     if(updateUser){
+
+     
+          sendEmail(
+            email,
+            "shopmedia forget-password",
+            `
+            <div>
+            <h2>Reset your password for Shopmedia.ng</h2>
+            <br>
+            <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
+            <a href="http://localhost:5000/api/users/reset-password/${user._id}/${token}">
+            http://localhost:5000/api/users/reset-password/${user._id}/${token}
+            </a>;
+            <p>If you didn’t ask to reset your password, you can ignore this email.
+            <br>
+    
+            Thanks,
+            <br>
+            
+            Shopmedia.ng</p>
+            </div>
+    
         `
-        <div>
-        <h2>Reset your password for Shopmedia.ng</h2>
-        <br>
-        <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
-        <a href="http://localhost:5000/api/users/reset-password/${user._id}/${token}">
-        http://localhost:5000/api/users/reset-password/${user._id}/${token}
-        </a>;
-        <p>If you didn’t ask to reset your password, you can ignore this email.
-        <br>
-
-        Thanks,
-        <br>
+          );
+          res.status(201).json({
+            message:
+              " Please following the instructions sent to your email to complete reseting your password.",
+          });
         
-        Shopmedia.ng</p>
-        </div>
-
-    `
-      );
-      res.status(201).json({
-        message:
-          " Please following the instructions sent to your email to complete reseting your password.",
-      });
+      
+        } 
+     
     });
   } else {
     res.status(401);
@@ -336,5 +345,77 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
     );
   }
 });
+
+
+// @desc: reset password
+// @Route: /api/users/reset-password
+// @Acess: public
+exports.resetPassword = asyncHandler(async (req, res) => {
+  let {password} = req.body
+
+  if(!password){
+    res.status(401);
+    throw new Error("Enter your password");
+  }
+  // @desc check if user enter strong password
+  function validatePassword(password) {
+    const regex =
+      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
+    return regex.test(password);
+  }
+  if (!validatePassword(password)) {
+    res.status(401);
+    throw new Error(
+      "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
+    );
+  }
+
+  
+
+  try {
+    const user = await userSchema.find({
+      
+      $and: [
+        {
+          id: req.params.id,
+          token: req.params.token,
+        },
+      ],
+   });
+
+    if (user.length > 0) {
+     
+    
+    console.log(user);
+    bcrypt.genSalt(10, function (err, salt) {
+      bcrypt.hash(password, salt, async (err, hash) => {
+  
+    let resetPassword = await userSchema.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: { password: hash, token:'' } },
+      { new: true }
+    );
+    if(resetPassword){
+      res.status(201).json({
+        message:
+          " Password changed \n You can now sign in with your new password.",
+      });
+    }
+  });
+});
+}else{
+  res.status(401);
+  throw new Error("invalid or expired link");
+  return
+}
+}
+
+
+    catch (error) {
+      res.status(501);
+      throw new Error(error.message);
+    }
+})
+
 
 
