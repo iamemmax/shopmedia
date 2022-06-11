@@ -6,10 +6,13 @@ const path = require("path");
 const userRoutes = require("./routes/userRoutes");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
-const app = express();
+const session = require("express-session")
+const passport = require("passport")
+ 
 
+const app = express();
 //@ desc: middlewares
-app.use(cors());
+app.use(cors({credentials:true}));
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
@@ -18,6 +21,23 @@ app.use(express.json());
 app.use(errorHandler);
 // @desc:DATABASE INITIALIZATION
 DB();
+
+app.use(
+    session({
+      secret: process.env.SECRETE,
+      cookie: { maxAge: 3600000, path: "/" },
+      resave: true,
+      saveUninitialized: true,
+    }),
+  );
+  
+  
+  //@desc : initializing passport 
+  app.use(passport.initialize());
+  app.use(passport.session());
+
+//@desc : require passport config
+require("./config/passport")(passport)
 
 //@desc: Routes
 app.use("/api/users", userRoutes);

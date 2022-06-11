@@ -4,7 +4,7 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const sendEmail = require("../config/email");
-const passport = reqiure("passport")
+const passport = require("passport")
 
 // @desc: create account
 // @Route: /api/users/register
@@ -185,10 +185,102 @@ exports.activateUser = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc: forget password
+// @Route: /api/users/forgot-password
+// @Acess: public
 
 
 // @desc: login account
-// @Route: /api/users/register
+// @Route: /api/users/login
 // @Acess: public
 
-exports.activateUser = asyncHandler(async (req, res) => {})
+exports.loginUser = asyncHandler(async (req, res, next) => {
+  let { email, password } = req.body;
+
+  console.log(req.body);
+  if (!email || !password) {
+    res.status(401);
+    throw new Error("Please fill all field");
+  }
+
+  // check if user enter valid email
+  function validateEmail(email) {
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(email);
+  }
+  if (!validateEmail(email)) {
+    res.status(401);
+    throw new Error("please enter a valid email");
+  }
+
+  //  // @desc check if user enter strong password
+  //  function validatePassword(password) {
+  //   const regex =
+  //     /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
+  //   return regex.test(password);
+  // }
+  // if (!validatePassword(password)) {
+  //   res.status(401);
+  //   throw new Error(
+  //     "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
+  //   );
+  // }
+
+
+  passport.authenticate("local", function (err, user) {
+    if (err) {
+      return next(err);
+    }
+    if (!user) {
+      return res.status(401).json({
+        message: "Email or password not correct",
+      });
+    }
+
+    req.logIn(user, function (err) {
+      if (err) {
+        next(err);
+        res.status(401);
+        throw new Error("Email or password not correct");
+      }
+
+      let { _id, username, email, fullname, phone_no, company_name } =
+      user;
+    let users = {
+      _id,
+      username,
+      email,
+      fullname,
+      phone_no,
+      company_name,
+    };
+      return res.status(201).json({
+        message: `logged in ${req.user.username}`,
+        isAuthenticated: true,
+        res: "ok",
+        users,
+      });
+    });
+  })(req, res, next);
+});
+
+// @desc: logout account
+// @Route: /api/users/logout
+// @Acess: public
+
+exports.logoutUser = (req, res) => {
+  req.logOut(function(err){
+    if(err)console.log(err);
+
+    req.session.destroy(() => {
+      res.clearCookie("connect.sid", {
+        path: "/",
+        httpOnly: true,
+      });
+      res.status(201).json({
+        message: "you successfully logout",
+      });
+    });
+  });
+};
