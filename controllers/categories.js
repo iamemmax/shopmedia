@@ -56,13 +56,9 @@ exports.createCategory = asyncHandler(async(req, res) =>{
 
 })
 
-
-
-
-// @desc: create subCategory
+// @desc: update category types
 // @Route: /api/category/update/:id
 // @Acess: private
-
 
 exports.updateCategory = asyncHandler(async(req, res) =>{
     
@@ -94,6 +90,26 @@ exports.updateCategory = asyncHandler(async(req, res) =>{
 })
 
 
+
+
+// @desc: Deletes category
+// @Route: /api/category/delete/:id
+// @Acess: private
+exports.deleteCategory = asyncHandler(async(req, res) =>{
+ 
+    let deleteCart = await categorySchema.findByIdAndDelete(req.params.id)
+    if(deleteCart){
+        return res.status(201).json({
+            res: "ok",
+            message: "category deleted successfully",
+            deleteCart,
+          });
+    }else{
+        return res.status(401).json({
+            message: "unable to delete category",
+          });
+    }
+})
 
 
 // @desc: create subCategory
