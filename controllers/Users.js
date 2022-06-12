@@ -46,19 +46,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     throw new Error("please enter a valid email");
   }
 
-  // @desc check if user enter strong password
-  function validatePassword(password) {
-    const regex =
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
-    return regex.test(password);
-  }
-  if (!validatePassword(password)) {
-    res.status(401);
-    throw new Error(
-      "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
-    );
-  }
-
+  
   // @desc check if password1 = password2
 
   if (password !== confirm_password) {
@@ -108,18 +96,59 @@ exports.createUser = asyncHandler(async (req, res) => {
                 company_name,
               };
 
-              let verifyUser = await new tokenSchema({
+               await new tokenSchema({
                 email,
                 token,
               }).save();
 
               sendEmail(
                 email,
-                "shopmedia registration",
+                "Welcome to ShopMedia.ng",
                 `
+                <div>
+                <h2>Welcome to ShopMedia</h2>
+                <p>Hi ${Username},</p>
+                <p>My name is Chidi Onwumere, the CEO of ShopMedia. Thank you for signing up on the
+                Shopmedia platform, we’re delighted to have you on board.
+                You join thousands of Companies across Africa, using our digital platform and infrastructure to
+                enable their businesses access seamless advertisement services from all over Africa.
+                We have built a modern platform that handles all your business advertisement needs on the go,
+                allowing you to focus on other important aspects of the business.
+                With ShopMedia, you can perform an array of activities:
+                ● You can create Media plans based on your budget using our live data and prices.
+                ● Find Advert spaces for Billboards, Radio, Newspaper, Television etc
+                ● Negotiate prices of the spaces directly with the media owners, thereby optimizing your
+                campaign budget
+                ● Book the advert spaces you have selected.</p>
+
+                <span>We care about you and your business, reach out to us via email at support@shopmedia.ng, or
+                via a phone call at +234 (90)-231-423-36.
+                We are taking your business beyond borders.
+                Warmest Regards,
+                Chidi Onwumere</span>
+                </a>;
+                </div>
+                `
+              );
+              sendEmail(
+                email,
+                "Verify Email Address",
+                `
+                <div>
+                <h2>Welcome to ShopMedia</h2>
+                <p>Hi ${Username},</p>
+                <p>Please click the button below to verify your email address.</p>
+
                 <a href="http://localhost:5000/api/users/verify/${_id}/${token}">
                 verify account
-              </a>;
+
+                  <p>If you did not create an account, no further action is required.
+                  Regards,</p>
+                <span>
+                ShopMedia Team
+                https://shopmedia.ng</span>
+                </a>;
+                </div>
                 `
               );
 
@@ -300,22 +329,26 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
      
           sendEmail(
             email,
-            "shopmedia forget-password",
+            "Change your password",
             `
             <div>
-            <h2>Reset your password for Shopmedia.ng</h2>
+            <h1>Hi ${user.username},</h1>
+            <p>Someone (hopefully you) has requested a password reset for your ShopMedia account. Follow
+            the link below to set a new password:</p>
             <br>
             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
             <a href="http://localhost:5000/api/users/reset-password/${user._id}/${token}">
-            http://localhost:5000/api/users/reset-password/${user._id}/${token}
+            Reset Password
             </a>;
-            <p>If you didn’t ask to reset your password, you can ignore this email.
+            <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
             <br>
     
+            <span>
             Thanks,
             <br>
             
-            Shopmedia.ng</p>
+            Shopmedia.ng
+            </span>
             </div>
     
         `
@@ -348,18 +381,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("Enter your password");
   }
-  // @desc check if user enter strong password
-  function validatePassword(password) {
-    const regex =
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
-    return regex.test(password);
-  }
-  if (!validatePassword(password)) {
-    res.status(401);
-    throw new Error(
-      "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
-    );
-  }
+  
 
   
 
@@ -418,19 +440,7 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       res.status(401);
       throw new Error("please fill all field");
     }
-
-   // @desc check if user enter strong password
-   function validatePassword(password) {
-    const regex =
-      /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*?&])([a-zA-Z0-9@$!%*?&]{8,})$/;
-    return regex.test(password);
-  }
-  if (!validatePassword(password)) {
-    res.status(401);
-    throw new Error(
-      "invalid password!!! password must contain 1uppercase, 1lowercase, 1number and 1special character"
-    );
-  }
+  
   if (password !== confirm_password) {
     res.status(401);
     throw new Error("password not match");

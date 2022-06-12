@@ -4,6 +4,7 @@ require("colors");
 const DB = require("./config/db");
 const path = require("path");
 const userRoutes = require("./routes/userRoutes");
+const categoryRoutes = require("./routes/categoryRoutes");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
@@ -41,6 +42,7 @@ require("./config/passport")(passport)
 
 //@desc: Routes
 app.use("/api/users", userRoutes);
+app.use("/api/category", categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`.red.bold));
