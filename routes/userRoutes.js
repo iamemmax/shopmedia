@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const upload = require("../config/upload")
 
-let { createUser, activateUser,  loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic } = require("../controllers/Users");
+let { createUser, activateUser,  loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic } = require("../controllers/users/Users");
 
 
 //@desc create account

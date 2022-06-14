@@ -51,7 +51,7 @@ const advertSchema = new mongoose.Schema({
     gender: {
         type: String,
         required: true,
-        enum: ["male", "female", "All"]
+        enum: ["male", "female", "all"]
 
     },
 
@@ -64,10 +64,11 @@ const advertSchema = new mongoose.Schema({
         type: String,
     },
     ageGroup: {
-        type: Number,
+        type: String,
     },
     slug:{
         type:String,
+        unique:true,
         require:true
 
     },

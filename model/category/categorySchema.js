@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+
+// const subCategorySchema =new mongoose.Schema({
 const categorySchema = new mongoose.Schema({
   types: {
     type: String,

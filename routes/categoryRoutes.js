@@ -3,7 +3,7 @@ const router = express.Router()
 
 
 
-let {listCategories,createCategory, updateCategory,deleteCategory, addSubCategory} = require("../controllers/categories")
+let {listCategories,createCategory, updateCategory,deleteCategory, addSubCategory} = require("../controllers/category/categories")
 
 router.get("/", listCategories)
 router.post("/create", createCategory)

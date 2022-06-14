@@ -1,4 +1,4 @@
-const categorySchema = require("../model/categorySchema");
+const categorySchema = require("../../model/category/categorySchema");
 const asyncHandler = require("express-async-handler");
 
 

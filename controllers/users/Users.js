@@ -1,13 +1,17 @@
-const userSchema = require("../model/UserSchema");
-const tokenSchema = require("../model/tokenSchema");
+const userSchema = require("../../model/users/UserSchema");
+const tokenSchema = require("../../model/users/tokenSchema");
 const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const sendEmail = require("../config/email");
 const passport = require("passport");
 const sharp = require("sharp")
 const fs = require("fs");
-const cloudinary = require("../config/cloudinary")
+const cloudinary = require("../../config/cloudinary")
+const sendEmail = require("../../helper/email");
+const validateEmail = require("../../helper/emailValidate")
+
+
+
 // @desc: create account
 // @Route: /api/users/register
 // @Acess: public
@@ -33,14 +37,10 @@ exports.createUser = asyncHandler(async (req, res) => {
     !phone_no
   ) {
     res.status(401);
-    throw new Error("please fill all field");
+    throw new Error("All fields are required ");
   }
   // @desc check if user enter valid email
-  function validateEmail(email) {
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
-  }
+  
   if (!validateEmail(email)) {
     res.status(401);
     throw new Error("please enter a valid email");
