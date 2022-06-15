@@ -56,43 +56,43 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
 });
 
 // @desc: update category types
-// @Route: /api/category/update/:id
+// @Route: /api/sub-category/update/:id
 // @Acess: private
 
-// exports.updateCategory = asyncHandler(async(req, res) =>{
+exports.updateSubCart = asyncHandler(async(req, res) =>{
 
-//     let {types} = req.body
+    let {subCategory} = req.body
 
-//     const Category = await categorySchema.findById(req.params.id)
+    const subCart = await subCategorySchema.findOne({id:req.params.id})
 
-//     if(Category){
-//            try {
-//             let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id},{$set:{types:types || Category.types }},{new:true})
-//             if(updateCategoryType){
-//                 return res.status(201).json({
-//                     res: "ok",
-//                     message: "category  updates successfully",
-//                     updateCategoryType,
-//                   });
-//             }else{
-//                 return res.status(401).json({
-//                     message: "unable to add sub-category",
-//                   });
-//             }
-//            } catch (error) {
-//             res.status(401);
-//             throw new Error(error.message);
-//            }
+    if(Category){
+           try {
+            let updateSubCat = await subCategorySchema.findOneAndUpdate({id:req.params.id},{$set:{subCategory:subCategory || subCart.subCategory }},{new:true})
+            if(updateSubCat){
+                return res.status(201).json({
+                    res: "ok",
+                    message: "sub category updates successfully",
+                    data:updateSubCat,
+                  });
+            }else{
+                return res.status(401).json({
+                    message: "unable to update sub-category",
+                  });
+            }
+           } catch (error) {
+            res.status(401);
+            throw new Error(error.message);
+           }
 
-//     }
-// })
+    }
+})
 
 // // @desc: Deletes category
 // // @Route: /api/category/delete/:id
 // // @Acess: private
 // exports.deleteCategory = asyncHandler(async(req, res) =>{
 
-//     let deleteCart = await categorySchema.findByIdAndDelete(req.params.id)
+//     let deleteCart = await sub.findByIdAndDelete(req.params.id)
 //     if(deleteCart){
 //         return res.status(201).json({
 //             res: "ok",
