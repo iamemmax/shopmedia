@@ -6,11 +6,12 @@ const asyncHandler = require("express-async-handler");
 // @Acess: private
 exports.listSubCategories = asyncHandler(async (req, res) => {
   try {
-    let subCat = await subCategorySchema.find();
+    let subCat = await subCategorySchema.find().populate("typesId").select("-_id -__v");
     if (subCat.length > 0) {
       return res.status(201).json({
         res: "ok",
-        subCat,
+        total:subCat.length,
+        data:subCat,
       });
     }
   } catch (error) {
@@ -18,6 +19,30 @@ exports.listSubCategories = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+
+// @desc: list sub category under each cartegory
+// @Route: /api/
+// @Acess: private
+exports.listSubCatByCart = asyncHandler(async (req, res) => {
+  try {
+    let subCat = await subCategorySchema.find({typesId:req.params.typeId}).populate("typesId").select("-_id -__v");
+    if (subCat.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total:subCat.length,
+        data:subCat,
+      });
+    }
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
+  }
+});
+
+
+
+
+
 
 // @desc: create category
 // @Route: /api/category/create

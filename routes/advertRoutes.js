@@ -8,8 +8,8 @@ let {createAdvert, listAdverts, getSingleAdvert, updateAdvert, deleteAdver} = re
 router.get("/", listAdverts)
 router.post("/create",  upload.array("advertImgs", 5), createAdvert)
 router.get("/:slug", getSingleAdvert)
-router.put("/update/:id", upload.array("advertImgs", 5), updateAdvert)
-router.delete("/delete/:id",  deleteAdver)
+router.put("/update/:advert_id", upload.array("advertImgs", 5), updateAdvert)
+router.delete("/delete/:advert_id",  deleteAdver)
 
 
 
