@@ -3,6 +3,7 @@ const asyncHandler = require("express-async-handler");
 const sharp = require("sharp")
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary")
+const crypto = require("crypto")
 
 
 
@@ -13,7 +14,7 @@ const cloudinary = require("../../config/cloudinary")
 
 exports.createAdvert = asyncHandler(async (req, res) => {
 
-    let { address, localGovt, state, price, size, types, gender, postedBy, subTypes, interest, ageGroup } = req.body
+    let { address, localGovt, state, price, size, types, advert_id, gender, postedBy, subTypes, interest, ageGroup } = req.body
 
     if (!address || !localGovt || !state || !price || !size || !types || !gender || !subTypes || !interest || !ageGroup || !postedBy) {
         res.status(401);
@@ -30,52 +31,62 @@ exports.createAdvert = asyncHandler(async (req, res) => {
 
     // @desc compress images before uploading
     let advertCloudImages = [];
-    for (const file of files) {
-        await sharp(file.path)
-            .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
-            .resize(500, 500)
-            .png({ quality: 90, force: true })
+    
+    for (let i = 0; i < files.length; i++) {
+        const element = files[i];
+        await sharp(element.path)
+        .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
+        .resize(500, 500)
+        .png({ quality: 90, force: true })
 
-
-        let uploadImg = await cloudinary.uploader.upload(file.path)
-
-        fs.unlinkSync(file.path);
-
-        let productImgs = {
-            img_id: uploadImg.public_id,
-            img: uploadImg.secure_url
-        }
-        advertCloudImages.push(productImgs)
-
-    }
-    try {
-        let advertExist = await advertSchema.findOne({ address: address })
-        if (advertExist) {
-            res.status(401);
-            throw new Error("advert already exist");
-        } else {
-            let uploadAdvert = await new advertSchema({
-                address, localGovt, state, price, size, types, gender, postedBy, subTypes, interest, ageGroup, advertImgs: advertCloudImages
-            }).save()
-
-            if (uploadAdvert) {
-                res.status(201).json({
-                    res: "ok",
-                    message: "advert created successfully",
-                    data: uploadAdvert
-                })
-            } else {
-                res.status(401).json({
-                    res: "error",
-                    message: "something went wrong ",
-
-                })
+        // advertCloudImages.push(productImgs)
+            let uploadImg = await cloudinary.uploader.upload(element.path)
+            fs.unlinkSync(element.path);
+    
+    
+            let productImgs = {
+                    img_id: uploadImg.public_id,
+                    img: uploadImg.secure_url
+                }
+                
+               if(uploadImg){
+                advertCloudImages.push(productImgs)
+               }
             }
+                console.log(advertCloudImages)
+            try {
+                let advertExist = await advertSchema.findOne({ address: address })
+                if (advertExist) {
+                        res.status(401);
+                        throw new Error("advert already exist");
+                    } else {
+                        crypto.randomBytes(10, async (err, buffer) => {
+                            let token = buffer.toString("hex");
+                 
+                            let uploadAdvert = await new advertSchema({
+                                advert_id:`shop_media${token}`,address, localGovt, state, price, size, types, gender, postedBy, subTypes, interest, ageGroup, advertImgs: advertCloudImages
+                }).save()
+            
+    
+                if (uploadAdvert) {
+                    res.status(201).json({
+                        res: "ok",
+                        message: "advert created successfully",
+                        data: uploadAdvert
+                    })
+                } else {
+                    res.status(401).json({
+                        res: "error",
+                        message: "something went wrong ",
+    
+                    })
+                }
+            })
+            }
+        } catch (error) {
+            res.status(400)
+            throw new Error(error.message)
         }
-    } catch (error) {
-        res.status(400)
-        throw new Error(error.message)
-    }
 })
 
 
@@ -130,35 +141,40 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
     let { address, localGovt, state, price, size, types, gender, postedBy, subTypes, interest, ageGroup } = req.body
 
     let fileArray = []
-    console.log(savedAdvert.advertImgs);
-    if (req.files) {
-        let files = savedAdvert.advertImgs
-        files.forEach(async file => {
-            await cloudinary.uploader.destroy(file.img_id)
+    
 
-            let newFiles = req.files
-            for (const new_file of newFiles) {
-                await sharp(new_file.path)
-                    .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
-                    .resize(500, 500)
-                    .png({ quality: 90, force: true })
+    let files = req.files
 
+    
+    if (files) {
+    let advertDbImgs = savedAdvert.advertImgs
 
-                let uploadImg = await cloudinary.uploader.upload(new_file.path)
+    advertDbImgs.forEach(async img =>{
+        await cloudinary.uploader.destroy(img.img_id)
 
-                fs.unlinkSync(new_file.path);
-
+    })
+        for (let i = 0; i < files.length; i++) {
+            const element = files[i];
+            await sharp(element.path)
+            .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
+            .resize(500, 500)
+            .png({ quality: 90, force: true })
+            
+            // advertCloudImages.push(productImgs)
+                let uploadImg = await cloudinary.uploader.upload(element.path)
+                fs.unlinkSync(element.path);
+        
+        
                 let productImgs = {
-                    img_id: uploadImg.public_id,
-                    img: uploadImg.secure_url
+                        img_id: uploadImg.public_id,
+                        img: uploadImg.secure_url
+                    }
+                    
+                   if(uploadImg){
+                    fileArray.push(productImgs)
+                   }
                 }
-                console.log(productImgs);
-                fileArray.push(productImgs)
-
             }
-
-        })
-    }
     try {
         if (savedAdvert) {
             await advertSchema.findByIdAndUpdate({ _id: req.params.id },
@@ -183,7 +199,9 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
         res.status(401);
         // throw new Error(error.message);
     }
+
 })
+
 
 
 exports.deleteAdver = asyncHandler(async(req, res) =>{

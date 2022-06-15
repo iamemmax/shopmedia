@@ -5,9 +5,17 @@ const storage = multer.diskStorage({
     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
   },
   destination: (req, file, cb) => {
-    cb(null, "./public/img");
+    cb(null, "");
   },
 });
+// const storage = multer.memoryStorage({
+//   filename: (req, file, cb) => {
+//     cb(null, file.fieldname + "-" + Date.now() + file.originalname);
+//   },
+//   destination: (req, file, cb) => {
+//     cb(null, "");
+//   },
+// });
 
 const upload = multer({
   storage: storage,

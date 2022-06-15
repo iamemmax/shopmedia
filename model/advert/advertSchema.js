@@ -11,6 +11,9 @@ const advertSchema = new mongoose.Schema({
         enum: ["vendor", "Admin", "super Admin"]
     },
 
+    advert_id:{
+        type:String
+    },
     address: {
         type: String,
         required: true

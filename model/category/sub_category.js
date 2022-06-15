@@ -12,6 +12,9 @@ const subCategorySchema = new mongoose.Schema({
     type: String,
     
   },
+  id:{
+    type:Number
+  },
   
   createdAt: {
     type: Date,
@@ -19,4 +22,4 @@ const subCategorySchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("category", subCategorySchema);
+module.exports = mongoose.model("sub-category", subCategorySchema);

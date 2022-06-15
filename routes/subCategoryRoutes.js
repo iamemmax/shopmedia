@@ -5,6 +5,6 @@ const router = express.Router()
 
 let {createSubCategory} = require("../controllers/category/subCategory")
 
-router.post("/create", createSubCategory)
+router.post("/:id/create", createSubCategory)
 
 module.exports = router
