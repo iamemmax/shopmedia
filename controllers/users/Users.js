@@ -9,6 +9,7 @@ const fs = require("fs");
 const cloudinary = require("../../config/cloudinary")
 const sendEmail = require("../../helper/email");
 const validateEmail = require("../../helper/emailValidate")
+const jwt = require("jsonwebtoken")
 
 
 
@@ -235,44 +236,78 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
     res.status(401);
     throw new Error("please enter a valid email");
   }
+const user = await userSchema.findOne({email})
+if(!user){
+  return res.status(401).json({
+    message:"  Incorrect email or password"
+  })
+}
+try {
+  //desc:match password
+  bcrypt.compare(password, user.password, (err, isMatch) =>{
+    if(err){
+      return res.status(401).json({
+        message:err
+      })
+    }
+    if(isMatch){
+      const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
+        expiresIn: "12h",
+      });
+      return res.status(200).json({
+        message:"login successful",
+        token
+      })
+    }else{
+      return res.status(401).json({
+        message:"  Incorrect email or password"
+      })
+    }
+  })
+  
+} catch (error) {
+  return res.status(400).json({
+    message: error,
+  });
+}
 
+});
   
 
-  passport.authenticate("local", function (err, user) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({
-        message: "Email or password not correct",
-      });
-    }
+  // passport.authenticate("local", function (err, user) {
+  //   if (err) {
+  //     return next(err);
+  //   }
+  //   if (!user) {
+  //     return res.status(401).json({
+  //       message: "Email or password not correct",
+  //     });
+  //   }
 
-    req.logIn(user, function (err) {
-      if (err) {
-        next(err);
-        res.status(401);
-        throw new Error("Email or password not correct");
-      }
+  //   req.logIn(user, function (err) {
+  //     if (err) {
+  //       next(err);
+  //       res.status(401);
+  //       throw new Error("Email or password not correct");
+  //     }
 
-      let { _id, username, email, fullname, phone_no, company_name } = user;
-      let users = {
-        _id,
-        username,
-        email,
-        fullname,
-        phone_no,
-        company_name,
-      };
-      return res.status(201).json({
-        message: `logged in ${req.user.username}`,
-        isAuthenticated: true,
-        res: "ok",
-        users,
-      });
-    });
-  })(req, res, next);
-});
+  //     let { _id, username, email, fullname, phone_no, company_name } = user;
+  //     let users = {
+  //       _id,
+  //       username,
+  //       email,
+  //       fullname,
+  //       phone_no,
+  //       company_name,
+  //     };
+  //     return res.status(201).json({
+  //       message: `logged in ${req.user.username}`,
+  //       isAuthenticated: true,
+  //       res: "ok",
+  //       users,
+  //     });
+  //   });
+  // })(req, res, next);
 
 // @desc: logout account
 // @Route: /api/users/logout

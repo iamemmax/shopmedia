@@ -4,6 +4,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary");
 const crypto = require("crypto");
+const search = require("../../helper/search")
 
 // @desc: create advert
 // @Route: /api/advert/create
@@ -58,19 +59,26 @@ exports.createAdvert = asyncHandler(async (req, res) => {
       .resize(500, 500)
       .png({ quality: 90, force: true });
 
-    let uploadImg = await cloudinary.uploader.upload(element.path);
-    fs.unlinkSync(element.path);
+    // let uploadImg =  cloudinary.image(element.path,{transformation:[{width:500, height:500}]}).uploader.upload();
 
+    const uploadImg = await cloudinary.uploader.upload(element.path, { eager: [
+      { width: 500, height: 500 }, 
+      // { width: 260, height: 200, crop: "crop", gravity: "north"} 
+    ]
+    })
+    fs.unlinkSync(element.path);
+    console.log( {img: uploadImg.eager[0].secure_url})
+    
     let productImgs = {
       img_id: uploadImg.public_id,
-      img: uploadImg.secure_url,
+      img: uploadImg.eager[0].secure_url,
     };
 
-    if (uploadImg) {
+  //   if (uploadImg) {
       advertCloudImages.push(productImgs);
-    }
+  //   }
   }
-  console.log(advertCloudImages);
+  // console.log(advertCloudImages);
   try {
     let advertExist = await advertSchema.findOne({ address: address });
     if (advertExist) {
@@ -94,7 +102,8 @@ exports.createAdvert = asyncHandler(async (req, res) => {
           interest,
           ageGroup,
           advertImgs: advertCloudImages,
-        }).save();
+        }).save()
+        
 
         if (uploadAdvert) {
           res.status(201).json({
@@ -258,7 +267,7 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
   }
 });
 
-exports.deleteAdver = asyncHandler(async (req, res) => {
+exports.deleteAdvert = asyncHandler(async (req, res) => {
   const advert = await advertSchema.findOne({advert_id:req.params.advert_id});
 
   try {
@@ -286,3 +295,21 @@ exports.deleteAdver = asyncHandler(async (req, res) => {
     throw new Error(error.message);
   }
 });
+
+
+exports.searchAdvert = asyncHandler(async(req, res) =>{
+  search(advertSchema, req, res )
+    // let searchResult = await  advertSchema.find(keyword).select("-_id, -__v")
+  // console.log(keyword)
+  // if(searchResult){
+  //   res.status(201).json({
+  //     res: "ok",
+  //     total:searchResult.length,
+     
+  //     data: searchResult,
+  //   });
+  // }else{
+
+  // }
+  
+})

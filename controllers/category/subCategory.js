@@ -81,87 +81,52 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
 });
 
 // @desc: update category types
-// @Route: /api/category/update/:id
+// @Route: /api/sub-category/update/:id
 // @Acess: private
 
-// exports.updateCategory = asyncHandler(async(req, res) =>{
+exports.updateSubCart = asyncHandler(async(req, res) =>{
 
-//     let {types} = req.body
+    let {subCategory} = req.body
 
-//     const Category = await categorySchema.findById(req.params.id)
+    const subCart = await subCategorySchema.findOne({id:req.params.id})
 
-//     if(Category){
-//            try {
-//             let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id},{$set:{types:types || Category.types }},{new:true})
-//             if(updateCategoryType){
-//                 return res.status(201).json({
-//                     res: "ok",
-//                     message: "category  updates successfully",
-//                     updateCategoryType,
-//                   });
-//             }else{
-//                 return res.status(401).json({
-//                     message: "unable to add sub-category",
-//                   });
-//             }
-//            } catch (error) {
-//             res.status(401);
-//             throw new Error(error.message);
-//            }
+    if(subCart){
+           try {
+            let updateSubCat = await subCategorySchema.findOneAndUpdate({id:req.params.id},{$set:{subCategory:subCategory || subCart.subCategory }},{new:true}).select("-_id -__v")
+            if(updateSubCat){
+                return res.status(201).json({
+                    res: "ok",
+                    message: "sub category updates successfully",
+                    data:updateSubCat,
+                  });
+            }else{
+                return res.status(401).json({
+                    message: "unable to update sub-category",
+                  });
+            }
+           } catch (error) {
+            res.status(401);
+            throw new Error(error.message);
+           }
 
-//     }
-// })
+    }
+})
 
-// // @desc: Deletes category
-// // @Route: /api/category/delete/:id
-// // @Acess: private
-// exports.deleteCategory = asyncHandler(async(req, res) =>{
+// @desc: Deletes category
+// @Route: /api/sub-category/delete/:id
+// @Acess: private
+exports.deleteSubCategory = asyncHandler(async(req, res) =>{
 
-//     let deleteCart = await categorySchema.findByIdAndDelete(req.params.id)
-//     if(deleteCart){
-//         return res.status(201).json({
-//             res: "ok",
-//             message: "category deleted successfully",
-//             deleteCart,
-//           });
-//     }else{
-//         return res.status(401).json({
-//             message: "unable to delete category",
-//           });
-//     }
-// })
-
-// // @desc: create subCategory
-// // @Route: /api/category/add-subTypes/:id
-// // @Acess: private
-
-// exports.addSubCategory = asyncHandler(async(req, res) =>{
-//     let {subCategory} = req.body
-
-//     if(!subCategory){
-//         res.status(401);
-//         throw new Error("please select sub category type");
-//     }
-//     const findCategory = await categorySchema.findById(req.params.id)
-
-//     if(findCategory){
-//            try {
-//             let addSubTypes = await categorySchema.findByIdAndUpdate({_id:req.params.id}, {$push:{subTypes:subCategory}},{new:true})
-//             if(addSubTypes){
-//                 return res.status(201).json({
-//                     res: "ok",
-//                     message: "category added successfully",
-//                     addSubTypes,
-//                   });
-//             }else{
-//                 return res.status(401).json({
-//                     message: "unable to add sub-category",
-//                   });
-//             }
-//            } catch (error) {
-//             res.status(401);
-//             throw new Error(error.message);
-//            }
-
-//     }
-// })
+    let deleteCart = await subCategorySchema.findOneAndDelete({id:req.params.id}).select("-_id, -__v")
+    if(deleteCart){
+        return res.status(201).json({
+            res: "ok",
+            message: "sub-category deleted successfully",
+            deleteCart,
+          });
+    }else{
+        return res.status(401).json({
+            message: "unable to delete category",
+          });
+    }
+})

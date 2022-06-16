@@ -3,10 +3,11 @@ require("dotenv").config();
 require("colors");
 const DB = require("./config/db");
 const path = require("path");
-const userRoutes = require("./routes/userRoutes");
-const categoryRoutes = require("./routes/categoryRoutes");
-const subCategoryRoutes = require("./routes/subCategoryRoutes");
-const advertRoutes = require("./routes/advertRoutes");
+const userRoutes = require("./routes/user/userRoutes");
+const categoryRoutes = require("./routes/category/categoryRoutes");
+const subCategoryRoutes = require("./routes/category/subCategoryRoutes");
+const advertRoutes = require("./routes/advert/advertRoutes");
+const searchRoutes = require("./routes/search/searchRoutes");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
@@ -47,6 +48,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/advert", advertRoutes);
 app.use("/api/sub-category", subCategoryRoutes);
+app.use("/api/find", searchRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`.red.bold));
