@@ -51,6 +51,11 @@ const advertSchema = new mongoose.Schema({
         required: true
 
     },
+    landmark: {
+        type: String,
+        required: true
+
+    },
     gender: {
         type: String,
         required: true,

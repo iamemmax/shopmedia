@@ -8,6 +8,7 @@ const categoryRoutes = require("./routes/category/categoryRoutes");
 const subCategoryRoutes = require("./routes/category/subCategoryRoutes");
 const advertRoutes = require("./routes/advert/advertRoutes");
 const searchRoutes = require("./routes/search/searchRoutes");
+const RateCardRoutes = require("./routes/Ratecard/pages");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
@@ -49,6 +50,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/advert", advertRoutes);
 app.use("/api/sub-category", subCategoryRoutes);
 app.use("/api/find", searchRoutes);
+app.use("/api/adpages", RateCardRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`.red.bold));

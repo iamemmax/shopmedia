@@ -5,14 +5,18 @@
 
     let {
       search,
-       subTypes,
+      types,
       order_by,
+      subTypes,
+      localGovt,
+      state,
+      ageGroup,
       page = 1,
       limit = 50,
-       types,
+      
     } = req.query;
     const filterOptions = {
-      // $and: [
+      $and:[{
         
 
           $or: [
@@ -23,14 +27,14 @@
           { size: { $regex: search, $options: "i" } },
           { subTypes: { $regex: search, $options: "i" } },
           { interest: { $regex: search, $options: "i" } },    
-         
-          
-           
-          ]
-        
-        // { subTypes },
-        // { types },
-      // ],
+          ],
+      },
+        { subTypes },
+        { types },
+        { state },
+        { localGovt },
+        // { ageGroup },
+      ],
     };
     const results = await model.find(filterOptions)
       .limit(limit * 1) //limit search result
