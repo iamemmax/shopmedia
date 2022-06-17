@@ -5,6 +5,7 @@ let {searchAdvert} = require("../../controllers/advert/advert")
 
 
 router.get("/",  searchAdvert)
+// router.get("/search",  searchBySubTypes)
 
 
 

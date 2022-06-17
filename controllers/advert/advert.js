@@ -4,7 +4,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary");
 const crypto = require("crypto");
-const search = require("../../helper/search");
+const {search} = require("../../helper/search");
 const compressImg = require("../../helper/sharp");
 
 // @desc: create advert
@@ -57,11 +57,7 @@ exports.createAdvert = asyncHandler(async (req, res) => {
 
   for (let i = 0; i < files.length; i++) {
     const element = files[i];
-    await sharp(element.path)
-      .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
-      .resize(500, 500)
-      .png({ quality: 90, force: true });
-
+    compressImg(element.path, 500, 500)
     // let uploadImg =  cloudinary.image(element.path,{transformation:[{width:500, height:500}]}).uploader.upload();
 
     const uploadImg = await cloudinary.uploader.upload(element.path, {
@@ -260,6 +256,7 @@ exports.updateAdvertImg = asyncHandler(async (req, res) => {
       };
       fileArray.push(productImgs);
     }
+    fs.unlinkSync(file.path);
   }
   fileArray.map(async (data) => {
    await advertSchema
@@ -354,3 +351,29 @@ exports.deleteAdvertImg = asyncHandler(async (req, res) => {
 exports.searchAdvert = asyncHandler(async (req, res) => {
   search(advertSchema, req, res);
 });
+
+exports.searchBySubTypes =  asyncHandler(async (req, res) => {
+  let order = req.body.order ?  req.body.order: "asc";
+  let sortBy = req.body.sortBy ?  req.body.sortBy: "asc";
+  let limit = req.body.limit ? parseInt(req.body.limit) : 100
+  let skip = parseInt(req.body.skip) 
+
+   let findArrgs = {}
+   
+    // for (let key in req.body.filters) {
+    //   if (req.body.filters[key].length > 0) {
+    //     findArrgs[key] = req.body.filters[key];
+    //     console.log(req.body.filters[key]);
+        
+    //   }
+    // }
+    // await advertSchema.find({state:req.body.state}).select("-_id").sort([[sortBy, order]]).skip(skip).limit(limit).exec((err, data)=>{
+    //   if(err)return res.status(400).send(err)
+    //   res.json({
+    //     total:data.length,
+    //     data
+    //   })
+
+    // })
+
+})

@@ -9,7 +9,8 @@ const fs = require("fs");
 const cloudinary = require("../../config/cloudinary")
 const sendEmail = require("../../helper/email");
 const validateEmail = require("../../helper/emailValidate")
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+const compressImg = require("../../helper/sharp");
 
 
 
@@ -22,7 +23,6 @@ exports.createUser = asyncHandler(async (req, res) => {
     email,
     fullname,
     password,
-    confirm_password,
     phone_no,
     company_name,
   } = req.body;
@@ -34,25 +34,21 @@ exports.createUser = asyncHandler(async (req, res) => {
     !email ||
     !fullname ||
     !password ||
-    !confirm_password ||
+
     !phone_no
   ) {
     res.status(401);
     throw new Error("All fields are required ");
   }
   // @desc check if user enter valid email
-  
+  function validateEmail(email) {
+    const regex =
+      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(email);
+  }
   if (!validateEmail(email)) {
     res.status(401);
     throw new Error("please enter a valid email");
-  }
-
-  
-  // @desc check if password1 = password2
-
-  if (password !== confirm_password) {
-    res.status(401);
-    throw new Error("password not match");
   }
 
   try {
@@ -72,24 +68,26 @@ exports.createUser = asyncHandler(async (req, res) => {
     } else {
       bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async (err, hash) => {
-          crypto.randomBytes(48, async (err, buffer) => {
+          crypto.randomBytes(20, async (err, buffer) => {
             let token = buffer.toString("hex");
             if (err) console.log(err);
 
             let newUser = await new userSchema({
+              user_id:`user_id_${token}`,
               username,
               email,
               fullname,
               password: hash,
               phone_no,
               company_name,
+
             }).save();
 
             if (newUser) {
-              let { _id, username, email, fullname, phone_no, company_name } =
+              let { user_id, username, email, fullname, phone_no, company_name } =
                 newUser;
               let user = {
-                _id,
+                user_id,
                 username,
                 email,
                 fullname,
@@ -101,14 +99,13 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 token,
               }).save();
-
               sendEmail(
                 email,
                 "Welcome to ShopMedia.ng",
                 `
                 <div>
                 <h2>Welcome to ShopMedia</h2>
-                <p>Hi ${Username},</p>
+                <p>Hi ${username},</p>
                 <p>My name is Chidi Onwumere, the CEO of ShopMedia. Thank you for signing up on the
                 Shopmedia platform, we’re delighted to have you on board.
                 You join thousands of Companies across Africa, using our digital platform and infrastructure to
@@ -137,25 +134,25 @@ exports.createUser = asyncHandler(async (req, res) => {
                 `
                 <div>
                 <h2>Welcome to ShopMedia</h2>
-                <p>Hi ${Username},</p>
+                <p>Hi ${username},</p>
                 <p>Please click the button below to verify your email address.</p>
 
-                <a href="http://localhost:5000/api/users/verify/${_id}/${token}">
+                <a href="http://localhost:5000/api/users/verify/${user_id}/${token}">
                 verify account
+                </a>;
 
                   <p>If you did not create an account, no further action is required.
                   Regards,</p>
                 <span>
                 ShopMedia Team
                 https://shopmedia.ng</span>
-                </a>;
                 </div>
                 `
               );
 
               return res.status(201).json({
                 res: "ok",
-                message: "Please click link sent to your email to complete your registration",
+                message: "Please click on the link sent to your email to complete your registration",
                 user,
               });
             }
@@ -170,11 +167,11 @@ exports.createUser = asyncHandler(async (req, res) => {
 });
 
 // @desc: verify account
-// @Route: /api/users/verify/:id/:token
+// @Route: /api/users/verify/:user_id/:token
 // @Acess: public
 exports.activateUser = asyncHandler(async (req, res) => {
   try {
-    const user = await userSchema.findById({ _id: req.params.id });
+    const user = await userSchema.findOne({ user_id: req.params.user_id });
 
     if (!user) {
       res.status(401);
@@ -186,7 +183,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
     }
 
     const token = await tokenSchema.findOne({
-      userId: req.params.id,
+      userId: req.params.user_id,
       token: req.params.token,
     });
     if (!token) {
@@ -195,7 +192,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
     }
 
     let updateUser = await userSchema.findOneAndUpdate(
-      { _id: req.params.id },
+      {user_id: req.params.user_id },
       { $set: { status: true } },
       { new: true }
     );
@@ -372,7 +369,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
             the link below to set a new password:</p>
             <br>
             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
-            <a href="http://localhost:5000/api/users/reset-password/${user._id}/${token}">
+            <a href="http://localhost:5000/api/users/reset-password/${user.user_id}/${token}">
             Reset Password
             </a>;
             <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
@@ -425,7 +422,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
       
       $and: [
         {
-          id: req.params.id,
+          user_id: req.params.user_id,
           token: req.params.token,
         },
       ],
@@ -439,7 +436,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
       bcrypt.hash(password, salt, async (err, hash) => {
   
     let resetPassword = await userSchema.findOneAndUpdate(
-      { _id: req.params.id },
+      { user_id: req.params.user_id },
       { $set: { password: hash, token:'' } },
       { new: true }
     );
@@ -468,32 +465,27 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 //@desc: change password
 //@access: private
 //@method: put
-//@route: /api/users/password/:id
+//@route: /api/users/change-password/user_id
 exports.ChangePassword = asyncHandler(async (req, res) => {
-  let { oldpassword, password, confirm_password } = req.body;
-    if(!oldpassword|| !password|| !confirm_password){
-      res.status(401);
-      throw new Error("please fill all field");
-    }
-  
-  if (password !== confirm_password) {
-    res.status(401);
-    throw new Error("password not match");
-  }
-  const user = await userSchema.findOne({ _id: req.params.id });
+  let { oldpassword, password} = req.body;
+
+  const user = await userSchema.findOne({ user_id: req.params.user_id });
   if (user) {
+    console.log(user)
     try {
       bcrypt.compare(oldpassword, user.password, (err, isMatch) => {
-        if (!isMatch) {
+        if (err) {
           res.send("old password not matched");
         }
         if (isMatch) {
           bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(password, salt, async (errr, hash) => {
-              
-            
+            bcrypt.hash(password, salt, async (err, hash) => {
+              if (user.password === hash) {
+                res.send("error");
+                return;
+              }
               let update = await userSchema.findOneAndUpdate(
-                { _id: req.params.id },
+                { user_id: req.params.user_id},
                 { $set: { password: hash || user.password } },
                 { new: true }
               );
@@ -504,8 +496,8 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
                 });
               } else {
                 res.status(201).json({
-                  message: " password updated successfully",
-
+                  res:"ok",
+                  message:"password change successfully"
                 });
               }
             });
@@ -533,31 +525,30 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
   }
 
   console.log(req.file)
-  const users = await userSchema.findById(req.params.id)
-   if(users.pic.length < 0){
-     await cloudinary.uploader.destroy(users[0].img_id)
-
-   }
-   
-  try {
-    await sharp(req.file.path)
-    .flatten({ background: { r: 255, g: 255, b: 255, alpha: 0 } })
-    .resize(200, 200)
-    .png({quality:90, force: true})
-    // .toFile(`./public/img/user${req.file.filename}.png`);
+  const users = await userSchema.findOne({user_id:req.params.user_id})
+  //  if(users.pic.length > 0){
+    //  }
     
-    let uploadImg = await cloudinary.uploader.upload(req.file.path)
+  try {
+    compressImg(req.file.path, 100, 100)
+    
+    let uploadImg = await cloudinary.uploader.upload(req.file.path, {
+      eager: [
+        { width: 100, height: 100 },
+      ],
+    })
 
     fs.unlinkSync(req.file.path);
     if(uploadImg){
       let profileImg = {
         img_id:uploadImg.public_id,
-        img:uploadImg.secure_url
+        img:uploadImg.eager[0].secure_url,
       }
       console.log(profileImg)
-      let updateProfile = await userSchema.findOneAndUpdate({_id:req.params.id}, {$set:{pic:[profileImg]}}, {new:true})
-
+      let updateProfile = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{pic:[profileImg]}}, {new:true}).select("-_id, -__v")
+      
       if(updateProfile){
+        await cloudinary.uploader.destroy(users.pic[0]?.img_id)
         res.status(201).json({
           message:"profile img updated successfully"
         })
@@ -574,7 +565,6 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
         
      
   } catch (error) {
-    fs.unlinkSync(req.file.path);
     res.status(401)
     throw new Error(error.message)
   }

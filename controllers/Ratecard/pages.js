@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
+const { filterPages } = require('./../../helper/search');
 const sharp = require("sharp");
+const fs = require("fs");
 const crypto = require("crypto");
 const cloudinary = require("../../config/cloudinary");
 const cardSchema = require("../../model/Ratecard/CardSchema");
@@ -27,12 +29,12 @@ exports.AddPages = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("name already exist");
   } else {
-    compressImg(req, 200, 200)
+    compressImg(req.file.path, 200, 200)
 
     const uploadImg = await cloudinary.uploader.upload(req.file.path, {
       eager: [{ width: 200, height: 200 }],
     });
-
+    fs.unlinkSync(req.file.path);
     let pageImg = {
       img_id: uploadImg.public_id,
       img: uploadImg.eager[0].secure_url,
@@ -131,26 +133,13 @@ exports.getSinglePage =  asyncHandler(async(req, res) =>{
 
 exports.updatePages = asyncHandler(async(req, res) =>{
   let {name, category} = req.body
-  let fileArray = []
-  const getPages = await cardSchema.findOne({page_id:req.params.page_id})
-  if(getPages){
-    if(req.file){
-      compressImg(req, 200, 200)
 
-      const uploadImg = await cloudinary.uploader.upload(req.file.path, {
-        eager: [{ width: 200, height: 200 }],
-      });
   
-      let pageImg = {
-        img_id: uploadImg.public_id,
-        img: uploadImg.eager[0].secure_url,
-      };
-      fileArray.push(pageImg);
-    }
+  const getPages = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id, -__v")
+
   
-  }
   try {
-    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category, pic:fileArray || getPages.pic}},{new:true}).select("-_id, -__v")
+    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id, -__v")
       if(!update){
         res.status(401).json({message:"something went wrong"})
       }
@@ -163,8 +152,119 @@ exports.updatePages = asyncHandler(async(req, res) =>{
       }
     
   } catch (error) {
-    res.status(401).json({message:error.message})
+   return res.status(401).json({message:error.message})
   }
 
+  
+})
 
+
+
+//@desc: update advert pages image
+//@access: private
+//@method: put
+//@route: /api/adpage/update/img/page_id
+
+exports.updateLogoImg =  asyncHandler(async(req, res) =>{
+  let {pic} = await cardSchema.findOne({page_id:req.params.page_id})
+  let fileArray = []
+  if(req.file){
+    compressImg(req.file.path, 200, 200)
+    
+    const uploadImg = await cloudinary.uploader.upload(req.file.path, {
+      eager: [{ width: 200, height: 200 }],
+    });
+    fs.unlinkSync(req.file.path);
+
+    let pageImg = {
+      img_id: uploadImg.public_id,
+      img: uploadImg.eager[0].secure_url,
+    };
+    fileArray.push(pageImg);
+  }
+  try {
+          let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{pic:fileArray }},{new:true}).select("-_id, -__v")
+    if(update){
+      await cloudinary.uploader.destroy(pic[0]?.img_id)
+      
+      return  res.status(201).json({
+          res:"ok",
+          message:"image updated successfully",
+          data:update
+        })
+     }else{
+      res.status(401).json({message:"something went wrong"})
+  
+     }
+    
+  } catch (error) {
+   return res.status(401).json({message:error.message})
+    
+  }
+
+})
+
+
+exports.removeAdPage =  asyncHandler(async(req, res) =>{
+  let pages = await cardSchema.findOne({page_id:req.params.page_id})
+
+
+  if(pages){
+
+    let removePage = await cardSchema.findOneAndDelete({page_id:req.params.page_id}).select("-_id, -__v")
+    if(removePage){
+      await cloudinary.uploader.destroy(pages.pic[0]?.img_id)
+      return  res.status(201).json({
+        res:"ok",
+        message:"pages deleted successfully",
+        data:removePage
+      })
+    }else{
+      res.status(401).json({message:"something went wrong"})
+      
+    }
+    
+  }else{
+    res.status(401).json({message:"pages not found"})
+    
+  }
+  })
+
+
+  exports.searchPages = asyncHandler(async(req, res)=>{
+   let {name} = req.body
+   let pages = await cardSchema.find({category:req.params.category})
+   if(pages){
+    if(pages){
+      filterPages(req, res, cardSchema)
+
+    }else{
+      res.status(401).json({res:"err", message:`${name} not found`})
+    }
+  }
+  })
+  
+
+  //@desc: update advert pages image
+//@access: private
+//@method: put
+//@route: /api/adpage/categories
+
+exports.listPagesByCategory = asyncHandler(async(req, res) =>{
+  try {
+    let getPages = await cardSchema.find({category:req.params.category}, {_id:0, __v:0})
+  if(getPages){
+    res.status(201).json({
+      res:"ok",
+      total:getPages.length,
+      message:"success",
+      data:getPages
+    })
+  }
+  } catch (error) {
+
+    res.status(401).json({
+      message:error.message
+    })
+  }
 })
