@@ -78,7 +78,9 @@ exports.createAdvert = asyncHandler(async (req, res) => {
         { width: 500, height: 500 },
        
       ],
-    });
+      upload_preset: "shopmedia",
+      url_suffix: "shopmedia"
+    },);
     let productImgs = {
       img_id: uploadImg.public_id,
       img: uploadImg.eager[0].secure_url,
