@@ -5,7 +5,7 @@ exports.search = async (model, req, res) => {
     $or: [
       { name: { $regex: search, $options: "i" } },
       { state: { $regex: search, $options: "i" } },
-      { localGovt: { $regex: search, $options: "i" } },
+      { city: { $regex: search, $options: "i" } },
       { types: { $regex: search, $options: "i" } },
       { landmark: { $regex: search, $options: "i" } },
       { size: { $regex: search, $options: "i" } },

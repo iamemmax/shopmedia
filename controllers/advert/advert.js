@@ -43,28 +43,40 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("All fields are required");
   }
+
   let files = req.files;
 
-  if (!files) {
-     res.status(401);
-    throw new Error("choose at least one image");
+  const {advertImgs} = req.body
+
+  if (!advertImgs && !files.length) {
+    return res.status(401).json({
+      res:"failed",
+      // status_code: 
+      message:"choose at least one image"
+    })
+    // throw new Error("choose at least one image");
     
   }
+  let advertExist = await advertSchema.findOne({ address: address });
+    if (advertExist) {
+      res.status(401);
+      throw new Error("advert already exist");
+    } 
 
   // @desc compress images before uploading
   let advertCloudImages = [];
-  console.log(files)
+  
+ 
 
   for (let i = 0; i < files.length; i++) {
-    console.log(element)
     const element = files[i];
+     
     compressImg(element.path, 500, 500)
-    // let uploadImg =  cloudinary.image(element.path,{transformation:[{width:500, height:500}]}).uploader.upload();
 
     const uploadImg = await cloudinary.uploader.upload(element.path, {
       eager: [
         { width: 500, height: 500 },
-        // { width: 260, height: 200, crop: "crop", gravity: "north"}
+       
       ],
     });
     let productImgs = {
@@ -73,18 +85,14 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     };
     console.log(productImgs)
 
-    //   if (uploadImg) {
+    //  
     advertCloudImages.push(productImgs);
-    //   }
+
     fs.unlinkSync(element.path);
+   
   }
-  // console.log(advertCloudImages);
   try {
-    let advertExist = await advertSchema.findOne({ address: address });
-    if (advertExist) {
-      res.status(401);
-      throw new Error("advert already exist");
-    } else {
+    
       crypto.randomBytes(10, async (err, buffer) => {
         let token = buffer.toString("hex");
 
@@ -118,12 +126,12 @@ exports.createAdvert = asyncHandler(async (req, res) => {
           });
         }
       });
-    }
+    
   } catch (error) {
     res.status(400);
     throw new Error(error.message);
   }
-});
+ });
 
 // @desc: list all advert
 // @Route: /api/advert/

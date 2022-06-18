@@ -6,8 +6,8 @@ const ensureLogin = require("../../helper/ensureLogin")
 let {createAdvert, listAdverts, getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg,deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
 
 
-router.get("/", ensureLogin, listAdverts)
-router.post("/create",  ensureLogin, upload.array("advertImgs", 5), createAdvert)
+router.get("/",  listAdverts)
+router.post("/create", ensureLogin ,upload.array("advertImgs", 5), createAdvert)
 router.post("/search", ensureLogin,   searchBySubTypes)
 router.get("/:slug",ensureLogin, getSingleAdvert)
 router.put("/update/:advert_id", ensureLogin, updateAdvert)
