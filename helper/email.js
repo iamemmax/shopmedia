@@ -19,7 +19,7 @@ module.exports = async (email, subject, html) => {
         clientId: CLIENT_ID,
         clientSecret: CLIENT_SECRETE,
         refreshToken: REFRESH_TOKEN,
-        user: process.env.EMAIL,
+        user: process.env.EMAIL_CREDENTIAL,
         accessToken: accessToken,
         // pass: process.env.PASSWORD,
       },
