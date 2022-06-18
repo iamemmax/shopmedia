@@ -7,7 +7,7 @@ let {createAdvert, listAdverts, getSingleAdvert, updateAdvert, deleteAdvert,upda
 
 
 router.get("/", ensureLogin, listAdverts)
-router.post("/create", upload.array("advertImgs", 5), ensureLogin, createAdvert)
+router.post("/create",  ensureLogin, upload.array("advertImgs", 5), createAdvert)
 router.post("/search", ensureLogin,   searchBySubTypes)
 router.get("/:slug",ensureLogin, getSingleAdvert)
 router.put("/update/:advert_id", ensureLogin, updateAdvert)

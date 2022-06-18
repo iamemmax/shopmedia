@@ -191,7 +191,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
       throw new Error("invalid link");
     }
 
-    let updateUser = await userSchema.findOneAndUpdate(
+    let userFound = await userSchema.findOneAndUpdate(
       {user_id: req.params.user_id },
       { $set: { status: true } },
       { new: true }
@@ -214,7 +214,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
 // @Route: /api/users/login
 // @Acess: public
 
-exports.loginUser = asyncHandler(async (req, res, next) => {
+exports.loginUser = asyncHandler(async(req, res) => {
   let { email, password } = req.body;
 
   console.log(req.body);
@@ -235,17 +235,18 @@ exports.loginUser = asyncHandler(async (req, res, next) => {
   }
 const user = await userSchema.findOne({email})
 if(!user){
-  return res.status(401).json({
-    message:"  Incorrect email or password"
-  })
+   res.status(401)
+  throw new Error("Incorrect email or password");
+  
+ 
 }
 try {
   //desc:match password
   bcrypt.compare(password, user.password, (err, isMatch) =>{
     if(err){
-      return res.status(401).json({
-        message:err
-      })
+       res.status(401)
+      throw new Error(error.message);
+
     }
     if(isMatch){
       const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
@@ -256,16 +257,18 @@ try {
         token
       })
     }else{
-      return res.status(401).json({
-        message:"  Incorrect email or password"
+      
+       return res.status(401).json({
+        message:"Incorrect email or password",
+      
       })
+
     }
   })
   
 } catch (error) {
-  return res.status(400).json({
-    message: error,
-  });
+    res.status(401)
+  throw new Error(error.message);
 }
 
 });
@@ -354,9 +357,9 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
       let token = buffer.toString("hex");
       if (err) console.log(err);
 
-     let updateUser = await userSchema.findOneAndUpdate({email:email}, {$set:{token:token}},{new:true})
+     let userFound = await userSchema.findOneAndUpdate({email:email}, {$set:{token:token}},{new:true})
 
-     if(updateUser){
+     if(userFound){
 
      
           sendEmail(
@@ -475,14 +478,19 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
     try {
       bcrypt.compare(oldpassword, user.password, (err, isMatch) => {
         if (err) {
-          res.send("old password not matched");
+          res.status(401);
+          throw new Error(
+            "old password not matched"
+          );
         }
         if (isMatch) {
           bcrypt.genSalt(10, function (err, salt) {
             bcrypt.hash(password, salt, async (err, hash) => {
               if (user.password === hash) {
-                res.send("error");
-                return;
+                res.status(401);
+                throw new Error(
+                  "old password and new password must not match"
+                );
               }
               let update = await userSchema.findOneAndUpdate(
                 { user_id: req.params.user_id},

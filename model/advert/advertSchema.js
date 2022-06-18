@@ -19,7 +19,7 @@ const advertSchema = new mongoose.Schema({
         required: true
 
     },
-    localGovt: {
+    city: {
         type: String,
         required: true
 
@@ -51,7 +51,7 @@ const advertSchema = new mongoose.Schema({
         required: true
 
     },
-    landmark: {
+    landmark:{
         type: String,
         required: true
 

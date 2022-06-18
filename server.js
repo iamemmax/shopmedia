@@ -23,7 +23,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //@desc: custom error middlewares
-app.use(errorHandler);
 // @desc:DATABASE INITIALIZATION
 DB();
 
@@ -52,5 +51,6 @@ app.use("/api/sub-category", subCategoryRoutes);
 app.use("/api/find", searchRoutes);
 app.use("/api/adpages", RateCardRoutes);
 
+app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`.red.bold));

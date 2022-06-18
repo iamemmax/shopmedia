@@ -1,6 +1,5 @@
 const advertSchema = require("../../model/advert/advertSchema");
 const asyncHandler = require("express-async-handler");
-const sharp = require("sharp");
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary");
 const crypto = require("crypto");
@@ -14,7 +13,7 @@ const compressImg = require("../../helper/sharp");
 exports.createAdvert = asyncHandler(async (req, res) => {
   let {
     address,
-    localGovt,
+    city,
     state,
     price,
     size,
@@ -30,7 +29,7 @@ exports.createAdvert = asyncHandler(async (req, res) => {
 
   if (
     !address ||
-    !localGovt ||
+    !city ||
     !state ||
     !landmark ||
     !price ||
@@ -39,23 +38,25 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     !gender ||
     !subTypes ||
     !interest ||
-    !ageGroup ||
-    !postedBy
+    !ageGroup 
   ) {
     res.status(401);
-    throw new Error("please fill all field");
+    throw new Error("All fields are required");
   }
   let files = req.files;
 
   if (!files) {
-    res.status(401);
-    throw new Error("please choose a photo");
+     res.status(401);
+    throw new Error("choose at least one image");
+    
   }
 
   // @desc compress images before uploading
   let advertCloudImages = [];
+  console.log(files)
 
   for (let i = 0; i < files.length; i++) {
+    console.log(element)
     const element = files[i];
     compressImg(element.path, 500, 500)
     // let uploadImg =  cloudinary.image(element.path,{transformation:[{width:500, height:500}]}).uploader.upload();
@@ -66,11 +67,11 @@ exports.createAdvert = asyncHandler(async (req, res) => {
         // { width: 260, height: 200, crop: "crop", gravity: "north"}
       ],
     });
-
     let productImgs = {
       img_id: uploadImg.public_id,
       img: uploadImg.eager[0].secure_url,
     };
+    console.log(productImgs)
 
     //   if (uploadImg) {
     advertCloudImages.push(productImgs);
@@ -90,19 +91,19 @@ exports.createAdvert = asyncHandler(async (req, res) => {
         let uploadAdvert = await new advertSchema({
           advert_id: `shop_media${token}`,
           address,
-          localGovt,
+          city,
           state,
           price,
           size,
           types,
           gender,
-          postedBy,
+          postedBy:req?.user,
           subTypes,
           interest,
           ageGroup,
           landmark,
           advertImgs: advertCloudImages,
-        }).save();
+        }).save()
 
         if (uploadAdvert) {
           res.status(201).json({
@@ -181,7 +182,7 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
   });
   let {
     address,
-    localGovt,
+    city,
     state,
     price,
     size,
@@ -203,7 +204,7 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
       {
         $set: {
           address: address || savedAdvert.address,
-          localGovt: localGovt || savedAdvert.localGovt,
+          city: city || savedAdvert.city,
           state: state || savedAdvert.state,
           price: price || savedAdvert.price,
           size: size || savedAdvert.size,
@@ -312,6 +313,9 @@ exports.deleteAdvert = asyncHandler(async (req, res) => {
             });
           }
         });
+    }else{
+      res.status(401)
+      throw new Error("Advert not found")
     }
   } catch (error) {
     return res.status(401).json({
