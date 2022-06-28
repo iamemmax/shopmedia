@@ -1,5 +1,6 @@
 const negotiateSchema = require("../../model/Business/negotiateSchema");
 const asyncHandler = require("express-async-handler");
+const crypto = require("crypto");
 
 
 
@@ -20,24 +21,26 @@ if(offerExist.length > 0){
         res.status(401)
         throw new Error("Enter all field")
     }
-       
-    let saveNegotiate = await new negotiateSchema({
-        userId, advertId:req.params.id,  negotiate:{offer, qty, start_date, end_date, number_of_months}, 
-    }).save()
+    crypto.randomBytes(10, async (err, buffer) => {
+        let token = buffer.toString("hex");
 
+    let saveNegotiate = await new negotiateSchema({
+        userId, advertId:req.params.id,  negotiate:{offer_id:token, offer, qty, start_date, end_date,  number_of_months}, 
+    }).save()
     if(saveNegotiate){
-      return  res.status(201).json({
+        return  res.status(201).json({
             res:"ok",
             message:`offer submitted successfully`,
             data:saveNegotiate
         })
     }else{
-      return res.status(401).json({
+        return res.status(401).json({
             res:"failed",
             message:`something went wrong`,
             
         })
     }
+})
 
 })
 
@@ -56,4 +59,21 @@ exports.listMyOfer = asyncHandler(async(req, res)=>{
         res.status(401)
         throw new Error("you have no pending offer")
     }
+})
+
+//@desc:list  delete user  offer
+exports.DeleteMyOfer = asyncHandler(async(req, res)=>{
+
+    let removeOffer = await negotiateSchema.findByIdAndDelete(req.params.id)
+    if(removeOffer){
+        return res.status(201).json({
+            res:"ok",
+            message:"offer deleted successfully",
+            data:removeOffer
+        })
+    }else{
+        res.status(401)
+        throw new Error("unable to delete offer")
+    }
+
 })

@@ -64,9 +64,9 @@ const nodemailer = require("nodemailer");
   
 
   // create reusable transporter object using the default SMTP transport
-  let transporter =  nodemailer.createTransport({
-    host: "mail.shopmedia.ng:2080",
-    port: 2080,
+  let transporter = await  nodemailer.createTransport({
+    host: "mail.shopmedia.ng",
+    port: 2095,
     logger: true,
     debug: true,
     ignoreTLS: true,
@@ -86,10 +86,11 @@ const nodemailer = require("nodemailer");
   var mailOptions = {
     from: `Shop Media "no-reply@shopmedia.com"`,
     replyTo: "no-reply@shopmedia.com",
-    to: email,
+    to: "kingemmax001@gmail.com",
     subject: subject,
     html: html,
   };
+  console.log(email, process.env.EMAIL_SECURITY, process.env.EMAIL_CREDENTIAL)
 
   await transporter.sendMail(mailOptions, function (error, info) {
     if (error) {

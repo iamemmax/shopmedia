@@ -9,6 +9,7 @@ const negotiateSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref:"users"
     },
+    offer_id:{type:String},
 
     negotiate:[],
     
