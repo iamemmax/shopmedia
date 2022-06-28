@@ -18,9 +18,7 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     price,
     size,
     types,
-    advert_id,
     gender,
-    postedBy,
     subTypes,
     landmark,
     interest,
@@ -143,8 +141,8 @@ exports.listAdverts = asyncHandler(async (req, res) => {
   try {
     let adverts = await advertSchema
       .find()
-      .populate("postedBy", "-password")
-      .select("-_id, -__v");
+      .populate("postedBy types")
+      .select("-_id -__v");
     if (adverts.length > 0) {
       return res.status(201).json({
         res: "ok",

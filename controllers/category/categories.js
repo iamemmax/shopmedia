@@ -27,22 +27,23 @@ exports.listCategories = asyncHandler(async(req, res) =>{
 // @Route: /api/category/create
 // @Acess: private
 exports.createCategory = asyncHandler(async(req, res) =>{
-    let {types} = req.body
-    if(!types){
+    let {type, name} = req.body
+    if(!type){
         res.status(401);
         throw new Error("please select category type");
     }
 
     try {
         let addCategory = await  new categorySchema({
-            types
+            name,
+            type
         }).save()
 
         if(addCategory){
             return res.status(201).json({
                 res: "ok",
                 message: "category added successfully",
-                addCategory,
+                data:addCategory,
               });
         }else{
             return res.status(401).json({
@@ -62,19 +63,19 @@ exports.createCategory = asyncHandler(async(req, res) =>{
 
 exports.updateCategory = asyncHandler(async(req, res) =>{
     
-    let {types} = req.body
+    let {name, type} = req.body
     
 
     const Category = await categorySchema.findById(req.params.id)
     
     if(Category){
            try {
-            let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id},{$set:{types:types || Category.types }},{new:true})
+            let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id},{$set:{name:name || Category.name, type:type || Category.type }},{new:true})
             if(updateCategoryType){
                 return res.status(201).json({
                     res: "ok",
                     message: "category  updates successfully",
-                    updateCategoryType,
+                    data:updateCategoryType,
                   });
             }else{
                 return res.status(401).json({
@@ -130,6 +131,7 @@ exports.addSubCategory = asyncHandler(async(req, res) =>{
            try {
             let addSubTypes = await categorySchema.findByIdAndUpdate({_id:req.params.id}, {$push:{subTypes:subCategory}},{new:true})
             if(addSubTypes){
+
                 return res.status(201).json({
                     res: "ok",
                     message: "category added successfully",

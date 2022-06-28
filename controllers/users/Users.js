@@ -217,7 +217,6 @@ exports.activateUser = asyncHandler(async (req, res) => {
 exports.loginUser = asyncHandler(async(req, res) => {
   let { email, password } = req.body;
 
-  console.log(req.body);
   if (!email || !password) {
     res.status(401);
     throw new Error("Please fill all field");
@@ -234,6 +233,7 @@ exports.loginUser = asyncHandler(async(req, res) => {
     throw new Error("please enter a valid email");
   }
 const user = await userSchema.findOne({email})
+const userInfo = await userSchema.findOne({email}).select("-password -__v")
 if(!user){
    res.status(401)
   throw new Error("Incorrect email or password");
@@ -245,7 +245,7 @@ try {
   bcrypt.compare(password, user.password, (err, isMatch) =>{
     if(err){
        res.status(401)
-      throw new Error(error.message);
+      // throw new Error(error.message);
 
     }
     if(isMatch){
@@ -254,6 +254,7 @@ try {
       });
       return res.status(200).json({
         message:"login successful",
+        userInfo,
         token
       })
     }else{

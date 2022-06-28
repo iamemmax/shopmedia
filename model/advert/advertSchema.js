@@ -47,9 +47,11 @@ const advertSchema = new mongoose.Schema({
 
     },
     types: {
-        type: String,
+        type: mongoose.Schema.Types.ObjectId,
+        
+        ref:"category",
         required: true
-
+        
     },
     landmark:{
         type: String,
