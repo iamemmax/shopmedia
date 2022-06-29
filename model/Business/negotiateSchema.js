@@ -21,11 +21,11 @@ const negotiateSchema = new mongoose.Schema({
         default:"1"
     },
     start_date:{
-        // type:Date,
-        // default:Date.now()
+        type:Date,
+        default:Date.now()
     },
     end_date:{
-        // type:Date,
+        type:Date,
         
     },
     number_of_months:{
@@ -44,4 +44,4 @@ const negotiateSchema = new mongoose.Schema({
     // booking:{type:Boolean, default:false}
 
 })
-module.exports = mongoose.model("business", negotiateSchema)
+module.exports = mongoose.model("negotiate", negotiateSchema)
