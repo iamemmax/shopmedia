@@ -17,9 +17,9 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     state,
     price,
     size,
-    types,
+    category,
+    sub_category,
     gender,
-    subTypes,
     landmark,
     interest,
     ageGroup,
@@ -32,9 +32,9 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     !landmark ||
     !price ||
     !size ||
-    !types ||
+    !category ||
     !gender ||
-    !subTypes ||
+    !sub_category||
     !interest ||
     !ageGroup 
   ) {
@@ -103,10 +103,10 @@ exports.createAdvert = asyncHandler(async (req, res) => {
           state,
           price,
           size,
-          types,
+          category,
+          sub_category,
           gender,
           postedBy:req?.user,
-          subTypes,
           interest,
           ageGroup,
           landmark,
@@ -141,7 +141,7 @@ exports.listAdverts = asyncHandler(async (req, res) => {
   try {
     let adverts = await advertSchema
       .find()
-      .populate("postedBy types")
+      .populate("postedBy category sub_category")
       .select("-_id -__v");
     if (adverts.length > 0) {
       return res.status(201).json({
@@ -194,10 +194,10 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
     state,
     price,
     size,
-    types,
+    category,
+    sub_category,
     gender,
     postedBy,
-    subTypes,
     interest,
     ageGroup,
   } = req.body;
@@ -216,9 +216,9 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
           state: state || savedAdvert.state,
           price: price || savedAdvert.price,
           size: size || savedAdvert.size,
-          types: types || savedAdvert.types,
+          category: category || savedAdvert.category,
           gender: gender || savedAdvert.gender,
-          subTypes: subTypes || savedAdvert.subTypes,
+          sub_category: sub_category || savedAdvert.sub_category,
           interest: interest || savedAdvert.interest,
           ageGroup: ageGroup || savedAdvert.ageGroup,
           postedBy: postedBy || savedAdvert.postedBy,

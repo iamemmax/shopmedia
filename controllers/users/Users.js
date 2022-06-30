@@ -642,7 +642,7 @@ exports.createAdmin = asyncHandler(async (req, res) => {
       
       });
     }
-    let addAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:"admin"}},{new:true}).select("-password -__v")
+    let addAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:req.body.roles}},{new:true}).select("-password -__v")
     if(addAdmin){
       return res.status(201).json({
         res: "ok",
@@ -692,3 +692,6 @@ exports.removeAdminAcct = asyncHandler(async (req, res) => {
   }
 })
 
+// @desc: remove multiple users
+// @Route: /api/users/remove/user_id
+// @Acess: private(super admin, admin)

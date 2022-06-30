@@ -46,12 +46,16 @@ const advertSchema = new mongoose.Schema({
         default: "1"
 
     },
-    types: {
+    category: {
         type: mongoose.Schema.Types.ObjectId,
         
         ref:"category",
-        required: true
+    },
+    sub_category: {
+        type: mongoose.Schema.Types.ObjectId,
         
+        ref:"sub-category",
+        required: true
     },
     landmark:{
         type: String,
@@ -65,10 +69,6 @@ const advertSchema = new mongoose.Schema({
 
     },
 
-    subTypes: {
-        type: String,
-        required: true
-    },
 
     interest: {
         type: String,

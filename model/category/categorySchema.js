@@ -2,19 +2,16 @@ const mongoose = require("mongoose");
 
 // const subCategorySchema =new mongoose.Schema({
 const categorySchema = new mongoose.Schema({
-  name: {
+  
+  category: {
+    type: String,
+    required:true
+    
+  },
+  category_type: {
     type: String,
     
   },
-  
-
-  subCategory: [],
-
-  type: {
-    type: String,
-    
-  },
-  
   createdAt: {
     type: Date,
     default: Date.now(),

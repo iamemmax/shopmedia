@@ -30,16 +30,15 @@ exports.listCategories = asyncHandler(async(req, res) =>{
 // @Route: /api/category/create
 // @Acess: private
 exports.createCategory = asyncHandler(async(req, res) =>{
-    let {type, name} = req.body
-    if(!type){
+    let {category, category_type} = req.body
+    if(!category){
         res.status(401);
-        throw new Error("please select category type");
+        throw new Error("select category ");
     }
 
     try {
         let addCategory = await  new categorySchema({
-            name,
-            type
+            category, category_type
         }).save()
 
         if(addCategory){
@@ -66,14 +65,14 @@ exports.createCategory = asyncHandler(async(req, res) =>{
 
 exports.updateCategory = asyncHandler(async(req, res) =>{
     
-    let {name, type} = req.body
+    let {category, category_type } = req.body
     
 
-    const Category = await categorySchema.findById(req.params.id)
+    const regCategory = await categorySchema.findById(req.params.id)
     
-    if(Category){
+    if(regCategory){
            try {
-            let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id},{$set:{name:name || Category.name, type:type || Category.type }},{new:true})
+            let updateCategoryType = await categorySchema.findOneAndUpdate({_id:req.params.id}, {$set:{category:category || regCategory.category, category_type:category_type || regCategory.category_type }}, {new:true})
             if(updateCategoryType){
                 return res.status(201).json({
                     res: "ok",
@@ -116,39 +115,39 @@ exports.deleteCategory = asyncHandler(async(req, res) =>{
 })
 
 
-// @desc: create subCategory
-// @Route: /api/category/add-subTypes/:id
-// @Acess: private
+// // @desc: create subCategory
+// // @Route: /api/category/add-subTypes/:id
+// // @Acess: private
 
 
-exports.addSubCategory = asyncHandler(async(req, res) =>{
-    let {subCategory} = req.body
+// exports.addSubCategory = asyncHandler(async(req, res) =>{
+//     let {subCategory} = req.body
     
-    if(!subCategory){
-        res.status(401);
-        throw new Error("please select sub category type");
-    }
-    const findCategory = await categorySchema.findById(req.params.id)
+//     if(!subCategory){
+//         res.status(401);
+//         throw new Error("please select sub category type");
+//     }
+//     const findCategory = await categorySchema.findById(req.params.id)
     
-    if(findCategory){
-           try {
-            let addSubTypes = await categorySchema.findByIdAndUpdate({_id:req.params.id}, {$push:{subTypes:subCategory}},{new:true})
-            if(addSubTypes){
+//     if(findCategory){
+//            try {
+//             let addSubTypes = await categorySchema.findByIdAndUpdate({_id:req.params.id}, {$push:{subTypes:subCategory}},{new:true})
+//             if(addSubTypes){
 
-                return res.status(201).json({
-                    res: "ok",
-                    message: "category added successfully",
-                    addSubTypes,
-                  });
-            }else{
-                return res.status(401).json({
-                    message: "unable to add sub-category",
-                  });
-            }
-           } catch (error) {
-            res.status(401);
-            throw new Error(error.message);
-           }
+//                 return res.status(201).json({
+//                     res: "ok",
+//                     message: "category added successfully",
+//                     addSubTypes,
+//                   });
+//             }else{
+//                 return res.status(401).json({
+//                     message: "unable to add sub-category",
+//                   });
+//             }
+//            } catch (error) {
+//             res.status(401);
+//             throw new Error(error.message);
+//            }
         
-    }
-})
+//     }
+// })
