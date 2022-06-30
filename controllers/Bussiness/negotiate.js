@@ -1,4 +1,5 @@
 const negotiateSchema = require("../../model/Business/negotiateSchema");
+const advertSchema = require("../../model/advert/advertSchema");
 const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
 
@@ -47,7 +48,7 @@ if(offerExist.length > 0){
 
 //@desc:list user  offer
 exports.listMyOfer = asyncHandler(async(req, res)=>{
-    let myOffer = await negotiateSchema.find({userId:req.params.id}).populate("userId", "advertId").select("-password, -__v")
+    let myOffer = await negotiateSchema.find({userId:req.params.id}).populate("userId", "advertId").select("-password -__v")
     if(myOffer?.length > 0){
        return res.status(201).json({
             res:"ok",
@@ -76,4 +77,25 @@ exports.DeleteMyOfer = asyncHandler(async(req, res)=>{
         throw new Error("unable to delete offer")
     }
 
+})
+
+
+
+
+//@desc:compare adverts sizes
+exports.compareAdvertSize = asyncHandler(async(req, res)=>{
+    const sizes = await advertSchema.find({size:req.params.size}).select("-__v")
+
+    if(sizes){
+        return res.status(201).json({
+            res:"ok",
+            total:sizes.length,
+            message:"advert compared successfully",
+            data:sizes
+        })
+    }else{
+        res.status(401)
+        throw new Error("advert not found")
+   
+    }
 })

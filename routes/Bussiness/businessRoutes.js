@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-let {negotiate,listMyOfer,DeleteMyOfer} = require("../../controllers/Bussiness/negotiate")
+let {negotiate,listMyOfer,DeleteMyOfer, compareAdvertSize} = require("../../controllers/Bussiness/negotiate")
 let {listCart,addTocart, Updatecart, RemoveFromCart} = require("../../controllers/Bussiness/cart")
 const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 //@desc:negotiate
@@ -14,5 +14,7 @@ router.post("/book/:id", adminAccess(["super admin", "admin", "customers", "vend
 router.put("/book/update/:id",ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), Updatecart)
 router.delete("/book/remove/:cart_id", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), RemoveFromCart)
 
+//@desc:compare advert
+router.get("/compare/advert/:size", ensureLogin, compareAdvertSize)
 
 module.exports = router

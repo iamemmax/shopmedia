@@ -107,7 +107,7 @@ exports.listPages = asyncHandler(async(req, res) =>{
 //@route: /api/adpage/update/page_id
 exports.getSinglePage =  asyncHandler(async(req, res) =>{
   try {
-    let single = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id, -__v")
+    let single = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id -__v")
     if(single){
       res.status(201).json({
         res:"ok",
@@ -133,11 +133,11 @@ exports.updatePages = asyncHandler(async(req, res) =>{
   let {name, category} = req.body
 
   
-  const getPages = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id, -__v")
+  const getPages = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id -__v")
 
   
   try {
-    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id, -__v")
+    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id -__v")
       if(!update){
         res.status(401).json({message:"something went wrong"})
       }
@@ -209,7 +209,7 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
 
   if(pages){
 
-    let removePage = await cardSchema.findOneAndDelete({page_id:req.params.page_id}).select("-_id, -__v")
+    let removePage = await cardSchema.findOneAndDelete({page_id:req.params.page_id}).select("-_id -__v")
     if(removePage){
       await cloudinary.uploader.destroy(pages.pic[0]?.img_id)
       return  res.status(201).json({
@@ -264,5 +264,32 @@ exports.listPagesByCategory = asyncHandler(async(req, res) =>{
     res.status(401).json({
       message:error.message
     })
+  }
+})
+
+//@desc: update advert pages status
+//@access: private
+//@method: put
+//@route: /api/adpage/categories
+
+exports.updateStatus = asyncHandler(async (req, res) => {
+  let statusUpt = await cardSchema.findOne({page_id:req.params.page_id})
+ 
+  if(statusUpt){
+    let updatedStatus = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{status:req.body.status}},{new:true}).select("-__v")
+    if(updatedStatus){
+      return res.status(201).json({
+        res: "ok",
+        message:"media agency updated  successfully",
+        data:updatedStatus,
+      });
+    }else{
+      res.status(401)
+  throw new Error("unable to update media agency")
+    }
+
+  }else{
+    res.status(401)
+  throw new Error("media agency not found")
   }
 })
