@@ -1,10 +1,9 @@
 const asyncHandler = require("express-async-handler");
-const { filterPages } = require('./../../helper/search');
-const sharp = require("sharp");
+const { filterPages } = require('../../helper/search');
 const fs = require("fs");
 const crypto = require("crypto");
 const cloudinary = require("../../config/cloudinary");
-const cardSchema = require("../../model/Ratecard/CardSchema");
+const cardSchema = require("../../model/Agency/CardSchema");
 const compressImg = require("../../helper/sharp");
 
 //@desc: add advert pages
@@ -12,10 +11,10 @@ const compressImg = require("../../helper/sharp");
 //@method: post
 //@route: /api/adpage/create
 exports.AddPages = asyncHandler(async (req, res) => {
-  let {name, category } = req.body;
+  let {company_name, category, email,location, phone, page_id } = req.body;
   let fileArray = [];
- 
-  if(!name || !category) {
+ console.log(company_name, category, email,location, phone)
+  if(!company_name || !category  ||!email || !phone || !location) {
     res.status(401);
     throw new Error("all field are require");
   }
@@ -23,11 +22,11 @@ exports.AddPages = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("choose a photo");
   }
-  //@desc : check if name exist
-  let pageExist = await cardSchema.findOne({ name });
+  //@desc : check if company_name exist
+  let pageExist = await cardSchema.findOne({ company_name });
   if (pageExist) {
     res.status(401);
-    throw new Error("name already exist");
+    throw new Error("company_name already exist");
   } else {
     compressImg(req.file.path, 200, 200)
 
@@ -48,9 +47,8 @@ exports.AddPages = asyncHandler(async (req, res) => {
  
  let cretePage = await new cardSchema({
   page_id:`adpage_${id}`,  
-  name,
-  category,
-    pic: fileArray,
+  company_name, category, email,location, phone,
+  logo: fileArray,
   }).save()
   
  

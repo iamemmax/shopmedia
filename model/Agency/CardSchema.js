@@ -6,14 +6,29 @@ const cardSchema = new mongoose.Schema({
     type: String,
 
   },
-  pic: [],
+  logo: [],
 
-  name:{
+  company_name:{
     type: String,
     required:true
 
   },
   category:{
+    type: String,
+    required:true
+
+  },
+  email:{
+    type: String,
+    required:true
+
+  },
+  location:{
+    type: String,
+    required:true
+
+  },
+  phone:{
     type: String,
     required:true
 
@@ -26,4 +41,4 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("cards", cardSchema);
+module.exports = mongoose.model("media agencies", cardSchema);

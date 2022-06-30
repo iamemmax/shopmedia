@@ -16,6 +16,9 @@ exports.listCategories = asyncHandler(async(req, res) =>{
             res: "ok",
             categories,
           });
+    }else{
+        res.status(401);
+        throw new Error("empty category");
     }
     } catch (error) {
         res.status(401);

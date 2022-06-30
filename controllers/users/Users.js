@@ -578,3 +578,116 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
     throw new Error(error.message)
   }
 })
+
+
+// @desc: list users account
+// @Route: /api/users
+// @Acess: private(admin, super admin)
+
+
+
+    exports.listUsers = asyncHandler(async (req, res) => {
+      try{
+        let users = await userSchema.find({},{__v:0})
+          // @desc check if username already exist
+          if(users.length > 0){
+            return res.status(201).json({
+              res: "ok",
+              total:users.length,
+              data:users,
+            });
+          }else{
+            res.status(401)
+            throw new Error("no registerd user")
+          }
+        
+        } catch (error) {
+          res.status(401);
+          throw new Error(error.message);
+        }
+});
+
+
+// @desc: remove users account
+// @Route: /api/users/remove/user_id
+// @Acess: private(admin, super admin)
+
+exports.removeUsers = asyncHandler(async (req, res) => {
+const remove = await userSchema.findOneAndDelete({user_id:req.params.user_id})
+if(remove){
+  return res.status(201).json({
+    res: "ok",
+    message:"user deleted successfully",
+    data:remove,
+  });
+}else{
+  res.status(401)
+  throw new Error("unable to delete user")
+}
+
+});
+
+
+// @desc: create admin account
+// @Route: /api/users/remove/user_id
+// @Acess: private(super admin)
+
+exports.createAdmin = asyncHandler(async (req, res) => {
+  let users = await userSchema.findOne({user_id:req.params.user_id})
+  if(users){
+    if(users?.roles === "super admin"){
+      return res.status(404).json({
+        res: "failed",
+        message:"unable to create admin",
+      
+      });
+    }
+    let addAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:"admin"}},{new:true}).select("-password -__v")
+    if(addAdmin){
+      return res.status(201).json({
+        res: "ok",
+        message:"admin created successfully",
+        data:addAdmin,
+      });
+    }else{
+      res.status(401)
+  throw new Error("unable to add admin")
+    }
+
+  }else{
+    res.status(401)
+  throw new Error("user not found")
+  }
+})
+
+// @desc: remove admin account
+// @Route: /api/users/remove/user_id
+// @Acess: private(super admin)
+
+exports.removeAdminAcct = asyncHandler(async (req, res) => {
+  let users = await userSchema.findOne({user_id:req.params.user_id})
+  if(users){
+    if(users?.roles === "super admin"){
+      return res.status(404).json({
+        res: "failed",
+        message:"unable to remove super Admin",
+      
+      });
+    }
+    let removeAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:"customers"}},{new:true}).select("-password -__v")
+    if(removeAdmin){
+      return res.status(201).json({
+        res: "ok",
+        message:"admin removed successfully",
+        data:removeAdmin,
+      });
+    }else{
+      res.status(401)
+  throw new Error("unable to remove admin")
+    }
+
+  }else{
+    res.status(401)
+  throw new Error("admin not found")
+  }
+})

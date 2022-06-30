@@ -8,7 +8,7 @@ const advertSchema = new mongoose.Schema({
     postedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
-        enum: ["vendor", "Admin", "super Admin"]
+        enum: ["user, vendor", "Admin", "super Admin"]
     },
 
     advert_id:{

@@ -9,7 +9,7 @@ const subCategoryRoutes = require("./routes/category/subCategoryRoutes");
 const advertRoutes = require("./routes/advert/advertRoutes");
 const searchRoutes = require("./routes/search/searchRoutes");
 const businessRoutes = require("./routes/Bussiness/businessRoutes");
-const RateCardRoutes = require("./routes/Ratecard/pages");
+const Agency = require("./routes/Agency/pages");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
@@ -50,7 +50,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/advert", advertRoutes);
 app.use("/api/sub-category", subCategoryRoutes);
 app.use("/api/find", searchRoutes);
-app.use("/api/adpages", RateCardRoutes);
+app.use("/api/adpages", Agency);
 app.use("/api/business", businessRoutes);
 
 app.use(errorHandler);

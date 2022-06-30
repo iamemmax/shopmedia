@@ -1,7 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const jwt =  require("jsonwebtoken");
 
- const  ensureLogin = asyncHandler(async (req, res, next) => {
+exports.ensureLogin = asyncHandler(async (req, res, next) => {
   const { authorization } = req.headers;
   const rawToken = authorization?.split(" ");
   try {
@@ -29,4 +29,22 @@ const jwt =  require("jsonwebtoken");
   }
 })
 
-module.exports = ensureLogin
+exports.adminAccess = (roles) => (req, res, next) => {
+ try {
+  if(roles.includes(req.user.roles)){
+    return next()
+  }else{
+    res.status(401)
+    throw new Error('Not authorized, no token')
+    
+  }
+
+ } catch (error) {
+  if (error) {
+    res.status(401)
+    throw new Error('Not authorized')
+   
+  }
+ }
+
+}

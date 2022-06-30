@@ -35,12 +35,12 @@ const UserSchema = new mongoose.Schema({
   roles: {
     type: String,
     default: "customers",
-    enum: ["admin", "customers"],
+    enum: ["super admin", "vendors","admin", "customers"],
   },
   pic:[],
   status: {
     type: Boolean,
-    default: false,
+    default: true,
   },
   token: {
     type: String,
