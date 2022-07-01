@@ -112,7 +112,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                         rel="stylesheet">
                 
                 
-                    <title>Shop Media - Email</title>
+                    <title>ShopMedia - Email</title>
                 
                 
                     <style>
@@ -380,7 +380,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                             <p><b>Our mailling address is</b></p>
                             <p>Shopmedia Limited</p>
                             <p>12 lagos island road</p>
-                            <p>Lekki asis</p>
+                            <p>Lekki asis, Abuja</p>
                             <p>Nigeria</p>
                             <br>
                             <p>You cab <a href="">unsubscribe</a> from this email or change your email notifications.</p>
@@ -428,7 +428,7 @@ exports.createUser = asyncHandler(async (req, res) => {
         rel="stylesheet">
 
 
-    <title>Shop Media - Email</title>
+    <title>ShopMedia - Email</title>
 
 
     <style>
@@ -676,15 +676,15 @@ exports.createUser = asyncHandler(async (req, res) => {
                 <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt=""></a>
                 <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt=""></a>
             </div>
-            <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
+            <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
             <p class="sm">You are receiving this email because you opted in via our website.</p>
             <p><b>Our mailling address is</b></p>
             <p>Shopmedia Limited</p>
             <p>12 lagos island road</p>
-            <p>Lekki asis</p>
+            <p>Lekki asis, Abuja</p>
             <p>Nigeria</p>
             <br>
-            <p>You cab <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+            <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
         </div>
     </footer>
     <!--------- Footer area end --------->
@@ -758,7 +758,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
     if (updateUser.status === true) {
       token.remove();
       return res.status(201).json({
-        message: "email verified successfull",
+        message: "email verified successfully",
       });
     }
   } catch (error) {
@@ -776,7 +776,7 @@ exports.loginUser = asyncHandler(async(req, res) => {
 
   if (!email || !password) {
     res.status(401);
-    throw new Error("Please fill all field");
+    throw new Error("Please all fields are required");
   }
 
   // check if user enter valid email
@@ -838,7 +838,7 @@ exports.logoutUser = (req, res) => {
         httpOnly: true,
       });
       res.status(201).json({
-        message: "you successfully logout",
+        message: "you've successfully logged out",
       });
     });
   });
@@ -852,7 +852,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   let { email } = req.body;
   if (!email) {
     res.status(401);
-    throw new Error("this field is require");
+    throw new Error("this field is required");
   }
 
   // check if user enter valid email
@@ -895,7 +895,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                 rel="stylesheet">
         
         
-            <title>Shop Media - Email</title>
+            <title>ShopMedia - Email</title>
         
         
             <style>
@@ -1107,15 +1107,13 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                 <section class="mail-area">
                     <div class="container">
                         <div class="mail-wrapper">
-                            <h4><Strong>Reset Password</Strong> </h4>
+                            <h4><Strong>Reset your Password</Strong> </h4>
                             <p>Hi ${user.username},</p>
                             <p>Someone (hopefully you) has requested a password reset for your ShopMedia account. Follow
                             the link below to set a new password:
                             </p>
         
                             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
-                           
-                            <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
 
                             <div class="mail-btn text-center pb-4">
                             <a href="https://shopmedia-api.herokuapp.com/api/users/reset-password/${user.user_id}/${token}">
@@ -1123,7 +1121,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                                 
                             </div>
         
-                            <p>If you did not create an account, no further action is required.</p>
+                           <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
         
                             <p>Regards, <br>
                                 ShopMedia Team</p>
@@ -1159,7 +1157,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                     <p>Lekki asis</p>
                     <p>Nigeria</p>
                     <br>
-                    <p>You cab <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+                    <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
                 </div>
             </footer>
             <!--------- Footer area end --------->
@@ -1183,7 +1181,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
           );
           res.status(201).json({
             message:
-              " Please following the instructions sent to your email to complete reseting your password.",
+              " Please follow the instructions sent to your email to complete reseting your password.",
           });
         
       
@@ -1193,7 +1191,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   } else {
     res.status(401);
     throw new Error(
-      "There is no user record corresponding to this identifier. The user may have been deleted"
+      "There is no user record corresponding to the information submitted. Please double-check that all information submitted are accurate"
     );
   }
 });
@@ -1239,7 +1237,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     if(resetPassword){
       res.status(201).json({
         message:
-          " Password changed \n You can now sign in with your new password.",
+          " Password changed successfully \n You can now sign in with your new password.",
       });
     }
   });
@@ -1268,14 +1266,14 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
   if(!oldpassword|| !new_password || !confirm_pass){
     return res.status(401).json({
           res:"failed",
-             message: "all fields are required"
+             message: "All fields are required"
         
          })
   }
   if(new_password !== confirm_pass){
     return res.status(401).json({
           res:"failed",
-             message: "password not matched"
+             message: "Password does not match"
         
          })
   }
@@ -1288,7 +1286,7 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       if(err){
         return res.status(401).json({
           res:"failed",
-             message: "old password not matched"
+             message: "Old password does not match"
         
          })
       }
@@ -1303,12 +1301,12 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
                  if (!update) {
                   res.send("unable to update pass");
                    res.status(401).json({
-                     message: "unable to update  password ",
+                     message: "Unable to update password ",
                    });
                  } else {
                    res.status(201).json({
                      res:"ok",
-                     message:"password change successfully"
+                     message:"Password changed successfully"
                    });
                  }
                 })
@@ -1316,7 +1314,7 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       }else{
         return res.status(401).json({
           res:"failed",
-             message: "old password not matched"
+             message: "Old password does not match"
         
          })
       }
@@ -1334,7 +1332,7 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
 exports.uploadProfilePic = asyncHandler(async(req, res)=>{
   if(!req.file){
     res.status(401)
-    throw new Error("please choose a file")
+    throw new Error("Please select a file")
   }
 
   console.log(req.file)
@@ -1363,12 +1361,12 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
       if(updateProfile){
         await cloudinary.uploader.destroy(users.pic[0]?.img_id)
         res.status(201).json({
-          message:"profile img updated successfully"
+          message:"Profile img updated successfully"
         })
       }else{
         fs.unlinkSync(req.file.path);
         res.status(401)
-    throw new Error("unable to update profile")
+    throw new Error("Unable to update profile")
 
       }
     }else{
@@ -1442,7 +1440,7 @@ exports.createAdmin = asyncHandler(async (req, res) => {
     if(users?.roles === "super admin"){
       return res.status(404).json({
         res: "failed",
-        message:"unable to create admin",
+        message:"Unable to create admin",
       
       });
     }
@@ -1450,17 +1448,17 @@ exports.createAdmin = asyncHandler(async (req, res) => {
     if(addAdmin){
       return res.status(201).json({
         res: "ok",
-        message:"admin created successfully",
+        message:"Admin created successfully",
         data:addAdmin,
       });
     }else{
       res.status(401)
-  throw new Error("unable to add admin")
+  throw new Error("Unable to add admin")
     }
 
   }else{
     res.status(401)
-  throw new Error("user not found")
+  throw new Error("User not found")
   }
 })
 
