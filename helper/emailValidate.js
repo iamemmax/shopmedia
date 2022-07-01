@@ -1,8 +1,14 @@
-function validateEmail(email) {
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
-  }
-  
+const checkValidEmail = (res, email) =>{
 
-  module.export = validateEmail
+  function validateEmail(email) {
+    const regex =
+    /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return regex.test(email);
+}
+
+if (!validateEmail(email)) {
+  res.status(401);
+  throw new Error("please enter a valid email");
+}
+}
+  module.exports = checkValidEmail

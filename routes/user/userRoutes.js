@@ -3,7 +3,7 @@ const router = express.Router();
 const upload = require("../.././config/upload")
 const {ensureLogin, adminAccess} = require("../.././helper/ensureLogin")
 
-let { createUser, activateUser,  loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic, listUsers, removeUsers, createAdmin,removeAdminAcct } = require("../../controllers/users/Users");
+let { createUser, activateUser, loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic, listUsers, removeUsers, createAdmin } = require("../../controllers/users/Users");
 
 
 //@desc create account
@@ -28,6 +28,6 @@ router.put("/upload-profile-img/:user_id", ensureLogin,  adminAccess(["super adm
 router.delete("/remove/:user_id", ensureLogin, adminAccess(["super admin", "admin"]), removeUsers)
 // @desc: Admin
 router.put("/create-admin/:user_id", ensureLogin, adminAccess(["super admin"]), createAdmin)
-router.put("/remove-admin/:user_id", ensureLogin, adminAccess(["super admin"]), removeAdminAcct)
+// router.put("/remove-admin/:user_id", ensureLogin, adminAccess(["super admin"]), removeAdminAcct)
 
 module.exports = router;

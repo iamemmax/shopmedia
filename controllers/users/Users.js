@@ -40,15 +40,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     throw new Error("All fields are required ");
   }
   // @desc check if user enter valid email
-  function validateEmail(email) {
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
-  }
-  if (!validateEmail(email)) {
-    res.status(401);
-    throw new Error("please enter a valid email");
-  }
+ validateEmail(res, email)
 
   try {
     // @desc check if username already exist
@@ -788,15 +780,8 @@ exports.loginUser = asyncHandler(async(req, res) => {
   }
 
   // check if user enter valid email
-  function validateEmail(email) {
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
-  }
-  if (!validateEmail(email)) {
-    res.status(401);
-    throw new Error("please enter a valid email");
-  }
+  validateEmail(res, email)
+
 const user = await userSchema.findOne({email})
 const userInfo = await userSchema.findOne({email}).select("-password -__v")
 if(!user){
@@ -871,15 +856,9 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   }
 
   // check if user enter valid email
-  function validateEmail(email) {
-    const regex =
-      /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return regex.test(email);
-  }
-  if (!validateEmail(email)) {
-    res.status(401);
-    throw new Error("please enter a valid email");
-  }
+  validateEmail(res, email)
+ 
+   
 
   const user = await userSchema.findOne({ email: email });
   if (user) {
@@ -895,28 +874,312 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
           sendEmail(
             email,
             "Change your password",
-            `
-            <div>
-            <h1>Hi ${user.username},</h1>
-            <p>Someone (hopefully you) has requested a password reset for your ShopMedia account. Follow
-            the link below to set a new password:</p>
-            <br>
-            <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
-            <a href="http://localhost:5000/api/users/reset-password/${user.user_id}/${token}">
-            Reset Password
-            </a>;
-            <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
-            <br>
-    
-            <span>
-            Thanks,
-            <br>
-            
-            Shopmedia.ng
-            </span>
-            </div>
-    
+          
         `
+    
+                
+        <!doctype html>
+        <html lang="en">
+        
+        <head>
+            <!-- Required meta tags -->
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        
+            <!-- Bootstrap CSS -->
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+                integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap"
+                rel="stylesheet">
+        
+        
+            <title>Shop Media - Email</title>
+        
+        
+            <style>
+                a:focus {
+                    outline: 0 solid
+                }
+        
+                img {
+                    max-width: 100%;
+                    height: auto;
+                }
+        
+                h1,
+                h2,
+                h3,
+                h4,
+                h5,
+                h6 {
+                    margin: 0 0 15px;
+                    color: #1B1B21;
+                }
+        
+        
+                body {
+                    color: #1E1F20;
+                    font-weight: 400;
+                    font-family: 'DM Sans', sans-serif;
+                    max-width: 599px;
+                    margin: 0 auto;
+                }
+        
+        
+                .selector-for-some-widget {
+                    box-sizing: content-box;
+                }
+        
+                a:hover {
+                    text-decoration: none
+                }
+        
+                /*--------------- Header area start ----------------*/
+                .header {
+                    background: #000;
+                    padding: 10px 10px;
+                    height: 55px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+        
+                /*--------------- Header area end ----------------*/
+        
+        
+        
+                /*--------------- Mail area start ----------------*/
+                .mail-area {
+                    padding-top: 50px;
+                    padding-bottom: 50px;
+                    background: #fff;
+                }
+        
+                .mail-wrapper {
+                    padding: 0 30px;
+                }
+        
+                .mail-wrapper h3 {
+                    font-weight: 700;
+                    font-size: 30px;
+                    line-height: 39px;
+                    text-align: center;
+                    letter-spacing: -0.02em;
+                    color: #000000;
+                    margin-bottom: 0;
+                }
+        
+                .mail-wrapper h3 a {
+                    color: #EBAA24;
+                    text-decoration: none;
+                    display: inline-block;
+                }
+        
+                .email-thumb {
+                    max-width: 388px;
+                    margin: 0 auto;
+                    margin-bottom: 30px;
+                }
+        
+                .mail-wrapper p {
+                    font-size: 15px;
+                    margin-bottom: 23px;
+                }
+        
+                .mail-wrapper li {
+                    font-size: 15px;
+                    margin-bottom: 17px;
+                }
+        
+                .mail-btn a {
+                    font-weight: 500;
+                    font-size: 13px;
+                    line-height: 17px;
+                    letter-spacing: -0.02em;
+                    color: #000000;
+                    display: inline-block;
+                    text-decoration: none;
+                    background: #EBAA24;
+                    border-radius: 5px;
+                    padding: 10px 30px;
+                }
+        
+                .mail-btn {
+                    padding-top: 5px;
+                }
+        
+                /*--------------- Mail area end ----------------*/
+        
+        
+                /*--------------- Footer area start ----------------*/
+                .footer p {
+                    font-weight: 500;
+                    font-size: 9px;
+                    line-height: 12px;
+                    text-align: center;
+                    letter-spacing: -0.0em;
+                    color: #FFFFFF;
+                    margin-bottom: 5px;
+                }
+        
+                .footer {
+                    text-align: center;
+                    padding: 18px 30px;
+                    background: #000000;
+                    color: #fff;
+                }
+        
+                .footer p b {
+                    font-weight: 700;
+                    font-size: 10px;
+                    line-height: 1.2;
+                    padding-top: 8px;
+                    display: block;
+                }
+        
+                .footer-social a {
+                    display: inline-block;
+                    max-width: 20px;
+                    margin: 0 5px;
+                }
+        
+                .footer-social {
+                    padding-bottom: 24px;
+                }
+        
+                .footer p a {
+                    color: #EBAA24;
+                    text-decoration: none;
+                }
+        
+                /*--------------- Footer area end ----------------*/
+        
+        
+        
+                /*--------------- Responsive area start ----------------*/
+                @media screen and (max-width: 575px) {
+                    .mail-wrapper {
+                        padding: 0 10px;
+                    }
+        
+                    .mail-wrapper h3 {
+                        font-size: 25px;
+                        line-height: 29px;
+                    }
+        
+        
+                }
+        
+                /*--------------- Responsive area end ----------------*/
+            </style>
+        
+        
+        
+        
+        
+        
+        
+        
+        </head>
+        
+        <body>
+        
+        
+        
+        
+            <!--------- Header area start --------->
+            <header class="header">
+                <div class="header-logo">
+                   <center><a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a></center> 
+                </div>
+            </header>
+            <!--------- Header area end --------->
+        
+        
+        
+            <!--------- Main area start --------->
+            <main class="main">
+        
+        
+                <!--------- Mail area start --------->
+                <section class="mail-area">
+                    <div class="container">
+                        <div class="mail-wrapper">
+                            <h4><Strong>Reset Password</Strong> </h4>
+                            <p>Hi ${user.username},</p>
+                            <p>Someone (hopefully you) has requested a password reset for your ShopMedia account. Follow
+                            the link below to set a new password:
+                            </p>
+        
+                            <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
+                           
+                            <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
+
+                            <div class="mail-btn text-center pb-4">
+                            <a href="https://shopmedia-api.herokuapp.com/api/users/reset-password/${user.user_id}/${token}">
+                          Reset password</a>
+                                
+                            </div>
+        
+                            <p>If you did not create an account, no further action is required.</p>
+        
+                            <p>Regards, <br>
+                                ShopMedia Team</p>
+                            <p><a href="https://shopmedia.ng" class="text-dark text-decoration-none">https://shopmedia.ng/</a></p>
+                        </div>
+                    </div>
+                </section>
+                <!--------- Mail area end --------->
+        
+        
+        
+            </main>
+            <!--------- Main area end --------->
+        
+        
+        
+        
+            <!--------- Footer area start --------->
+            <footer class="footer">
+                <div class="container">
+             
+                <div class="footer-social d-flex justify-content-center align-items-center">
+                <a href=""><img src="/img/facebook.svg" alt="facebook"></a>
+                
+                        <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt="instagram"></a>
+                        <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt="twiter"></a>
+                    </div>
+                    <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
+                    <p class="sm">You are receiving this email because you opted in via our website.</p>
+                    <p><b>Our mailling address is</b></p>
+                    <p>Shopmedia Limited</p>
+                    <p>12 lagos island road</p>
+                    <p>Lekki asis</p>
+                    <p>Nigeria</p>
+                    <br>
+                    <p>You cab <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+                </div>
+            </footer>
+            <!--------- Footer area end --------->
+        
+        
+        
+        
+        
+        
+        
+            <script src="assets/js/jquery.min.js"></script>
+            <script src="assets/js/popper.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+                integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+                crossorigin="anonymous"></script>
+        
+        </body>
+        
+        </html>
+                        `
           );
           res.status(201).json({
             message:
@@ -983,7 +1246,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 });
 }else{
   res.status(401);
-  throw new Error("Try resetting your password again <br/> Your request to reset your password has expired or the link has already been used");
+  throw new Error("Try resetting your password again /n Your request to reset your password has expired or the link has already been used");
   
 }
 }
@@ -1000,56 +1263,68 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 //@method: put
 //@route: /api/users/change-password/user_id
 exports.ChangePassword = asyncHandler(async (req, res) => {
-  let { oldpassword, password} = req.body;
+  let { oldpassword, new_password, confirm_pass} = req.body;
 
-  const user = await userSchema.findOne({ user_id: req.params.user_id });
-  if (user) {
-    console.log(user)
-    try {
-      bcrypt.compare(oldpassword, user.password, (err, isMatch) => {
-        if (err) {
-          res.status(401);
-          throw new Error(
-            "old password not matched"
-          );
-        }
-        if (isMatch) {
-          bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(password, salt, async (err, hash) => {
-              if (user.password === hash) {
-                res.status(401);
-                throw new Error(
-                  "old password and new password must not match"
-                );
-              }
-              let update = await userSchema.findOneAndUpdate(
-                { user_id: req.params.user_id},
-                { $set: { password: hash || user.password } },
-                { new: true }
-              );
-              if (!update) {
-                // res.send("unable to update pass");
-                res.status(401).json({
-                  message: "unable to update  password ",
-                });
-              } else {
-                res.status(201).json({
-                  res:"ok",
-                  message:"password change successfully"
-                });
-              }
-            });
-          });
-        }
-      });
-    } catch (error) {
-      res.status(501);
-      throw new Error(error.message);
-    }
-  } else {
-    res.status(401);
-    throw new Error("user not found");
+  if(!oldpassword|| !new_password || !confirm_pass){
+    return res.status(401).json({
+          res:"failed",
+             message: "all fields are required"
+        
+         })
   }
+  if(new_password !== confirm_pass){
+    return res.status(401).json({
+          res:"failed",
+             message: "password not matched"
+        
+         })
+  }
+ 
+
+  const {password} = await userSchema.findOne({ user_id: req.params.user_id }).select("password")
+  // if (user) {
+    if(password){
+     bcrypt.compare(oldpassword, password, (err, isMatch)=>{
+      if(err){
+        return res.status(401).json({
+          res:"failed",
+             message: "old password not matched"
+        
+         })
+      }
+      if(isMatch){
+        bcrypt.genSalt(10, function (err, salt) {
+          bcrypt.hash(new_password, salt, async (err, hash) => {
+                 let update = await userSchema.findOneAndUpdate(
+                   { user_id: req.params.user_id},
+                   { $set:{password: hash || password } },
+                   { new: true }
+                 );
+                 if (!update) {
+                  res.send("unable to update pass");
+                   res.status(401).json({
+                     message: "unable to update  password ",
+                   });
+                 } else {
+                   res.status(201).json({
+                     res:"ok",
+                     message:"password change successfully"
+                   });
+                 }
+                })
+                })
+      }else{
+        return res.status(401).json({
+          res:"failed",
+             message: "old password not matched"
+        
+         })
+      }
+     })
+
+    }
+    
+ 
 });
 
 //@desc: update user profile img
