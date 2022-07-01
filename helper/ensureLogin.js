@@ -15,6 +15,14 @@ exports.ensureLogin = asyncHandler(async (req, res, next) => {
       // console.log(data.user);
       return next();
     });
+
+    if(req.user.verified === false){
+      return res.status(200).json({
+        res:"failed",
+        message:"Account not verify",
+       
+      })
+    }
   } catch (error) {
     if (error) {
       res.status(401)
