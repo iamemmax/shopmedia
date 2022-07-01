@@ -1464,37 +1464,7 @@ exports.createAdmin = asyncHandler(async (req, res) => {
   }
 })
 
-// @desc: remove admin account
-// @Route: /api/users/remove/user_id
-// @Acess: private(super admin)
 
-exports.removeAdminAcct = asyncHandler(async (req, res) => {
-  let users = await userSchema.findOne({user_id:req.params.user_id})
-  if(users){
-    if(users?.roles === "super admin"){
-      return res.status(404).json({
-        res: "failed",
-        message:"unable to remove super Admin",
-      
-      });
-    }
-    let removeAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:"customers"}},{new:true}).select("-password -__v")
-    if(removeAdmin){
-      return res.status(201).json({
-        res: "ok",
-        message:"admin removed successfully",
-        data:removeAdmin,
-      });
-    }else{
-      res.status(401)
-  throw new Error("unable to remove admin")
-    }
-
-  }else{
-    res.status(401)
-  throw new Error("admin not found")
-  }
-})
 
 // @desc: remove multiple users
 // @Route: /api/users/remove/user_id

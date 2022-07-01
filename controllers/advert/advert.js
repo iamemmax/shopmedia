@@ -243,7 +243,7 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
   }
 });
 
-// @desc: advert images advert
+// @desc: updating images advert images 
 // @Route: /api/advert/upadte/img
 // @Acess: private
 exports.updateAdvertImg = asyncHandler(async (req, res) => {
@@ -290,7 +290,75 @@ exports.updateAdvertImg = asyncHandler(async (req, res) => {
            
           });
         
+
+
+
+
+   
 });
+
+
+
+
+// @desc:updating advertImg  simuustaneously
+// @Route: /api/advert/delete/:advert_id
+// @Acess: private
+
+exports.updateEachImg = asyncHandler(async (req, res) => {
+  const AdvertExist = await advertSchema.findOne({advert_id:req.params.advert_id})
+
+  
+  if(AdvertExist){
+    let {advertImgs} = AdvertExist
+
+   let updatedImg = advertImgs.filter(img => img?.img_id !== req.body.img_id )
+   compressImg(req.file.path, 500, 500)
+    
+    let uploadImg = await cloudinary.uploader.upload(req.file.path, {
+      eager: [
+        { width: 100, height: 100 },
+      ],
+    })
+
+    fs.unlinkSync(req.file.path);
+    if(uploadImg){
+      let adImg = {
+        img_id:uploadImg.public_id,
+        img:uploadImg.eager[0].secure_url,
+      }
+      console.log(adImg)
+      
+      if(updatedImg){
+        let oldeImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$set:{advertImgs:updatedImg}}, {new:true})
+        let OverrideImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$push:{advertImgs:adImg}}, {new:true})
+        if(OverrideImg){
+           await cloudinary.uploader.destroy(req.body.img_id);
+           res.status(201).json({
+            res: "ok",
+            message: "advert image updated successfully",
+            data:OverrideImg
+           
+          });
+        
+        }else{
+          return res.status(401).json({
+            res: "ok",
+            message: "something went wrong",
+          });
+        }
+      }
+    }
+   
+  try {
+   
+  } catch (error) {
+    
+  }
+
+}
+})
+
+
 
 // @desc: delete advert
 // @Route: /api/advert/delete/:advert_id
@@ -331,6 +399,11 @@ exports.deleteAdvert = asyncHandler(async (req, res) => {
     });
   }
 });
+
+// @desc: delete advert images
+// @Route: /api/advert-img/delete/:advert_id
+// @Acess: private
+
 
 exports.deleteAdvertImg = asyncHandler(async (req, res) => {
   const deleteAvertImg = await advertSchema.findOne({advert_id:req.params.advert_id})
