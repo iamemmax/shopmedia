@@ -4,7 +4,6 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const passport = require("passport");
-const sharp = require("sharp")
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary")
 const sendEmail = require("../../helper/email");
