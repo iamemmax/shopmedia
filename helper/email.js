@@ -14,7 +14,7 @@ const mailgun = new Mailgun(formData);
   
     
     const messageData = {
-      from: 'shop media <hi@shopmedia.ng>',
+      from: 'shopMedia <hi@shopmedia.ng>',
       to: email,
       subject: subject,
       html: html,
