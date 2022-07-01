@@ -15,7 +15,7 @@ const welcomeEmail = require("../../helper/Email Template/welcomeEmail")
 
 // @desc: create account
 // @Route: /api/users/register
-// @Acess: public
+// @Acess: publicu
 exports.createUser = asyncHandler(async (req, res) => {
   let {
     username,
