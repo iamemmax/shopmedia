@@ -47,7 +47,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
    
       if(cartFound){
         return res.status(401).json({
-          message: "sub-category already exist",
+          message: "Sub-category already exist",
         });
       }
    
@@ -70,7 +70,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
       });
     } else {
       return res.status(401).json({
-        message: "unable to add category",
+        message: "Unable to add category",
       });
     }
   })
@@ -105,19 +105,19 @@ exports.updateSubCart = asyncHandler(async(req, res) =>{
         if(updateSubCart){
           return res.status(201).json({
             res: "ok",
-            message: "sub category updates successfully",
+            message: "Sub category updated successfully",
             data:updateSubCart,
           });
         }else{
           return res.status(401).json({
             res:"failed",
-                message: "unable to update sub-category",
+                message: "Unable to update sub-category",
               });
         }
       }else{
         return res.status(401).json({
           res:"failed",
-              message: "sub-category not found",
+              message: "Sub-category not found",
             });
       }
 
@@ -137,12 +137,12 @@ exports.deleteSubCategory = asyncHandler(async(req, res) =>{
     if(deleteCart){
         return res.status(201).json({
             res: "ok",
-            message: "sub-category deleted successfully",
+            message: "Sub-category deleted successfully",
             deleteCart,
           });
     }else{
         return res.status(401).json({
-            message: "unable to delete category",
+            message: "Unable to delete category",
           });
     }
 })
