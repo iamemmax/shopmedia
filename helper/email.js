@@ -4,22 +4,31 @@ const DOMAIN = process.env.DOMAIN;
 const Mailgun = require('mailgun.js');
 const formData = require('form-data');
 const mailgun = new Mailgun(formData);
-  module.exports = async (email, subject, html) => {
+
+
+  const sendEmail =  async (email, subject, html) => {
     
-    const client = mailgun.client({username: 'api', key: API_KEY});
+    const client = await mailgun.client({username: 'api', key: API_KEY});
+    (async () => {
+    
+  
     
     const messageData = {
       from: 'shop media <hi@shopmedia.ng>',
       to: email,
       subject: subject,
-      text: html
+      html: html,
+    
     };
     
-    client.messages.create(DOMAIN, messageData)
+   await client.messages.create(DOMAIN, messageData)
      .then((res) => {
        console.log(res);
      })
      .catch((err) => {
        console.error(err);
      });
-  }
+    })()
+}
+
+  module.exports = sendEmail
