@@ -4,7 +4,6 @@ const asyncHandler = require("express-async-handler");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const passport = require("passport");
-const sharp = require("sharp")
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary")
 const sendEmail = require("../../helper/email");
@@ -750,12 +749,12 @@ exports.activateUser = asyncHandler(async (req, res) => {
 
     let userFound = await userSchema.findOneAndUpdate(
       {user_id: req.params.user_id },
-      { $set: { status: true } },
+      { $set: { verified: true } },
       { new: true }
     );
-    console.log(updateUser);
+   
 
-    if (updateUser.status === true) {
+    if (userFound.verify === true) {
       token.remove();
       return res.status(201).json({
         message: "email verified successfully",
@@ -788,6 +787,14 @@ if(!user){
    res.status(401)
   throw new Error("Incorrect email or password");
   
+ 
+}
+if(user.verified === false){
+  return res.status(200).json({
+    res:"failed",
+    message:"Account not verify",
+   
+  })
  
 }
 try {
@@ -829,6 +836,7 @@ try {
 // @Acess: public
 
 exports.logoutUser = (req, res) => {
+  
   req.logOut(function (err) {
     if (err) console.log(err);
 
@@ -861,6 +869,14 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
    
 
   const user = await userSchema.findOne({ email: email });
+  if(user.verified === false){
+    return res.status(200).json({
+      res:"failed",
+      message:"Account not verify",
+     
+    })
+   
+  }
   if (user) {
     crypto.randomBytes(48, async (err, buffer) => {
       let token = buffer.toString("hex");

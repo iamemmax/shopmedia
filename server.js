@@ -9,6 +9,7 @@ const subCategoryRoutes = require("./routes/category/subCategoryRoutes");
 const advertRoutes = require("./routes/advert/advertRoutes");
 const searchRoutes = require("./routes/search/searchRoutes");
 const businessRoutes = require("./routes/Bussiness/businessRoutes");
+const paymentRoutes = require("./routes/payment/paymentRoutes")
 const Agency = require("./routes/Agency/pages");
 const { errorHandler } = require("./config/errorMiddleWares");
 const cors = require("cors");
@@ -52,6 +53,7 @@ app.use("/api/sub-category", subCategoryRoutes);
 app.use("/api/find", searchRoutes);
 app.use("/api/adpages", Agency);
 app.use("/api/business", businessRoutes);
+app.use("/api/payment", paymentRoutes);
 
 app.use(errorHandler);
 const PORT = process.env.PORT || 5000;

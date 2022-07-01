@@ -38,9 +38,9 @@ const UserSchema = new mongoose.Schema({
     enum: ["super admin", "vendors","admin", "customers"],
   },
   pic:[],
-  status: {
+  verified: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   token: {
     type: String,
