@@ -58,7 +58,7 @@ exports.createAdvert = asyncHandler(async (req, res) => {
   let advertExist = await advertSchema.findOne({ address: address });
     if (advertExist) {
       res.status(401);
-      throw new Error("advert already exist");
+      throw new Error("Advert already exist");
     } 
 
   // @desc compress images before uploading
