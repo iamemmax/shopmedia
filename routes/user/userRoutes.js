@@ -3,7 +3,7 @@ const router = express.Router();
 const upload = require("../.././config/upload")
 const {ensureLogin, adminAccess} = require("../.././helper/ensureLogin")
 
-let { createUser, activateUser, loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, uploadProfilePic, listUsers, removeUsers, createAdmin } = require("../../controllers/users/Users");
+let { createUser, activateUser, loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, updateProfile, uploadProfilePic, listUsers, removeUsers, createAdmin } = require("../../controllers/users/Users");
 
 
 //@desc create account
@@ -23,7 +23,8 @@ router.get("/logout", ensureLogin, logoutUser)
 router.post("/forget-password", forgetPassword)
 //@desc reset password 
 router.post("/reset-password/:user_id/:token", resetPassword)
-router.put("/change-password/:user_id/", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), ChangePassword)
+router.put("/change-password/:user_id", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), ChangePassword)
+router.put("/profile/update/:user_id", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), updateProfile)
 router.put("/upload-profile-img/:user_id", ensureLogin,  adminAccess(["super admin", "admin", "customers", "vendors"]), upload.single("pic"), uploadProfilePic)
 router.delete("/remove/:user_id", ensureLogin, adminAccess(["super admin", "admin"]), removeUsers)
 // @desc: Admin

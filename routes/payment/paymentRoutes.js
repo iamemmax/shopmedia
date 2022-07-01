@@ -11,6 +11,6 @@ const {listBank} = require("../../controllers/payment/payment")
 // router.get("/transactions", ensureLogin,adminAccess(["super admin", "admin"]), listTransaction)
 // router.get("/transaction/:id", ensureLogin, fetchTransaction)
 
-router.get("/list-banks", ensureLogin, listBank)
+router.get("/banks", ensureLogin, listBank)
 
 module.exports = router

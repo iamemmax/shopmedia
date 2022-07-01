@@ -75,7 +75,7 @@ exports.createUser = asyncHandler(async (req, res) => {
             }).save();
 
             if (newUser) {
-              let { user_id, username, email, fullname, phone_no, company_name } =
+              let { user_id, username, email, fullname, phone_no, company_name, verified } =
                 newUser;
               let user = {
                 user_id,
@@ -84,6 +84,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 fullname,
                 phone_no,
                 company_name,
+                verified
               };
 
                await new tokenSchema({
@@ -1398,6 +1399,51 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
 })
 
 
+
+//@desc: update user profile 
+//@access: private
+//@method: put
+//@route: /api/users/profile/update
+
+exports.updateProfile = asyncHandler(async(req, res)=>{
+  let user = await userSchema.findOne({user_id:req.params.user_id}).select("-password -__v")
+  let {firstname, lastname, fullname,  phone_no} = req.body
+
+  try{
+    if(user){
+      let updateUser = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{firstname:firstname || user.firstname, lastname:lastname || user.lastname, fullname:fullname || user.fullname, phone_no:phone_no || user.phone_no, }}, {new:true})
+      if(updateUser){
+        res.status(201).json({
+          res:"ok",
+          message:"Profile  updated successfully",
+          data:updateUser
+        })
+      }else{
+        res.status(201).json({
+          res:"failed",
+          message:"something went wrong"
+          
+        })
+      }
+    }else{
+      res.status(201).json({
+        res:"failed",
+        message:"user not found"
+        
+      })
+    }
+  }catch(error){
+    res.status(201).json({
+      res:"failed",
+      message:error.message
+      
+    })
+  }
+
+})
+
+
+
 // @desc: list users account
 // @Route: /api/users
 // @Acess: private(admin, super admin)
@@ -1483,3 +1529,4 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 // @desc: remove multiple users
 // @Route: /api/users/remove/user_id
 // @Acess: private(super admin, admin)
+
