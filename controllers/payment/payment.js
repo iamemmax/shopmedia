@@ -28,14 +28,15 @@ exports.listBank = asyncHandler(async(req, res) =>{
 })
 
 exports.createCustomer = asyncHandler(async(req, res) =>{
-    let {email, firstname, lastname, phone_no } = req.body
+    let {email, firstname, lastname, phone_no , fullname} = req.body
     
 try{
     const newCustomer = paystack.createCustomer({
         email,
         first_name:firstname,
         last_name:lastname,
-        phone:phone_no
+        phone:phone_no,
+        fullname
       })
       
       newCustomer.then(function(response){
@@ -43,7 +44,7 @@ try{
       }).then( body => {
         console.log(body.data)
         let {id, customer_code, email} = body.data
-        return res.status(200).json({data:{id, email, customer_code}})
+        return res.status(200).json({data:body.data})
       })  
 }catch(error){
     return res.status(401).json({
@@ -130,10 +131,11 @@ exports.customerRisk = asyncHandler(async(req, res) =>{
 
 
 exports.initializeTransaction =  asyncHandler(async(req, res) =>{
-  let {amount, email} = req.body
+  let {amount, email, channels} = req.body
     const initialized =paystack.initializeTransaction({
       amount,
-      email
+      email,
+      channel:['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
     })
       
       initialized.then(function (response){
@@ -173,13 +175,15 @@ verify.then(function (response){
 })
 
 exports.chargeTransaction =  asyncHandler(async(req, res) =>{
-  let {card_no, cvv, expiry_year, expiry_month, email, amount} = req.body
+  let {card_no, cvv, expiry_year, expiry_month, email, amount, authorization_code} = req.body
   const charge = paystack.chargeCard({
     card:{
       number: card_no, // mastercard
       cvv,
-      expiry_year,
+      expiry_year,  
       expiry_month,
+      authorization_code:null,
+      channel: "card"
     },
     email,
     amount:amount // 156,000 Naira in kobo
@@ -195,5 +199,5 @@ exports.chargeTransaction =  asyncHandler(async(req, res) =>{
         message:error.message
     })
   })
-  PayStack.engageMock()
+  
 })
