@@ -75,7 +75,6 @@ exports.getCustomer = asyncHandler(async(req, res) =>{
 
 
 
-
 exports.checkOut = asyncHandler(async(req, res) =>{
     let {price} = req.body
     let {phone_no} = await userSchema.findOne({user_id:req.params.user_id})
@@ -89,7 +88,8 @@ exports.checkOut = asyncHandler(async(req, res) =>{
         amount:price, // Amount in kobo
         slug:token,
         redirect_url:'http://localhost:5000/api/payment/callback',
-        custom_fields: [phone_no]
+        custom_fields: [phone_no],
+        channels:["card"]
       })
       
       checkout.then(function (response){
@@ -131,11 +131,21 @@ exports.customerRisk = asyncHandler(async(req, res) =>{
 
 
 exports.initializeTransaction =  asyncHandler(async(req, res) =>{
-  let {amount, email, channels} = req.body
+  let {amount, email, channels,phone} = req.body
+  crypto.randomBytes(10, async (err, buffer) => {
+    let token = buffer.toString("hex");
+ 
     const initialized =paystack.initializeTransaction({
       amount,
       email,
-      channel:['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer']
+      channel:['card', 'bank', 'ussd', 'qr', 'mobile_money', 'bank_transfer'],
+      subaccount:"ACCT_ynugqbt26lrfdz0",
+      reference: token,
+      phone,
+
+     
+
+
     })
       
       initialized.then(function (response){
@@ -148,6 +158,7 @@ exports.initializeTransaction =  asyncHandler(async(req, res) =>{
             res:"failed",
             message:error.message
         })
+      })
       })
 })
 
@@ -176,14 +187,17 @@ verify.then(function (response){
 
 exports.chargeTransaction =  asyncHandler(async(req, res) =>{
   let {card_no, cvv, expiry_year, expiry_month, email, amount, authorization_code} = req.body
+  crypto.randomBytes(10, async (err, buffer) => {
+    let token = buffer.toString("hex");
+ 
   const charge = paystack.chargeCard({
     card:{
       number: card_no, // mastercard
       cvv,
       expiry_year,  
       expiry_month,
-      authorization_code:null,
-      channel: "card"
+      authorization_code:token,
+      // channel: "card"
     },
     email,
     amount:amount // 156,000 Naira in kobo
@@ -199,5 +213,7 @@ exports.chargeTransaction =  asyncHandler(async(req, res) =>{
         message:error.message
     })
   })
+  })
   
 })
+ 
