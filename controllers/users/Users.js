@@ -91,7 +91,309 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 token,
               }).save();
+             
               sendEmail(
+                email,
+                "Verify Email Address",
+                `
+          
+                
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap"
+        rel="stylesheet">
+
+
+    <title>ShopMedia - Email</title>
+
+
+    <style>
+        a:focus {
+            outline: 0 solid
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            margin: 0 0 15px;
+            color: #1B1B21;
+        }
+
+
+        body {
+            color: #1E1F20;
+            font-weight: 400;
+            font-family: 'DM Sans', sans-serif;
+            max-width: 599px;
+            margin: 0 auto;
+        }
+
+
+        .selector-for-some-widget {
+            box-sizing: content-box;
+        }
+
+        a:hover {
+            text-decoration: none
+        }
+
+        /*--------------- Header area start ----------------*/
+        .header {
+            background: #000;
+            padding: 10px 10px;
+            height: 55px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /*--------------- Header area end ----------------*/
+
+
+
+        /*--------------- Mail area start ----------------*/
+        .mail-area {
+            padding-top: 50px;
+            padding-bottom: 50px;
+            background: #fff;
+        }
+
+        .mail-wrapper {
+            padding: 0 30px;
+        }
+
+        .mail-wrapper h3 {
+            font-weight: 700;
+            font-size: 30px;
+            line-height: 39px;
+            text-align: center;
+            letter-spacing: -0.02em;
+            color: #000000;
+            margin-bottom: 0;
+        }
+
+        .mail-wrapper h3 a {
+            color: #EBAA24;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .email-thumb {
+            max-width: 388px;
+            margin: 0 auto;
+            margin-bottom: 30px;
+        }
+
+        .mail-wrapper p {
+            font-size: 15px;
+            margin-bottom: 23px;
+        }
+
+        .mail-wrapper li {
+            font-size: 15px;
+            margin-bottom: 17px;
+        }
+
+        .mail-btn a {
+            font-weight: 500;
+            font-size: 13px;
+            line-height: 17px;
+            letter-spacing: -0.02em;
+            color: #000000;
+            display: inline-block;
+            text-decoration: none;
+            background: #EBAA24;
+            border-radius: 5px;
+            padding: 10px 30px;
+        }
+
+        .mail-btn {
+            padding-top: 5px;
+        }
+
+        /*--------------- Mail area end ----------------*/
+
+
+        /*--------------- Footer area start ----------------*/
+        .footer p {
+            font-weight: 500;
+            font-size: 9px;
+            line-height: 12px;
+            text-align: center;
+            letter-spacing: -0.0em;
+            color: #FFFFFF;
+            margin-bottom: 5px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 18px 30px;
+            background: #000000;
+            color: #fff;
+        }
+
+        .footer p b {
+            font-weight: 700;
+            font-size: 10px;
+            line-height: 1.2;
+            padding-top: 8px;
+            display: block;
+        }
+
+        .footer-social a {
+            display: inline-block;
+            max-width: 20px;
+            margin: 0 5px;
+        }
+
+        .footer-social {
+            padding-bottom: 24px;
+        }
+
+        .footer p a {
+            color: #EBAA24;
+            text-decoration: none;
+        }
+
+        /*--------------- Footer area end ----------------*/
+
+
+
+        /*--------------- Responsive area start ----------------*/
+        @media screen and (max-width: 575px) {
+            .mail-wrapper {
+                padding: 0 10px;
+            }
+
+            .mail-wrapper h3 {
+                font-size: 25px;
+                line-height: 29px;
+            }
+
+
+        }
+
+        /*--------------- Responsive area end ----------------*/
+    </style>
+
+
+
+
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+    <!--------- Header area start --------->
+    <header class="header">
+        <div class="header-logo">
+            <a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a>
+        </div>
+    </header>
+    <!--------- Header area end --------->
+
+
+
+    <!--------- Main area start --------->
+    <main class="main">
+
+
+        <!--------- Mail area start --------->
+        <section class="mail-area">
+            <div class="container">
+                <div class="mail-wrapper">
+                    <h4>Verify Email Address </h4>
+                    <p>Hi ${username},</p>
+                    <p>Please click the button below to verify your email address.
+                    </p>
+
+                    <div class="mail-btn text-center pb-4">
+                    <a href="https://shopmedia-api.herokuapp.com/api/users/verify/${user_id}/${token}"> Verify your email</a>
+                        
+                    </div>
+
+                    <p>If you did not create an account, no further action is required.</p>
+
+                    <p>Regards, <br>
+                        ShopMedia Team</p>
+                    <p><a href="" class="text-dark text-decoration-none">https://shopmedia.ng/</a></p>
+                </div>
+            </div>
+        </section>
+        <!--------- Mail area end --------->
+
+
+
+    </main>
+    <!--------- Main area end --------->
+
+
+
+
+    <!--------- Footer area start --------->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-social d-flex justify-content-center align-items-center">
+                <a href=""><img src="https://tomal.dev/shopMedia/images/facebook.svg" alt=""></a>
+                <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt=""></a>
+                <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt=""></a>
+            </div>
+            <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
+            <p class="sm">You are receiving this email because you opted in via our website.</p>
+            <p><b>Our mailling address is</b></p>
+            <p>Shopmedia Limited</p>
+            <p>12 lagos island road</p>
+            <p>Lekki asis, Abuja</p>
+            <p>Nigeria</p>
+            <br>
+            <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+        </div>
+    </footer>
+    <!--------- Footer area end --------->
+
+
+
+
+
+
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/js/popper.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
+        crossorigin="anonymous"></script>
+
+</body>
+
+</html>
+                `
+              );
+               sendEmail(
                 email,
                 "Welcome to ShopMedia.ng",
                 ` 
@@ -404,307 +706,6 @@ exports.createUser = asyncHandler(async (req, res) => {
                 
                 </html>`
               
-              );
-              sendEmail(
-                email,
-                "Verify Email Address",
-                `
-          
-                
-<!doctype html>
-<html lang="en">
-
-<head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap"
-        rel="stylesheet">
-
-
-    <title>ShopMedia - Email</title>
-
-
-    <style>
-        a:focus {
-            outline: 0 solid
-        }
-
-        img {
-            max-width: 100%;
-            height: auto;
-        }
-
-        h1,
-        h2,
-        h3,
-        h4,
-        h5,
-        h6 {
-            margin: 0 0 15px;
-            color: #1B1B21;
-        }
-
-
-        body {
-            color: #1E1F20;
-            font-weight: 400;
-            font-family: 'DM Sans', sans-serif;
-            max-width: 599px;
-            margin: 0 auto;
-        }
-
-
-        .selector-for-some-widget {
-            box-sizing: content-box;
-        }
-
-        a:hover {
-            text-decoration: none
-        }
-
-        /*--------------- Header area start ----------------*/
-        .header {
-            background: #000;
-            padding: 10px 10px;
-            height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /*--------------- Header area end ----------------*/
-
-
-
-        /*--------------- Mail area start ----------------*/
-        .mail-area {
-            padding-top: 50px;
-            padding-bottom: 50px;
-            background: #fff;
-        }
-
-        .mail-wrapper {
-            padding: 0 30px;
-        }
-
-        .mail-wrapper h3 {
-            font-weight: 700;
-            font-size: 30px;
-            line-height: 39px;
-            text-align: center;
-            letter-spacing: -0.02em;
-            color: #000000;
-            margin-bottom: 0;
-        }
-
-        .mail-wrapper h3 a {
-            color: #EBAA24;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .email-thumb {
-            max-width: 388px;
-            margin: 0 auto;
-            margin-bottom: 30px;
-        }
-
-        .mail-wrapper p {
-            font-size: 15px;
-            margin-bottom: 23px;
-        }
-
-        .mail-wrapper li {
-            font-size: 15px;
-            margin-bottom: 17px;
-        }
-
-        .mail-btn a {
-            font-weight: 500;
-            font-size: 13px;
-            line-height: 17px;
-            letter-spacing: -0.02em;
-            color: #000000;
-            display: inline-block;
-            text-decoration: none;
-            background: #EBAA24;
-            border-radius: 5px;
-            padding: 10px 30px;
-        }
-
-        .mail-btn {
-            padding-top: 5px;
-        }
-
-        /*--------------- Mail area end ----------------*/
-
-
-        /*--------------- Footer area start ----------------*/
-        .footer p {
-            font-weight: 500;
-            font-size: 9px;
-            line-height: 12px;
-            text-align: center;
-            letter-spacing: -0.0em;
-            color: #FFFFFF;
-            margin-bottom: 5px;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 18px 30px;
-            background: #000000;
-            color: #fff;
-        }
-
-        .footer p b {
-            font-weight: 700;
-            font-size: 10px;
-            line-height: 1.2;
-            padding-top: 8px;
-            display: block;
-        }
-
-        .footer-social a {
-            display: inline-block;
-            max-width: 20px;
-            margin: 0 5px;
-        }
-
-        .footer-social {
-            padding-bottom: 24px;
-        }
-
-        .footer p a {
-            color: #EBAA24;
-            text-decoration: none;
-        }
-
-        /*--------------- Footer area end ----------------*/
-
-
-
-        /*--------------- Responsive area start ----------------*/
-        @media screen and (max-width: 575px) {
-            .mail-wrapper {
-                padding: 0 10px;
-            }
-
-            .mail-wrapper h3 {
-                font-size: 25px;
-                line-height: 29px;
-            }
-
-
-        }
-
-        /*--------------- Responsive area end ----------------*/
-    </style>
-
-
-
-
-
-
-
-
-</head>
-
-<body>
-
-
-
-
-    <!--------- Header area start --------->
-    <header class="header">
-        <div class="header-logo">
-            <a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a>
-        </div>
-    </header>
-    <!--------- Header area end --------->
-
-
-
-    <!--------- Main area start --------->
-    <main class="main">
-
-
-        <!--------- Mail area start --------->
-        <section class="mail-area">
-            <div class="container">
-                <div class="mail-wrapper">
-                    <h4>Verify Email Address </h4>
-                    <p>Hi ${username},</p>
-                    <p>Please click the button below to verify your email address.
-                    </p>
-
-                    <div class="mail-btn text-center pb-4">
-                    <a href="https://shopmedia-api.herokuapp.com/api/users/verify/${user_id}/${token}"> Verify your email</a>
-                        
-                    </div>
-
-                    <p>If you did not create an account, no further action is required.</p>
-
-                    <p>Regards, <br>
-                        ShopMedia Team</p>
-                    <p><a href="" class="text-dark text-decoration-none">https://shopmedia.ng/</a></p>
-                </div>
-            </div>
-        </section>
-        <!--------- Mail area end --------->
-
-
-
-    </main>
-    <!--------- Main area end --------->
-
-
-
-
-    <!--------- Footer area start --------->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-social d-flex justify-content-center align-items-center">
-                <a href=""><img src="https://tomal.dev/shopMedia/images/facebook.svg" alt=""></a>
-                <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt=""></a>
-                <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt=""></a>
-            </div>
-            <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
-            <p class="sm">You are receiving this email because you opted in via our website.</p>
-            <p><b>Our mailling address is</b></p>
-            <p>Shopmedia Limited</p>
-            <p>12 lagos island road</p>
-            <p>Lekki asis, Abuja</p>
-            <p>Nigeria</p>
-            <br>
-            <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
-        </div>
-    </footer>
-    <!--------- Footer area end --------->
-
-
-
-
-
-
-
-    <script src="assets/js/jquery.min.js"></script>
-    <script src="assets/js/popper.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
-        crossorigin="anonymous"></script>
-
-</body>
-
-</html>
-                `
               );
 
               return res.status(201).json({
