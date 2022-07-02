@@ -1,109 +1,11 @@
 const asyncHandler = require("express-async-handler");
-const axios = require("axios")
 const PayStack = require('paystack-node')
 const environment = process.env.NODE_ENV
-
+const userSchema = require("../../model/users/UserSchema")
 const paystack = new PayStack(process.env.PAYSTACK_API, environment)
+const crypto = require("crypto");
 
 
-
-//    let config = {
-//     headers:{
-//         Authorization:`Bearer ${process.env.PAYSTACK_API}`}
-// };
-//@desc:initializes transaction
-// exports.initializePayment = asyncHandler(async(req, res) =>{
-// //     let {email, amount, currency} = req.body
-
-// //     if(!email||  !amount||  !currency){
-// //         return res.status(401).json({
-// //             res:"failed",
-// //             message:"all fields are required"
-// //         })
-// //     }
-// //     let data = {email, amount, currency}
-    
-// // console.log(data)
-// //     let initialPayment = await axios.post("https://api.paystack.co/transaction/initialize", data, config)
-
-// //     if(initialPayment){
-// //         return res.status(201).json({
-// //             res:"ok",
-// //             data:initialPayment.data.data.authorization_url
-// //         })
-// //     }else{
-// //         console.log("error")
-// //     }
-
-// })
-
-//@desc:verify transaction
-
-
-// exports.verifyTransaction = asyncHandler(async(req, res) =>{
-// //    try{
-// //     const verify = await axios.get(`https://api.paystack.co/transaction/verify/${req.params.id}`, config)
-// //     if(verify){
-// //         return res.status(201).json({
-// //             data:verify.data
-// //         })
-// //     }else{
-// //         return res.status(401).json({
-// //             message:"invalid reference id"
-// //         })
-// //     }
-// //    }catch(error){
-// //     return res.status(401).json({
-// //         message:error.message
-// //     })
-// //    }
-// })
-
-
-
-//@desc:list tansaction
-
-// exports.listTransaction = asyncHandler(async(req, res) =>{
-//     try{
-//      const list = await axios.get(`https://api.paystack.co/transaction`, config)
-//      if(list){
-//          return res.status(201).json({
-//              data:list.data
-//          })
-//      }else{
-//          return res.status(401).json({
-//              message:"invalid reference id"
-//          })
-//      }
-//     }catch(error){
-//      return res.status(401).json({
-//          message:error.message
-//      })
-//     }
-//  })
-
-
- //@desc:verify transaction
-
-
-// exports.fetchTransaction = asyncHandler(async(req, res) =>{
-//     // try{
-//     //  const singleTransaction = await axios.get(`https://api.paystack.co/transaction/${req.params.id}`, config)
-//     //  if(singleTransaction){
-//     //      return res.status(201).json({
-//     //          data:singleTransaction.data
-//     //      })
-//     //  }else{
-//     //      return res.status(401).json({
-//     //          message:"invalid transaction id"
-//     //      })
-//     //  }
-//     // }catch(error){
-//     //  return res.status(401).json({
-//     //      message:error.message
-//     //  })
-//     // }
-//  })
 
 
 exports.listBank = asyncHandler(async(req, res) =>{
@@ -123,4 +25,175 @@ exports.listBank = asyncHandler(async(req, res) =>{
       }catch(ex){
         console.error(ex.message);
       }
+})
+
+exports.createCustomer = asyncHandler(async(req, res) =>{
+    let {email, firstname, lastname, phone_no } = req.body
+    
+try{
+    const newCustomer = paystack.createCustomer({
+        email,
+        first_name:firstname,
+        last_name:lastname,
+        phone:phone_no
+      })
+      
+      newCustomer.then(function(response){
+        return response.body
+      }).then( body => {
+        console.log(body.data)
+        let {id, customer_code, email} = body.data
+        return res.status(200).json({data:{id, email, customer_code}})
+      })  
+}catch(error){
+    return res.status(401).json({
+        res:"ok",
+        message:error.message
+    })
+}
+})
+
+exports.getCustomer = asyncHandler(async(req, res) =>{
+    const getCustomerById = paystack.getCustomer({
+        customer_id:req.params.customer_code
+      })
+      
+      getCustomerById.then(function(response){
+        return res.status(200).json({
+            res:"ok",
+            data:response.body
+        })
+        
+      }).catch(function(error){
+        return res.status(200).json({
+            res:"failed",
+            message:error.message
+        })
+      })
+})
+
+
+
+
+exports.checkOut = asyncHandler(async(req, res) =>{
+    let {price} = req.body
+    let {phone_no} = await userSchema.findOne({user_id:req.params.user_id})
+    crypto.randomBytes(10, async (err, buffer) => {
+      let token = buffer.toString("hex");
+   
+    const checkout = paystack.createPage({
+        name:'advert name',
+        description:'This is payment for advert ',
+        
+        amount:price, // Amount in kobo
+        slug:token,
+        redirect_url:'http://localhost:5000/api/payment/callback',
+        custom_fields: [phone_no]
+      })
+      
+      checkout.then(function (response){
+        return res.status(200).json({
+          res:"ok",
+          data:response.body
+        })
+      }).catch(function (error){
+        return res.status(200).json({
+          res:"failed",
+          // message:error.message
+        })
+      })
+      })
+})
+
+exports.customerRisk = asyncHandler(async(req, res) =>{
+    let customer = req.params.customer
+    
+    
+    const risk = paystack.setRiskActionOnCustomer({
+        risk_action:'deny',
+        customer
+    })
+    console.log(customer)
+      
+      risk.then(function (response){
+        return res.status(200).json({
+            res:"ok",
+            data:response.body
+        })
+      }).catch(function (error){
+        return res.status(200).json({
+            res:"failed",
+            message:error.message
+        })
+      })
+})
+
+
+exports.initializeTransaction =  asyncHandler(async(req, res) =>{
+  let {amount, email} = req.body
+    const initialized =paystack.initializeTransaction({
+      amount,
+      email
+    })
+      
+      initialized.then(function (response){
+        return res.status(200).json({
+            res:"ok",
+            data:response.body
+        })
+      }).catch(function (error){
+        return res.status(200).json({
+            res:"failed",
+            message:error.message
+        })
+      })
+})
+
+
+
+
+exports.verifyTransaction = asyncHandler(async(req, res) =>{
+
+const verify = paystack.verifyTransaction({
+  reference: req.params.reference
+})
+
+verify.then(function (response){
+  return res.status(200).json({
+    res:"ok",
+    data:response.body
+})
+}).catch(function (error){
+  return res.status(200).json({
+    res:"failed",
+    message:error.message
+})
+})
+
+})
+
+exports.chargeTransaction =  asyncHandler(async(req, res) =>{
+  let {card_no, cvv, expiry_year, expiry_month, email, amount} = req.body
+  const charge = paystack.chargeCard({
+    card:{
+      number: card_no, // mastercard
+      cvv,
+      expiry_year,
+      expiry_month,
+    },
+    email,
+    amount:amount // 156,000 Naira in kobo
+  })
+  charge.then(function (response){
+    return res.status(200).json({
+        res:"ok",
+        data:response.body
+    })
+  }).catch(function (error){
+    return res.status(200).json({
+        res:"failed",
+        message:error.message
+    })
+  })
+  PayStack.engageMock()
 })
