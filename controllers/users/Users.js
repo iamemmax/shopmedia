@@ -161,9 +161,15 @@ exports.createUser = asyncHandler(async (req, res) => {
             background: #000;
             padding: 10px 10px;
             height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
+        
+        .header img {
+	        max-width: 148px !important;
+            display: block !important;
+            margin: 0 auto !important;
         }
 
         /*--------------- Header area end ----------------*/
@@ -304,13 +310,13 @@ exports.createUser = asyncHandler(async (req, res) => {
 
 </head>
 
-<body>
+<body style="max-width: 590px; margin: 0 auto">
 
 
 
 
     <!--------- Header area start --------->
-    <header class="header">
+    <header class="header" style="display:flex; align-items: center; justify-content: center">
         <div class="header-logo">
             <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
         </div>
@@ -359,9 +365,9 @@ exports.createUser = asyncHandler(async (req, res) => {
     <footer class="footer">
         <div class="container">
             <div class="footer-social d-flex justify-content-center align-items-center">
-                <a href=""><img src="https://tomal.dev/shopMedia/images/facebook.svg" alt=""></a>
-                <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt=""></a>
-                <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/Vector.svg" alt=""></a>
             </div>
             <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
             <p class="sm">You are receiving this email because you opted in via our website.</p>
@@ -391,7 +397,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 </body>
 
 </html>
-                `
+                 `
               );
                sendEmail(
                 email,
@@ -464,7 +470,11 @@ exports.createUser = asyncHandler(async (req, res) => {
                             align-items: center;
                             justify-content: center;
                         }
-                
+                   .header img {
+	                   max-width: 148px !important;
+                       display: block !important;
+                       margin: 0 auto !important;
+                    }
                         /*--------------- Header area end ----------------*/
                 
                 
@@ -603,13 +613,13 @@ exports.createUser = asyncHandler(async (req, res) => {
                 
                 </head>
                 
-                <body>
+                <body style="max-width: 590px; margin: 0 auto">
                 
                 
                 
                 
                     <!--------- Header area start --------->
-                    <header class="header">
+                    <header class="header" style="display:flex; align-items: center; justify-content: center">
                         <div class="header-logo">
                             <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
                         </div>
@@ -673,9 +683,9 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <footer class="footer">
                         <div class="container">
                             <div class="footer-social d-flex justify-content-center align-items-center">
-                                <a href=""><img src=https://tomal.dev/shopMedia/images/facebook.svg" alt=""></a>
-                                <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt=""></a>
-                                <a href=""><img src="https://tomal.dev/shopMedia/images/vector.svg" alt=""></a>
+                                <a href=""><img src=https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/vector.svg" alt=""></a>
                             </div>
                             <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
                             <p class="sm">You are receiving this email because you opted in via our website.</p>
