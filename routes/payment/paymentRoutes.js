@@ -10,7 +10,7 @@ router.post("/create/customer", ensureLogin, createCustomer)
 router.get("/customer/:customer_code", ensureLogin, getCustomer)
 router.get("/customer/risk/:customer", ensureLogin, customerRisk)
 router.post("/checkout/:user_id", ensureLogin, checkOut)
-router.post("/inintialize", ensureLogin, initializeTransaction)
+router.post("/initialize", ensureLogin, initializeTransaction)
 router.get("/verify/:reference",  verifyTransaction)
 router.post("/callback", ensureLogin, chargeTransaction)
 

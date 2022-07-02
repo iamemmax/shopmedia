@@ -191,16 +191,24 @@ exports.chargeTransaction =  asyncHandler(async(req, res) =>{
     let token = buffer.toString("hex");
  
   const charge = paystack.chargeCard({
-    card:{
-      number: card_no, // mastercard
-      cvv,
-      expiry_year,  
-      expiry_month,
-      authorization_code:token,
-      // channel: "card"
+    "email":"some@body.nice",
+    "amount":"10000",
+    "metadata":{
+      "custom_fields":[
+        {
+          "value":"makurdi",
+          "display_name": "Donation for",
+          "variable_name": "donation_for"
+        }
+      ]
     },
-    email,
-    amount:amount // 156,000 Naira in kobo
+    "card":{
+      "cvv":"408",
+      "number":"4084084084084081",
+      "expiry_month":"01",
+      "expiry_year":"99"
+    },
+    "pin":"0000"
   })
   charge.then(function (response){
     return res.status(200).json({
