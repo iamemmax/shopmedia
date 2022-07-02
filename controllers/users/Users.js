@@ -333,7 +333,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                     </p>
 
                     <div class="mail-btn text-center pb-4">
-                    <a href="https://shopmedia-api.herokuapp.com/api/users/verify/${user_id}/${token}"> Verify your email</a>
+                    <a href="http://localhost:3000/api/users/verify/${user_id}/${token}"> Verify your email</a>
                         
                     </div>
 
