@@ -36,7 +36,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     !phone_no
   ) {
     res.status(401);
-    throw new Error("All fields are required ");
+    throw new Error("All fields are required");
   }
   // @desc check if user enter valid email
  validateEmail(res, email)
@@ -47,14 +47,14 @@ exports.createUser = asyncHandler(async (req, res) => {
     const emailExist = await userSchema.findOne({ email: email });
     if (usernameExist) {
       return res.status(401).json({
-        message: "username already exist",
+        message: "Username already exist",
       })
     }
 
     // @desc check if email already exist
  else if (emailExist) {
       return res.status(401).json({
-        message: "email already exist",
+        message: "Email already linked to another user",
       });
     } else {
       bcrypt.genSalt(10, function (err, salt) {
@@ -94,7 +94,7 @@ exports.createUser = asyncHandler(async (req, res) => {
              
               sendEmail(
                 email,
-                "Verify Email Address",
+                "Verify Your Email",
                 `
           
                 
@@ -312,7 +312,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     <!--------- Header area start --------->
     <header class="header">
         <div class="header-logo">
-            <a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a>
+            <a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a>
         </div>
     </header>
     <!--------- Header area end --------->
@@ -327,7 +327,7 @@ exports.createUser = asyncHandler(async (req, res) => {
         <section class="mail-area">
             <div class="container">
                 <div class="mail-wrapper">
-                    <h4>Verify Email Address </h4>
+                    <h4>Let's verify it's your email</h4>
                     <p>Hi ${username},</p>
                     <p>Please click the button below to verify your email address.
                     </p>
@@ -340,8 +340,8 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <p>If you did not create an account, no further action is required.</p>
 
                     <p>Regards, <br>
-                        ShopMedia Team</p>
-                    <p><a href="" class="text-dark text-decoration-none">https://shopmedia.ng/</a></p>
+                       ShopMedia Team</p>
+                    
                 </div>
             </div>
         </section>
@@ -611,7 +611,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <!--------- Header area start --------->
                     <header class="header">
                         <div class="header-logo">
-                            <a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a>
+                            <a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a>
                         </div>
                     </header>
                     <!--------- Header area end --------->
@@ -626,7 +626,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                         <section class="mail-area">
                             <div class="container">
                                 <div class="mail-wrapper">
-                                    <h3>Welcome to <a href=""><strong></a></h3>
+                                    <h3>Welcome to <a href=""><strong>ShopMedia.ng</a></h3>
                                     <div class="email-thumb">
                                         <img src="https://tomal.dev/shopMedia/images/email-thumb.png" alt="">
                                     </div>
@@ -646,7 +646,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                                             campaign budget</li>
                                         <li> Book the advert spaces you have selected.</li>
                                     </ul>
-                                    <p>We care about you and your business, reach out to us via email at support@shopmedia.ng, or via a
+                                    <p>We care about you and your business, reach out to us via email at hi@shopmedia.ng, or via a
                                         phone call at +234 (90)-231-423-36.</p>
                                     <p>We are taking your business beyond borders.</p>
                                     <p>Warmest Regards, <br>
@@ -654,7 +654,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                                         Chidi Onwumere</p>
                 
                                     <div class="mail-btn text-center">
-                                        <a href="">Get Started</a>
+                                        <a href="https://shopmedia.ng">Get Started</a>
                                     </div>
                                 </div>
                             </div>
@@ -685,7 +685,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                             <p>Lekki asis, Abuja</p>
                             <p>Nigeria</p>
                             <br>
-                            <p>You cab <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+                            <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
                         </div>
                     </footer>
                     <!--------- Footer area end --------->
@@ -733,11 +733,11 @@ exports.activateUser = asyncHandler(async (req, res) => {
 
     if (!user) {
       res.status(401);
-      throw new Error("invalid link");
+      throw new Error("Invalid link");
     }
     if (user.status) {
       res.status(201);
-      throw new Error("email already verified");
+      throw new Error("Email already verified");
     }
 
     const token = await tokenSchema.findOne({
@@ -746,7 +746,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
     });
     if (!token) {
       res.status(401);
-      throw new Error("invalid link");
+      throw new Error("Invalid link");
     }
 
     let userFound = await userSchema.findOneAndUpdate(
@@ -759,7 +759,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
     if (userFound.verify === true) {
       token.remove();
       return res.status(201).json({
-        message: "email verified successfully",
+        message: "Email verified successfully",
       });
     }
   } catch (error) {
@@ -777,7 +777,7 @@ exports.loginUser = asyncHandler(async(req, res) => {
 
   if (!email || !password) {
     res.status(401);
-    throw new Error("Please all fields are required");
+    throw new Error("All fields are required");
   }
 
   // check if user enter valid email
@@ -807,7 +807,7 @@ try {
       if(user.verified === false){
         return res.status(200).json({
           res:"failed",
-          message:"Account not verify",
+          message:"Account not verifed.\n Please check your email for verification link.",
          
         })
        
@@ -816,7 +816,7 @@ try {
         expiresIn: "12h",
       });
       return res.status(200).json({
-        message:"login successful",
+        message:"Login successful",
         userInfo,
         token
       })
@@ -852,7 +852,7 @@ exports.logoutUser = (req, res) => {
         httpOnly: true,
       });
       res.status(201).json({
-        message: "you've successfully logged out",
+        message: "You've successfully logged out",
       });
     });
   });
@@ -866,7 +866,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   let { email } = req.body;
   if (!email) {
     res.status(401);
-    throw new Error("this field is required");
+    throw new Error("This field is required");
   }
 
   // check if user enter valid email
@@ -878,7 +878,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   if(user.verified === false){
     return res.status(200).json({
       res:"failed",
-      message:"Account not verify",
+      message:"Account not verified. \n Please check your email for verification link.",
      
     })
    
@@ -1114,7 +1114,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
             <!--------- Header area start --------->
             <header class="header">
                 <div class="header-logo">
-                   <center><a href=""><img src="https://tomal.dev/shopMedia/images/logo.png" alt=""></a></center> 
+                   <center><a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a></center> 
                 </div>
             </header>
             <!--------- Header area end --------->
@@ -1143,7 +1143,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                                 
                             </div>
         
-                           <p>If you don't wish to reset your password, disregard this email and no action will be taken.</p>
+                           <p>If you do not wish to reset your password, kindly disregard this email and no action will be taken.</p>
         
                             <p>Regards, <br>
                                 ShopMedia Team</p>
@@ -1266,7 +1266,7 @@ exports.resetPassword = asyncHandler(async (req, res) => {
 });
 }else{
   res.status(401);
-  throw new Error("Try resetting your password again /n Your request to reset your password has expired or the link has already been used");
+  throw new Error("Try resetting your password again \n Your request to reset your password has expired or the link has already been used");
   
 }
 }
@@ -1420,20 +1420,20 @@ exports.updateProfile = asyncHandler(async(req, res)=>{
       if(updateUser){
         res.status(201).json({
           res:"ok",
-          message:"Profile  updated successfully",
+          message:"Profile updated successfully",
           data:updateUser
         })
       }else{
         res.status(201).json({
           res:"failed",
-          message:"something went wrong"
+          message:"Something went wrong, try agan later."
           
         })
       }
     }else{
       res.status(201).json({
         res:"failed",
-        message:"user not found"
+        message:"User not found"
         
       })
     }
@@ -1467,7 +1467,7 @@ exports.updateProfile = asyncHandler(async(req, res)=>{
             });
           }else{
             res.status(401)
-            throw new Error("no registerd user")
+            throw new Error("No registerd user in Database")
           }
         
         } catch (error) {
@@ -1486,12 +1486,12 @@ const remove = await userSchema.findOneAndDelete({user_id:req.params.user_id})
 if(remove){
   return res.status(201).json({
     res: "ok",
-    message:"user deleted successfully",
+    message:"User deleted successfully",
     data:remove,
   });
 }else{
   res.status(401)
-  throw new Error("unable to delete user")
+  throw new Error("Unable to delete user")
 }
 
 });
