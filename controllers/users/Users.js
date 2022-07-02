@@ -791,23 +791,27 @@ if(!user){
   
  
 }
-if(user.verified === false){
-  return res.status(200).json({
-    res:"failed",
-    message:"Account not verify",
-   
-  })
- 
-}
+
 try {
   //desc:match password
   bcrypt.compare(password, user.password, (err, isMatch) =>{
     if(err){
-       res.status(401)
-      // throw new Error(error.message);
+      return res.status(401).json({
+      res:"failed",
+      message:"Incorrect email or password",
+       
+      })
 
     }
     if(isMatch){
+      if(user.verified === false){
+        return res.status(200).json({
+          res:"failed",
+          message:"Account not verify",
+         
+        })
+       
+      }
       const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
         expiresIn: "12h",
       });
