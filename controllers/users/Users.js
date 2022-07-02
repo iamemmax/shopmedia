@@ -312,7 +312,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     <!--------- Header area start --------->
     <header class="header">
         <div class="header-logo">
-            <a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a>
+            <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
         </div>
     </header>
     <!--------- Header area end --------->
@@ -611,7 +611,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <!--------- Header area start --------->
                     <header class="header">
                         <div class="header-logo">
-                            <a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a>
+                            <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
                         </div>
                     </header>
                     <!--------- Header area end --------->
