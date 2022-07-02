@@ -155,7 +155,12 @@ exports.createUser = asyncHandler(async (req, res) => {
         a:hover {
             text-decoration: none
         }
+.flex-center{
+display: flex !important;
+align-items:center !important;
+justify-content: center !important;
 
+}
         /*--------------- Header area start ----------------*/
         .header {
             background: #000;
@@ -167,7 +172,7 @@ exports.createUser = asyncHandler(async (req, res) => {
         }
         
         .header img {
-	        max-width: 148px !important;
+	        max-width: 190px !important;
             display: block !important;
             margin: 0 auto !important;
         }
@@ -317,8 +322,8 @@ exports.createUser = asyncHandler(async (req, res) => {
 
     <!--------- Header area start --------->
     <header class="header" style="display:flex; align-items: center; justify-content: center">
-        <div class="header-logo">
-            <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+        <div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
+            <a href="" class="flex-center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
         </div>
     </header>
     <!--------- Header area end --------->
@@ -338,9 +343,8 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <p>Please click the button below to verify your email address.
                     </p>
 
-                    <div class="mail-btn text-center pb-4">
-                    <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a>
-                        
+                    <div class="mail-btn text-center pb-4 flex-center">
+                    <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a> 
                     </div>
 
                     <p>If you did not create an account, no further action is required.</p>
@@ -367,7 +371,7 @@ exports.createUser = asyncHandler(async (req, res) => {
             <div class="footer-social d-flex justify-content-center align-items-center">
                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                <a href=""><img src="https://mail.shopmedia.ng/social-icon/twitter.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/Vector.svg" alt=""></a>
             </div>
             <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
             <p class="sm">You are receiving this email because you opted in via our website.</p>
@@ -397,7 +401,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 </body>
 
 </html>
-                 `
+                `
               );
                sendEmail(
                 email,
@@ -471,7 +475,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                             justify-content: center;
                         }
                    .header img {
-	                   max-width: 148px !important;
+	                   max-width: 190px !important;
                        display: block !important;
                        margin: 0 auto !important;
                     }
@@ -615,16 +619,15 @@ exports.createUser = asyncHandler(async (req, res) => {
                 
                 <body style="max-width: 590px; margin: 0 auto">
                 
-                
-                
-                
-                    <!--------- Header area start --------->
-                    <header class="header" style="display:flex; align-items: center; justify-content: center">
-                        <div class="header-logo">
-                            <a href=""><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
-                        </div>
-                    </header>
-                    <!--------- Header area end --------->
+                 
+                    
+		    <!--------- Header area start --------->
+		    <header class="header" style="display:flex; align-items: center; justify-content: center">
+			<div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
+			    <a href="" class="flex-center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+			</div>
+		    </header>
+		    <!--------- Header area end --------->
                 
                 
                 
@@ -663,7 +666,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 
                                         Chidi Onwumere</p>
                 
-                                    <div class="mail-btn text-center">
+                                    <div class="mail-btn text-center flex-center">
                                         <a href="https://shopmedia.ng">Get Started</a>
                                     </div>
                                 </div>
@@ -682,10 +685,10 @@ exports.createUser = asyncHandler(async (req, res) => {
                     <!--------- Footer area start --------->
                     <footer class="footer">
                         <div class="container">
-                            <div class="footer-social d-flex justify-content-center align-items-center">
-                                <a href=""><img src=https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
+                            <div class="footer-social flex-center">
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
                                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/twitter.svg" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/vector.svg" alt=""></a>
                             </div>
                             <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
                             <p class="sm">You are receiving this email because you opted in via our website.</p>
@@ -715,7 +718,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 </body>
                 
                 </html>`
-              
+		       
               );
 
               return res.status(201).json({
