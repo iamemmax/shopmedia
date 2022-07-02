@@ -47,7 +47,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     const emailExist = await userSchema.findOne({ email: email });
     if (usernameExist) {
       return res.status(401).json({
-        message: "Username already used by another user",
+        message: "Username already picked by another user",
       })
     }
 
