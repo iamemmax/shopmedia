@@ -47,7 +47,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     const emailExist = await userSchema.findOne({ email: email });
     if (usernameExist) {
       return res.status(401).json({
-        message: "Username already exist",
+        message: "Username already used by another user",
       })
     }
 
@@ -367,7 +367,7 @@ exports.createUser = asyncHandler(async (req, res) => {
             <div class="footer-social d-flex justify-content-center align-items-center">
                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                <a href=""><img src="https://mail.shopmedia.ng/social-icon/Vector.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/twitter.svg" alt=""></a>
             </div>
             <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
             <p class="sm">You are receiving this email because you opted in via our website.</p>
@@ -685,7 +685,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                             <div class="footer-social d-flex justify-content-center align-items-center">
                                 <a href=""><img src=https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
                                 <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/vector.svg" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/twitter.svg" alt=""></a>
                             </div>
                             <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
                             <p class="sm">You are receiving this email because you opted in via our website.</p>
