@@ -7,35 +7,44 @@ const paystack = new PayStack(process.env.PAYSTACK_API, environment)
 
 
 
-//    let config = {
-//     headers:{
-//         Authorization:`Bearer ${process.env.PAYSTACK_API}`}
-// };
-//@desc:initializes transaction
-// exports.initializePayment = asyncHandler(async(req, res) =>{
-// //     let {email, amount, currency} = req.body
+  
+const config = {
+  headers: {
+    "Content-Type": "application/json",
 
-// //     if(!email||  !amount||  !currency){
-// //         return res.status(401).json({
-// //             res:"failed",
-// //             message:"all fields are required"
-// //         })
-// //     }
-// //     let data = {email, amount, currency}
+  },
+}
+// @desc:initializes transaction
+exports.initializePayment = asyncHandler(async(req, res) =>{
+    let {email, amount, currency, phone} = req.body
+
+    axios.defaults.headers.common = {
+      "Authorization":`Bearer ${process.env.PAYSTACK_API}`,
+    };
+  
+    if(!email||  !amount){
+        return res.status(401).json({
+            res:"failed",
+            message:"all fields are required"
+        })
+    }
+    let data = {email, amount,  channel:["card"], phone
+
+}
     
-// // console.log(data)
-// //     let initialPayment = await axios.post("https://api.paystack.co/transaction/initialize", data, config)
 
-// //     if(initialPayment){
-// //         return res.status(201).json({
-// //             res:"ok",
-// //             data:initialPayment.data.data.authorization_url
-// //         })
-// //     }else{
-// //         console.log("error")
-// //     }
+    let initialPayment = await axios.post("https://api.paystack.co/transaction/initialize", data, config)
 
-// })
+    if(initialPayment){
+        return res.status(201).json({
+            res:"ok",
+            data:initialPayment.data
+        })
+    }else{
+        console.log("error")
+    }
+
+})
 
 //@desc:verify transaction
 
