@@ -8,7 +8,7 @@ const checkValidEmail = (res, email) =>{
 
 if (!validateEmail(email)) {
   res.status(401);
-  throw new Error("Please enter a valid email");
+  throw new Error("Please enter a valid email address");
 }
 }
   module.exports = checkValidEmail
