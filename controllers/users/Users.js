@@ -1530,3 +1530,6 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 // @Route: /api/users/remove/user_id
 // @Acess: private(super admin, admin)
 
+exports.removeMultipleUsers = asyncHandler(async (req, res) => {
+  console.log("12345")
+})
