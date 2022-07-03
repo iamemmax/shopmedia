@@ -1425,7 +1425,7 @@ exports.uploadProfilePic = asyncHandler(async(req, res)=>{
 //@route: /api/users/profile/update
 
 exports.updateProfile = asyncHandler(async(req, res)=>{
-  let user = await userSchema.findOne({user_id:req.params.user_id}).select("-password -__v")
+  let user = await userSchema.findOne({user_id:req.params.user_id}).select("-password -__v -token")
   let {firstname, lastname, fullname,  phone_no} = req.body
 
   try{
