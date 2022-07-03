@@ -47,7 +47,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     const emailExist = await userSchema.findOne({ email: email });
     if (usernameExist) {
       return res.status(401).json({
-        message: "Username already picked by another user",
+        message: "Company already exists",
       })
     }
 
@@ -323,7 +323,7 @@ justify-content: center !important;
     <!--------- Header area start --------->
     <header class="header" style="display:flex; align-items: center; justify-content: center">
         <div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
-            <a href="" class="flex-center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+            <a href="" class="flex-center"style="display:flex; align-items: center; justify-content: center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
         </div>
     </header>
     <!--------- Header area end --------->
@@ -338,12 +338,13 @@ justify-content: center !important;
         <section class="mail-area">
             <div class="container">
                 <div class="mail-wrapper">
+		
                     <h4>Let's verify it's your email</h4>
                     <p>Hi ${username},</p>
                     <p>Please click the button below to verify your email address.
                     </p>
 
-                    <div class="mail-btn text-center pb-4 flex-center">
+                    <div class="mail-btn text-center pb-4 flex-center" style="display: flex; align-items: center; justify-content: center">
                     <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a> 
                     </div>
 
@@ -624,7 +625,7 @@ justify-content: center !important;
 		    <!--------- Header area start --------->
 		    <header class="header" style="display:flex; align-items: center; justify-content: center">
 			<div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
-			    <a href="" class="flex-center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+			    <a href="" class="flex-center" style="display:flex; align-items: center; justify-content: center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
 			</div>
 		    </header>
 		    <!--------- Header area end --------->
@@ -666,7 +667,7 @@ justify-content: center !important;
                 
                                         Chidi Onwumere</p>
                 
-                                    <div class="mail-btn text-center flex-center">
+                                    <div class="mail-btn text-center flex-center"  style="display: flex; align-items: center; justify-content: center">
                                         <a href="https://shopmedia.ng">Get Started</a>
                                     </div>
                                 </div>
@@ -718,7 +719,7 @@ justify-content: center !important;
                 </body>
                 
                 </html>`
-		       
+              
               );
 
               return res.status(201).json({
