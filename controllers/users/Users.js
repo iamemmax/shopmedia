@@ -339,7 +339,7 @@ justify-content: center !important;
             <div class="container">
                 <div class="mail-wrapper">
 		
-                    <h4>Let's verify it's your email</h4>
+                    
                     <p>Hi ${username},</p>
                     <p>Please click the button below to verify your email address.
                     </p>
@@ -370,16 +370,16 @@ justify-content: center !important;
     <footer class="footer">
         <div class="container">
             <div class="footer-social d-flex justify-content-center align-items-center">
-                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
-                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                <a href=""><img src="https://mail.shopmedia.ng/social-icon/Vector.svg" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.png" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.png" alt=""></a>
+                <a href=""><img src="https://mail.shopmedia.ng/social-icon/twitter.png" alt=""></a>
             </div>
             <p><i>Copyright 2022 Shopmedia , All right reserved.</i></p>
             <p class="sm">You are receiving this email because you opted in via our website.</p>
             <p><b>Our mailling address is</b></p>
             <p>Shopmedia Limited</p>
-            <p>12 lagos island road</p>
-            <p>Lekki asis, Abuja</p>
+            <p>Plot 856, Oluawotesu Street</p>
+            <p>Jabi, Abuja</p>
             <p>Nigeria</p>
             <br>
             <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
@@ -687,17 +687,17 @@ justify-content: center !important;
                     <footer class="footer">
                         <div class="container">
                             <div class="footer-social flex-center">
-                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.svg" alt=""></a>
-                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.svg" alt=""></a>
-                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/vector.svg" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.png" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.png" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.png" alt=""></a>
                             </div>
                             <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
                             <p class="sm">You are receiving this email because you opted in via our website.</p>
                             <p><b>Our mailling address is</b></p>
                             <p>Shopmedia Limited</p>
-                            <p>12 lagos island road</p>
-                            <p>Lekki asis, Abuja</p>
-                            <p>Nigeria</p>
+                            <p>Plot 856, Oluawotesu Street</p>
+            			<p>Jabi, Abuja</p>
+            			<p>Nigeria</p>
                             <br>
                             <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
                         </div>
@@ -909,7 +909,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
      
           sendEmail(
             email,
-            "Change your password",
+            "Reset your password",
           
         `
     
@@ -1126,11 +1126,11 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
         
         
             <!--------- Header area start --------->
-            <header class="header">
-                <div class="header-logo">
-                   <center><a href=""><img src="https://mail.shopmedia.ng/images/png/ShopMedia_Logo_Yellow.png" alt=""></a></center> 
-                </div>
-            </header>
+            <header class="header" style="display:flex; align-items: center; justify-content: center">
+			<div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
+			    <a href="" class="flex-center" style="display:flex; align-items: center; justify-content: center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+			</div>
+		    </header>
             <!--------- Header area end --------->
         
         
@@ -1151,7 +1151,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
         
                             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
 
-                            <div class="mail-btn text-center pb-4">
+                            <div class="mail-btn text-center flex-center"  style="display: flex; align-items: center; justify-content: center">
                             <a href="https://shopmedia-api.herokuapp.com/api/users/reset-password/${user.user_id}/${token}">
                           Reset password</a>
                                 
@@ -1175,29 +1175,26 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
         
         
         
-            <!--------- Footer area start --------->
-            <footer class="footer">
-                <div class="container">
-             
-                <div class="footer-social d-flex justify-content-center align-items-center">
-                <a href=""><img src="/img/facebook.svg" alt="facebook"></a>
-                
-                        <a href=""><img src="https://tomal.dev/shopMedia/images/instagram.svg" alt="instagram"></a>
-                        <a href=""><img src="https://tomal.dev/shopMedia/images/Vector.svg" alt="twiter"></a>
-                    </div>
-                    <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
-                    <p class="sm">You are receiving this email because you opted in via our website.</p>
-                    <p><b>Our mailling address is</b></p>
-                    <p>Shopmedia Limited</p>
-                    <p>12 lagos island road</p>
-                    <p>Lekki asis</p>
-                    <p>Nigeria</p>
-                    <br>
-                    <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
-                </div>
-            </footer>
-            <!--------- Footer area end --------->
-        
+             <!--------- Footer area start --------->
+                    <footer class="footer">
+                        <div class="container">
+                            <div class="footer-social flex-center">
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/facebook.png" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.png" alt=""></a>
+                                <a href=""><img src="https://mail.shopmedia.ng/social-icon/instagram.png" alt=""></a>
+                            </div>
+                            <p><i>Copyright 2022 Shopmedia , Allright reserved.</i></p>
+                            <p class="sm">You are receiving this email because you opted in via our website.</p>
+                            <p><b>Our mailling address is</b></p>
+                            <p>Shopmedia Limited</p>
+                            <p>Plot 856, Oluawotesu Street</p>
+            			<p>Jabi, Abuja</p>
+            			<p>Nigeria</p>
+                            <br>
+                            <p>You can <a href="">unsubscribe</a> from this email or change your email notifications.</p>
+                        </div>
+                    </footer>
+                    <!--------- Footer area end --------->
         
         
         
