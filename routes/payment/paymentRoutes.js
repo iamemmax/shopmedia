@@ -3,7 +3,7 @@ const router = express.Router()
 
 const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 
-const {listBank,initializePayment, chargeTransaction, submitTransactionPin,submitTransactionPhone, submitTransactionOtp, checkPendingTransaction, verifyTransaction, listTransaction, fetchTransaction, fetchTotalTransaction, exportTransactions,transactionTimeline, createTransferReceipient, listTransferReceipient, deleteTransferReceipient} = require("../../controllers/payment/payment")
+const {listBank,initializePayment, chargeTransaction, submitTransactionPin,submitTransactionPhone, submitTransactionOtp, checkPendingTransaction, verifyTransaction, listTransaction, fetchTransaction, fetchTotalTransaction, exportTransactions,transactionTimeline, createTransferReceipient, listTransferReceipient, deleteTransferReceipient, initializedTransfer, finalizedTransfer} = require("../../controllers/payment/payment")
 
 router.post("/initialize", ensureLogin, initializePayment)
 router.post("/charge", ensureLogin, chargeTransaction)
@@ -24,5 +24,7 @@ router.get("/list-banks", ensureLogin, listBank)
 router.post("/create/tranfer_recepient", ensureLogin, createTransferReceipient)
 router.get("/list/tranfer_recepient", ensureLogin, listTransferReceipient)
 router.delete("/remove/tranfer_recepient/:recipient_code_or_id", ensureLogin, deleteTransferReceipient)
+router.post("/initialize/transfer", ensureLogin, initializedTransfer)
+router.post("/finalise/transfer", ensureLogin, finalizedTransfer)
 
-module.exports = router    
+module.exports = router     

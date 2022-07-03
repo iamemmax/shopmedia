@@ -38,8 +38,8 @@ exports.initializePayment = asyncHandler(async(req, res) =>{
             data:initialPayment.data
         })
     }else{
-        console.log("error")
-    }
+        console.log("error") 
+    } 
 
 })
 
@@ -350,7 +350,9 @@ exports.listBank = asyncHandler(async(req, res) =>{
             })
         }
       }catch(ex){
-        console.error(ex.message);
+        return res.status(401).json({
+            message:error.message
+        }) 
       }
 })
 
@@ -396,7 +398,28 @@ exports.createTransferReceipient = asyncHandler(async(req, res) =>{
   }
 })
 
-exports.deleteTransferReceipient = asyncHandler(async(req, res) =>{
+
+exports.listTransferReceipient = asyncHandler(async(req, res) =>{
+    try{
+
+const listReceipience = await axios.get(`https://api.paystack.co/transferrecipient`, config)
+     if(listReceipience){
+         return res.status(201).json({
+             data:listReceipience.data
+         })
+     }else{
+         return res.status(401).json({
+             message:"invalid transaction id"
+         })
+     }
+    }catch(error){
+     return res.status(401).json({
+         message:error.message
+     })
+    }
+ })
+ 
+ exports.deleteTransferReceipient = asyncHandler(async(req, res) =>{
     try{
 
 const deleteReceipience = await axios.delete(`https://api.paystack.co/transferrecipient/${req.params.recipient_code_or_id}`, config)
@@ -417,22 +440,65 @@ const deleteReceipience = await axios.delete(`https://api.paystack.co/transferre
      })
     }
  })
-exports.listTransferReceipient = asyncHandler(async(req, res) =>{
-    try{
 
-const listReceipience = await axios.get(`https://api.paystack.co/transferrecipient`, config)
-     if(listReceipience){
-         return res.status(201).json({
-             data:listReceipience.data
-         })
-     }else{
-         return res.status(401).json({
-             message:"invalid transaction id"
-         })
-     }
-    }catch(error){
-     return res.status(401).json({
-         message:error.message
-     })
+
+ exports.initializedTransfer = asyncHandler(async(req, res) =>{
+    let {reason, amount, recipient} = req.body
+
+    
+  
+    if(!amount||  !recipient){
+        return res.status(401).json({
+            res:"failed",
+            message:"all fields are required"
+        })
     }
+    let data = {source:"balance",currency:"NGN", amount, recipient, reason
+
+}
+    
+
+    let initializetransfer = await axios.post("https://api.paystack.co/transfer", data, config)
+
+    if(initializetransfer){
+        return res.status(201).json({
+            res:"ok",
+            data:initializetransfer.data
+        })
+    }else{
+        return res.status(401).json({
+            message:error.message
+        }) 
+    }
+
+ })
+
+ exports.finalizedTransfer = asyncHandler(async(req, res) =>{
+    let {otp, transfer_code } = req.body
+
+    
+  
+    if(!otp||  !transfer_code){
+        return res.status(401).json({
+            res:"failed",
+            message:"all fields are required"
+        })
+    }
+    let data = {otp, transfer_code
+}
+    
+
+    let finalisedTrs = await axios.post("https://api.paystack.co/transfer/finalize_transfer", data, config)
+
+    if(finalisedTrs){
+        return res.status(201).json({
+            res:"ok",
+            data:finalisedTrs.data
+        })
+    }else{
+        return res.status(401).json({
+            message:error.message
+        }) 
+    }
+
  })

@@ -764,7 +764,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
 
     let userFound = await userSchema.findOneAndUpdate(
       {user_id: req.params.user_id },
-      { $set: { verified: true } },
+      { $set: { verified: true , token:''} },
       { new: true }
     );
    
@@ -797,7 +797,7 @@ exports.loginUser = asyncHandler(async(req, res) => {
   validateEmail(res, email)
 
 const user = await userSchema.findOne({email})
-const userInfo = await userSchema.findOne({email}).select("-password -__v -_id")
+const userInfo = await userSchema.findOne({email}).select("-password -__v -token -_id")
 if(!user){
    res.status(401)
   throw new Error("Incorrect email or password");
@@ -1272,10 +1272,10 @@ exports.resetPassword = asyncHandler(async (req, res) => {
     if(resetPassword){
       res.status(201).json({
         message:
-          " Password changed successfully \n You can now sign in with your new password.",
+          " Password changed successfully \n You can now sign in with your new password.", 
       });
     }
-  });
+  }); 
 });
 }else{
   res.status(401);
