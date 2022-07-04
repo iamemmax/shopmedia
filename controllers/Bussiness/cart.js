@@ -22,7 +22,7 @@ console.log(price)
 
      
     if(advertId?.toString() === req.params.id){
-      let  update = await cartSchema.findOneAndUpdate({advertId:req.params.id}, {$set:{qty:qty+1, price:(qty+1)* price}}, {new:true}).select("-_id -__v")
+      let  update = await cartSchema.findOneAndUpdate({advertId:req.params.id}, {$set:{qty:qty+1, price:(qty+1)* price}}, {new:true}).select("-_id -__v").populate("userId advertId", "-_id -__v -token -password")
       if(update){
         return  res.status(201).json({
             res:"ok",
@@ -71,7 +71,7 @@ exports.Updatecart = asyncHandler(async(req, res)=>{
 
 
     if(advertId?.toString() === req.params.advertId){
-        let  update = await cartSchema.findOneAndUpdate({advertId:req.params.advertId}, {$set:{qty:req.body.qty, price:(req.body.qty * price)}}, {new:true}).select("-_id -__v")
+        let  update = await cartSchema.findOneAndUpdate({advertId:req.params.advertId}, {$set:{qty:req.body.qty, price:(req.body.qty * price)}}, {new:true}).select("-_id -__v").populate("userId advertId", "-_id -__v -token -password")
         if(update){
           return  res.status(201).json({
               res:"ok",
@@ -100,7 +100,7 @@ exports.RemoveFromCart = asyncHandler(async(req, res)=>{
 
 
 exports.listCart = asyncHandler(async(req, res)=>{
- let cart = await cartSchema.find({userId:{$eq:req.params.id}})
+ let cart = await cartSchema.find({userId:{$eq:req.params._id}}).populate("userId advertId", "-_id -__v -token -password")
  if(cart.length > 0){
     let price  = cart?.map(x => x.price)
     return  res.status(201).json({

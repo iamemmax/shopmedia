@@ -141,7 +141,7 @@ exports.listAdverts = asyncHandler(async (req, res) => {
   try {
     let adverts = await advertSchema
       .find()
-      .populate("postedBy category sub_category")
+      .populate("postedBy category sub_category", "-_id -__v -token -password")
       .select("-_id -__v");
     if (adverts.length > 0) {
       return res.status(201).json({

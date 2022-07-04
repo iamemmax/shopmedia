@@ -12,7 +12,6 @@ const cartSchema = new mongoose.Schema({
   
     booking_id:{type:String},
     cart_id:{type:String},
-    advertId:{type:String},
     qty:{type:Number, default:1},
     start_date:{type:Date, default:Date.now()},
     end_date:{type:Date},

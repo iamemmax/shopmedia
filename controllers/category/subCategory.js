@@ -9,7 +9,7 @@ const crypto = require("crypto")
 // @Acess: private
 exports.listSubCategories = asyncHandler(async (req, res) => {
   try {
-    let subCat = await subCategorySchema.find({categoryId:req.params.categoryId}).populate("categoryId").select("-__v");
+    let subCat = await subCategorySchema.find({categoryId:req.params.categoryId}).populate("categoryId", "-_id -__v ").select("-__v");
     if (subCat.length > 0) {
       return res.status(201).json({
         res: "ok",
