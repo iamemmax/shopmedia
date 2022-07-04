@@ -1,12 +1,13 @@
 const express = require("express")
 const router = express.Router()
-let {negotiate,listMyOfer,DeleteMyOfer, compareAdvertSize} = require("../../controllers/Bussiness/negotiate")
+let {negotiate,listMyOfer,DeleteMyOfer, compareAdvertSize, acceptOffer} = require("../../controllers/Bussiness/negotiate")
 let {listCart,addTocart, Updatecart, RemoveFromCart} = require("../../controllers/Bussiness/cart")
 const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 //@desc:negotiate
 router.post("/negotiate/:id", ensureLogin, negotiate)
 router.get("/myoffer/:id", ensureLogin, listMyOfer)
-router.delete("/myoffer/remove/:id",  adminAccess(["super admin", "admin", "customers", "vendors"]), ensureLogin, DeleteMyOfer)
+router.delete("/myoffer/remove/:offer_id", ensureLogin,  adminAccess(["super admin", "admin", "customers", "vendors"]), DeleteMyOfer)
+router.put("/offer/authorize/:offer_id", ensureLogin,  adminAccess(["super admin", "admin"]), acceptOffer)
 
 //@desc:cart
 router.get("/mycart/:id", ensureLogin, listCart)

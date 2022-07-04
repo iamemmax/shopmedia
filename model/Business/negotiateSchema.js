@@ -10,8 +10,6 @@ const negotiateSchema = new mongoose.Schema({
         ref:"users"
     },
     offer_id:{type:String},
-
-    negotiate:[],
     
     offer:{
         type:Number,
@@ -33,7 +31,7 @@ const negotiateSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        default:"pending"
+        default:"pending"  
     }
 
     // remark:{
