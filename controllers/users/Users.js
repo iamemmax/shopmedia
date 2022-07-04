@@ -165,16 +165,14 @@ justify-content: center !important;
         .header {
             background: #000;
             padding: 10px 10px;
-            height: 55px;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            height: 55px; 
         }
         
         .header img {
 	        max-width: 190px !important;
             display: block !important;
             margin: 0 auto !important;
+	    margin-top: 12px !important;
         }
 
         /*--------------- Header area end ----------------*/
@@ -321,9 +319,9 @@ justify-content: center !important;
 
 
     <!--------- Header area start --------->
-    <header class="header" style="display:flex; align-items: center; justify-content: center">
-        <div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
-            <a href="" class="flex-center"style="display:flex; align-items: center; justify-content: center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+    <header class="header" style="text-align: center">
+        <div class="header-logo" style="text-align: center">
+             <img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""> 
         </div>
     </header>
     <!--------- Header area end --------->
@@ -344,7 +342,7 @@ justify-content: center !important;
                     <p>Please click the button below to verify your email address.
                     </p>
 
-                    <div class="mail-btn text-center pb-4 flex-center" style="display: flex; align-items: center; justify-content: center">
+                    <div class="mail-btn text-center " style="text-align: center">
                     <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a> 
                     </div>
 
@@ -467,19 +465,19 @@ justify-content: center !important;
                         }
                 
                         /*--------------- Header area start ----------------*/
-                        .header {
-                            background: #000;
-                            padding: 10px 10px;
-                            height: 55px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        }
-                   .header img {
-	                   max-width: 190px !important;
-                       display: block !important;
-                       margin: 0 auto !important;
-                    }
+			.header {
+			    background: #000;
+			    padding: 10px 10px;
+			    height: 55px; 
+			}
+
+			.header img {
+				max-width: 190px !important;
+			    display: block !important;
+			    margin: 0 auto !important;
+			    margin-top: 12px !important;
+			}
+
                         /*--------------- Header area end ----------------*/
                 
                 
@@ -622,10 +620,11 @@ justify-content: center !important;
                 
                  
                     
+		
 		    <!--------- Header area start --------->
-		    <header class="header" style="display:flex; align-items: center; justify-content: center">
-			<div class="header-logo flex-center" style="display:flex; align-items: center; justify-content: center">
-			    <a href="" class="flex-center" style="display:flex; align-items: center; justify-content: center"><img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""></a>
+		    <header class="header" style="text-align: center">
+			<div class="header-logo" style="text-align: center">
+			     <img src="https://mail.shopmedia.ng/images/png/rsz_12shopmedia_logo_yellow.png" alt=""> 
 			</div>
 		    </header>
 		    <!--------- Header area end --------->
@@ -667,7 +666,7 @@ justify-content: center !important;
                 
                                         Chidi Onwumere</p>
                 
-                                    <div class="mail-btn text-center flex-center"  style="display: flex; align-items: center; justify-content: center">
+                                    <div class="mail-btn text-center"  style="text-align: center">
                                         <a href="https://shopmedia.ng">Get Started</a>
                                     </div>
                                 </div>
