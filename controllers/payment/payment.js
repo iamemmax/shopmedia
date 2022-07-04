@@ -5,6 +5,7 @@ const userSchema = require("../../model/users/UserSchema")
 const paystack = new PayStack(process.env.PAYSTACK_API, environment)
 const crypto = require("crypto");
 const axios = require("axios")
+const orderSchema = require("../../model/order/orderSchema")
 
 let config = {
    headers: {
@@ -15,20 +16,20 @@ let config = {
 }
 // @desc:initializes transaction
 exports.initializePayment = asyncHandler(async(req, res) =>{
-    let {email, amount, currency, phone} = req.body
+    let {email,  currency, phone} = req.body
 
+  let {totalPrice} =  await orderSchema.find({userId:{$eq:req.user._id}})
     
   
-    if(!email||  !amount){
+    if(!email){
         return res.status(401).json({
             res:"failed",
-            message:"all fields are required"
+            message:"email is required"
         })
     }
-    let data = {email, amount, currency, channel:["card"], phone
+    let data = {email, amount:totalPrice*100, currency, channel:["card"], phone
 
 }
-    
 
     let initialPayment = await axios.post("https://api.paystack.co/transaction/initialize", data, config)
 
@@ -45,23 +46,28 @@ exports.initializePayment = asyncHandler(async(req, res) =>{
 
 
 exports.chargeTransaction = asyncHandler(async(req, res) =>{
-  let{email, amount, cvv, number, expiry_month, expiry_year, pin} = req.body
+  let{email,  cvv, number, expiry_month, expiry_year, pin} = req.body
+  let {totalPrice, userId}=  await orderSchema.findOne({userId:{$eq:req.user._id}}).populate("userId", "-_id -__v -token -password").select("-__v -_id")
+            
+
   let data = {
     
       email,
-      amount,
+      amount:totalPrice,
       "metadata":{
         "custom_fields":[
           {
-            "value":"makurdi",
-            "display_name": "shop media",
-            "variable_name": "shop media"
+            "value":'shop media',
+            "display_name":`${userId.firstname} ${userId.lastname}`,
+            "variable_name": "shop media",
+            "cancel_action": "https://your-cancel-url.com"
           }
         ]
       },
       "card":{
         cvv,
         number,
+
         expiry_month,
         expiry_year
       },
@@ -69,9 +75,10 @@ exports.chargeTransaction = asyncHandler(async(req, res) =>{
     
     
   }
+
   try{
         const verify = await axios.post(`https://api.paystack.co/charge`, data, config)
-console.log(verify)
+
         if(verify){
           return res.status(201).json({
               res:"ok",

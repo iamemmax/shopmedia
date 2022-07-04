@@ -7,9 +7,10 @@ const orderSchema = mongoose.Schema(
       required: true,
       ref: "users",
     },
+   
    order_id:{ type: String },
     orderItems: [],
-    
+     
     paymentMethod: {
       type: String,
       required: true,

@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema")
 const orderSchema = require("../../model/order/orderSchema")
+const paginate = require("../../helper/pagination")
 
 // @desc  create a new order
 // @route GET /api/orders/create
@@ -137,7 +138,7 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         const allOrders = await orderSchema.find({userId:{$eq:req.user._id}}).sort({'createdAt':"-1"}).populate("userId", "-_id -__v -token -password").select("-__v -_id")
             
             if(allOrders){
-                res.status(201).json({
+              return  res.status(201).json({
                     res:"ok",
                     total:allOrders?.length,
                     data:allOrders
@@ -157,4 +158,26 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         }
     }
 	
+});
+
+
+
+// @desc  fetch all orders
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+ exports.getAllOrders = asyncHandler(async (req, res) => {
+    const allOrders = await orderSchema.find().sort({'createdAt':"-1"}).populate("userId", "-_id -__v -token -password").select("-__v -_id")
+    // paginate(odel, postedBy,  results, sort)
+    if(allOrders.length > 0){
+        return  res.status(201).json({
+            res:"ok",
+            total:allOrders?.length,
+            data:allOrders
+        })
+    }else{
+        return  res.status(401).json({
+            res:"failed",
+            message:"order not found"
+        })
+    }
 });
