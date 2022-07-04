@@ -18,6 +18,7 @@ const cartSchema = new mongoose.Schema({
     end_date:{type:Date},
     number_of_months:{type:String},
     remark:{type:String},
+    price:{type:Number, default:1},
 
     // start_date:{
     //     // type:Date,

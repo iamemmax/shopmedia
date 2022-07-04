@@ -1,4 +1,5 @@
 const cartSchema = require("../../model/Business/cartSchema");
+const advertSchema = require("../../model/advert/advertSchema");
 const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
 
@@ -9,20 +10,19 @@ exports.addTocart = asyncHandler(async(req, res)=>{
     let {start_date, remark, end_date, number_of_months, userId} = req.body
     let {cart_id, qty, advertId} = await cartSchema.findOne({userId}) ?? ""
     
-    
+    let {price} = await advertSchema.findOne({_id:req.params.id})
     //@desc:check if offer with the advert id exist
-
     
     if(!end_date){
         res.status(401)
         throw new Error("Enter all fields")
     }
 
-
+console.log(price)
 
      
     if(advertId?.toString() === req.params.id){
-      let  update = await cartSchema.findOneAndUpdate({advertId:req.params.id}, {$set:{qty:qty+1}}, {new:true})
+      let  update = await cartSchema.findOneAndUpdate({advertId:req.params.id}, {$set:{qty:qty+1, price:(qty+1)* price}}, {new:true}).select("-_id -__v")
       if(update){
         return  res.status(201).json({
             res:"ok",
@@ -35,7 +35,7 @@ exports.addTocart = asyncHandler(async(req, res)=>{
         crypto.randomBytes(10, async (err, buffer) => {
             let token = buffer.toString("hex");
            let newItem = await new cartSchema({
-            userId,  cart_id:token, advertId:req.params.id, qty, start_date, end_date,  number_of_months, remark, 
+            userId,  cart_id:token, advertId:req.params.id, qty, start_date, end_date,  number_of_months, remark, price
         }).save()
         
         if(newItem){
@@ -66,10 +66,12 @@ exports.Updatecart = asyncHandler(async(req, res)=>{
         })
         
     }
-    let {advertId} = await cartSchema.findOne({advertId:req.params.id}) ?? ""
+    let {advertId} = await cartSchema.findOne({advertId:req.params.advertId}) ?? ""
+    let {price} = await advertSchema.findOne({_id:req.params.advertId})
 
-    if(advertId?.toString() === req.params.id){
-        let  update = await cartSchema.findOneAndUpdate({advertId:req.params.id}, {$set:{qty:req.body.qty}}, {new:true})
+
+    if(advertId?.toString() === req.params.advertId){
+        let  update = await cartSchema.findOneAndUpdate({advertId:req.params.advertId}, {$set:{qty:req.body.qty, price:(req.body.qty * price)}}, {new:true}).select("-_id -__v")
         if(update){
           return  res.status(201).json({
               res:"ok",

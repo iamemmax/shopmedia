@@ -10,11 +10,11 @@ router.delete("/myoffer/remove/:id",  adminAccess(["super admin", "admin", "cust
 
 //@desc:cart
 router.get("/mycart/:id", ensureLogin, listCart)
-router.post("/book/:id", adminAccess(["super admin", "admin", "customers", "vendors"]), ensureLogin, addTocart)
-router.put("/book/update/:id",ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), Updatecart)
+router.post("/book/:id", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]),  addTocart)
+router.put("/book/update/:advertId",ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), Updatecart)
 router.delete("/book/remove/:cart_id", ensureLogin, adminAccess(["super admin", "admin", "customers", "vendors"]), RemoveFromCart)
 
 //@desc:compare advert
 router.get("/compare/advert/:size", ensureLogin, compareAdvertSize)
 
-module.exports = router
+module.exports = router 

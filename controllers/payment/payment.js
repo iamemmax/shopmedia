@@ -427,8 +427,8 @@ const deleteReceipience = await axios.delete(`https://api.paystack.co/transferre
          return res.status(201).json({
             res:"ok",
             message:"recipient deleted successfully",
-             data:deleteReceipience.data
-         })
+            data:deleteReceipience.data
+        })
      }else{
          return res.status(401).json({
              message:"invalid transaction id"
@@ -502,3 +502,83 @@ const deleteReceipience = await axios.delete(`https://api.paystack.co/transferre
     }
 
  })
+        
+ exports.verifyTransfer = asyncHandler(async(req, res) =>{
+            try{
+        
+        const verifyTrs = await axios.get(`https://api.paystack.co/transfer/verify/${req.params.reference}`, config)
+             if(verifyTrs){
+                 return res.status(201).json({
+                     data:verifyTrs.data
+                 })
+             }else{
+                 return res.status(401).json({
+                     message:"invalid transaction reference"
+                 })
+             }
+            }catch(error){
+             return res.status(401).json({
+                 message:error.message
+             })
+            }
+         })
+ exports.fetchTransferById = asyncHandler(async(req, res) =>{
+            try{
+        
+        const fetchTrs = await axios.get(`https://api.paystack.co/transfer/${req.params.id}`, config)
+             if(fetchTrs){
+                 return res.status(201).json({
+                     data:fetchTrs.data
+                 })
+             }else{
+                 return res.status(401).json({
+                     message:"invalid transaction id"
+                 })
+             }
+            }catch(error){
+             return res.status(401).json({
+                 message:error.message
+             })
+            }
+         })
+
+
+
+
+
+     exports.initializedBulkTransfer = asyncHandler(async(req, res) =>{
+        let tt = []
+           
+        
+            let p = {amount, recipient}
+         
+     
+            // if(!amount||  !recipient){
+            //     return res.status(401).json({
+            //         res:"failed",
+            //         message:"all fields are required"
+            //     })
+            // }
+            let data = {source:"balance",currency:"NGN",
+            "transfers": [amount, recipient]
+        
+        }
+            console.log(data)
+        
+            let bulkTransfer = await axios.post("https://api.paystack.co/transfer/bulk", data, config)
+        
+            if(bulkTransfer){
+                return res.status(201).json({
+                    res:"ok",
+                    data:bulkTransfer.data
+                })
+            }else{
+                return res.status(401).json({
+                    message:error.message 
+                }) 
+            }
+        
+         })
+
+
+         
