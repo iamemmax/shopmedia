@@ -547,23 +547,20 @@ const deleteReceipience = await axios.delete(`https://api.paystack.co/transferre
 
 
      exports.initializedBulkTransfer = asyncHandler(async(req, res) =>{
-        let tt = []
-           
-        
-            let p = {amount, recipient}
-         
-     
-            // if(!amount||  !recipient){
-            //     return res.status(401).json({
-            //         res:"failed",
-            //         message:"all fields are required"
-            //     })
-            // }
+       
+      
+            
+            if(!req.body.length){
+                return res.status(401).json({
+                    res:"failed",
+                    message:"all fields are required"
+                })
+            }
             let data = {source:"balance",currency:"NGN",
-            "transfers": [amount, recipient]
+            "transfers":req.body
         
         }
-            console.log(data)
+            // console.log(data)
         
             let bulkTransfer = await axios.post("https://api.paystack.co/transfer/bulk", data, config)
         

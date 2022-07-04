@@ -20,24 +20,10 @@ const cartSchema = new mongoose.Schema({
     remark:{type:String},
     price:{type:Number, default:1},
 
-    // start_date:{
-    //     // type:Date,
-    //     // default:Date.now()
-    // },
-    // end_date:{
-    //     // type:Date,
-        
-    // },
-    // number_of_months:{
-    //     type:String,
-    // },
-
-
-    // remark:{
-    //     type:String,
-    // },
-  
-    
+    createdAt:{
+        type:Date,
+        default:Date.now()
+    }
 
 })
 module.exports = mongoose.model("carts", cartSchema)
