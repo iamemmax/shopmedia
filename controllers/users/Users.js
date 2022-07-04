@@ -1152,7 +1152,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
                             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
 
                             <div class="mail-btn text-center pb-4">
-                            <a href="https://shopmedia-api.herokuapp.com/api/users/reset-password/${user.user_id}/${token}">
+                            <a href="https://shop-media-master-danny-flames.vercel.app/api/users/reset-password/${user.user_id}/${token}">
                           Reset password</a>
                                 
                             </div>

@@ -7,33 +7,25 @@ const orderSchema = mongoose.Schema(
       required: true,
       ref: "users",
     },
-    orderItems: [
-      {
-        cartId: {
-          type: mongoose.Schema.Types.ObjectId,
-          required: true,
-          ref: "carts",
-        },
-      },
-    ],
+   order_id:{ type: String },
+    orderItems: [],
     
     paymentMethod: {
       type: String,
       required: true,
-      default:"card"
+      default:"card",
+      enum:["card", "transfer"]
     },
-    // depends on if stripe or paypal method is used
+    // depends on if card or transfer method is used
     paymentResult: {
       id: { type: String },
+      reference: { type: String },
+      type: { type: String },
       status: { type: String },
       update_time: { type: String },
       email_address: { type: String },
     },
-    itemsPrice: {
-      type: Number,
-      required: true,
-      default: 0.0,
-    },
+   
     // taxPrice: {
     //   type: Number, 
     //   required: true,

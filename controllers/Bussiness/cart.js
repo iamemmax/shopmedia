@@ -102,9 +102,11 @@ exports.RemoveFromCart = asyncHandler(async(req, res)=>{
 exports.listCart = asyncHandler(async(req, res)=>{
  let cart = await cartSchema.find({userId:{$eq:req.params.id}})
  if(cart.length > 0){
+    let price  = cart?.map(x => x.price)
     return  res.status(201).json({
         res:"ok",
         total:cart.length,
+        totalPrice:price?.reduce((x, y) => x + y, 0) ,
         data:cart
     })
  }else{
