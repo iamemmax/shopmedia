@@ -667,7 +667,7 @@ justify-content: center !important;
                                         Chidi Onwumere</p>
                 
                                     <div class="mail-btn text-center"  style="text-align: center">
-                                        <a href="https://shopmedia.ng">Get Started</a>
+                                         <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a>
                                     </div>
                                 </div>
                             </div>
