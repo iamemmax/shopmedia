@@ -16,20 +16,19 @@ let config = {
 }
 // @desc:initializes transaction
 exports.initializePayment = asyncHandler(async(req, res) =>{
-    let {email,  currency, phone} = req.body
+    let {email, amount, currency, phone} = req.body
 
-  let {totalPrice} =  await orderSchema.find({userId:{$eq:req.user._id}})
-    
+  let {userId,totalPrice } =  await orderSchema.findOne({userId:{$eq:req.user._id}}).populate("userId", "email phone_no")
+
+  console.log(userId.phone_no, userId.email)
   
-    if(!email){
-        return res.status(401).json({
-            res:"failed",
-            message:"email is required"
-        })
+    let data = {email:userId.email, amount:totalPrice, currency:"NGN", channel:["card"], phone:userId.phone_no,
+        "metadata": {
+            "cancel_action": "http://cancelurl.com"
+        },
     }
-    let data = {email, amount:totalPrice*100, currency, channel:["card"], phone
 
-}
+
 
     let initialPayment = await axios.post("https://api.paystack.co/transaction/initialize", data, config)
 
@@ -52,7 +51,7 @@ exports.chargeTransaction = asyncHandler(async(req, res) =>{
 
   let data = {
     
-      email,
+      email:userId.email,
       amount:totalPrice,
       "metadata":{
         "custom_fields":[

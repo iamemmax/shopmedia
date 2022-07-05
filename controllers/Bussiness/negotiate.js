@@ -103,11 +103,14 @@ exports.compareAdvertSize = asyncHandler(async(req, res)=>{
 exports.acceptOffer = asyncHandler(async(req, res)=>{
     let{offer} = req.body
  const updateOffer = await negotiateSchema.findOneAndUpdate({offer_id:{$eq:req.params.offer_id}}, {$set:{status:offer}}, {new:true}).populate("userId", "-password  -__v").select("-__v")
+
+
  if(updateOffer && updateOffer.status === "approved" ){
 
     let {userId, end_date, number_of_months, advertId} = updateOffer
     const {_id, price} = await advertSchema.findOne({_id:advertId})
-    // save offer to cartSchema
+
+    // save offer to cartSchema if offers is approve
     crypto.randomBytes(10, async (err, buffer) => {
         let token = buffer.toString("hex");
    

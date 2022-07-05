@@ -49,9 +49,9 @@ require("./config/passport")(passport)
 //@desc: Routes
 app.use("/api/users", userRoutes);
 app.use("/api/category", categoryRoutes);
+app.use("/api/search", searchRoutes);
 app.use("/api/advert", advertRoutes);
 app.use("/api/sub-category", subCategoryRoutes);
-app.use("/api/find", searchRoutes);
 app.use("/api/adpages", Agency);
 app.use("/api/business", businessRoutes);
 app.use("/api/payment", paymentRoutes);

@@ -462,3 +462,38 @@ exports.searchBySubTypes =  asyncHandler(async (req, res) => {
     // })
 
 })
+
+
+exports.searchAdvertQuery = asyncHandler(async (req, res) => {
+  const keyword = req.query.search
+  ? {
+        $or:[
+          { address: { $regex: req.query.search, $option: "i" } },
+          {state: { $regex: req.query.search, $option: "i" } },
+          { city: { $regex: req.query.search, $options: "i" } },
+          { category: { $regex: req.query.search, $options: "i" } },
+          { landmark: { $regex: req.query.search, $options: "i" } },
+          { size: { $regex: req.query.search, $options: "i" } },
+          { sub_category : { $regex: req.query.search, $options: "i" } },
+          { interest: { $regex: req.query.search, $options: "i" } },
+          { ageGroup: { $regex: req.query.search, $options: "i" } },
+
+        ],
+      }
+    : {};
+  try {
+    const search = await advertSchema.find(keyword);
+    if (!search) {
+      res.status(400);
+      throw new Error("advert not found");
+    }
+    res.status(201).json({
+      count: search.length,
+      results:search,
+    });
+  } catch (error) {
+    res.status(501);
+    throw new Error(error.message);
+  }
+  console.log(req.query)
+});

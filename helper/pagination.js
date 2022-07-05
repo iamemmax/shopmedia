@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-exports.paginated = asyncHandler(async (model, postedBy) => {
+exports.paginated = asyncHandler(async () => {
     
 return async(req, res, next) =>{
     const page = parseInt(req.query.page)
@@ -38,8 +38,8 @@ if(query){
 
     results.result = await model.find({title:{$regex:query, $options: '$i'}}).populate(postedBy).sort(sort).limit(limit).skip(startIndex).exec()
 }else{
-
     results.result  = await model.find().sort(sort).limit(limit).skip(startIndex).exec()
+
 }
     
     

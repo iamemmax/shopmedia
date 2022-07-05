@@ -3,19 +3,20 @@ exports.search = async (model, req, res) => {
 
   const filterOptions = {
     $or: [
-      { name: { $regex: search, $options: "i" } },
+      { address: { $regex: search, $options: "i" } },
       { state: { $regex: search, $options: "i" } },
       { city: { $regex: search, $options: "i" } },
-      { types: { $regex: search, $options: "i" } },
+      { category: { $regex: search, $options: "i" } },
       { landmark: { $regex: search, $options: "i" } },
       { size: { $regex: search, $options: "i" } },
-      { subTypes: { $regex: search, $options: "i" } },
+      { sub_category: { $regex: search, $options: "i" } },
       { interest: { $regex: search, $options: "i" } },
+      { ageGroup: { $regex: search, $options: "i" } },
     ],
   };
   const results = await model
     .find(filterOptions)
-    .select("-_id, -__v")
+    .select("-_id -__v")
     .limit(limit * 1) //limit search result
     .skip((page - 1) * limit) // skip docs
     .sort({ createdAt: order_by === "createdAt" && "asc" }); // sort order
@@ -66,3 +67,6 @@ exports.filterPages = async (req, res, model) => {
     results: results,
   });
 };
+
+
+

@@ -3,7 +3,7 @@ const router = express.Router()
 const upload = require("../../config/upload")
 const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 
-let {createAdvert, listAdverts, getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg, updateEachImg, deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
+let {createAdvert, listAdverts,  searchAdvertQuery,  getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg, updateEachImg, deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
 
 
 router.get("/",  listAdverts)

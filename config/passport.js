@@ -1,53 +1,20 @@
 // const passport = require("passport");
-const LocalStrategy = require("passport-local").Strategy;
+const GoogleStrategy = require("passport-google-oauth20").Strategy;
 const userSchema = require("../model/users/UserSchema");
 const bcrypt = require("bcryptjs");
 
 module.exports = passportAuth = (passport) => {
-  passport.use(
-    new LocalStrategy({ usernameField: "email" }, function (
-      email,
-      password,
-      done
-    ) {
-      userSchema.findOne({ email: email }, function (err, user) {
-        if (err) {
-          return done(err);
-        }
-        if (!user) {
-          return done(null, false, {
-            message: "email or password not matched.",
-          });
-        }
-        if (!user.password) {
-          return done(null, false, {
-            message: '"email or password not matched.',
-          });
-        }
-        if (!user.status) {
-          return done(null, false, {
-            message: 'email or password not matched.',
-          });
-        }
-
-        if (user && user.status) {
-          bcrypt.compare(password, user.password, (err, isMatch) => {
-            if (err)
-              return done(null, false, {
-                message: "email or password not matched.",
-              });
-            if (isMatch) {
-              return done(null, user);
-            } else {
-              return done(null, false, {
-                message: "email or password not matched.",
-              });
-            }
-          });
-        }
-      })
-    })
-  );
+  passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://www.example.com/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
   passport.serializeUser(function (user, done) {
     done(null, user.id);

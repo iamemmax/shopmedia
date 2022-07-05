@@ -10,7 +10,7 @@ const sendEmail = require("../../helper/email");
 const validateEmail = require("../../helper/emailValidate")
 const jwt = require("jsonwebtoken");
 const compressImg = require("../../helper/sharp");
-const welcomeEmail = require("../../helper/Email Template/welcomeEmail")
+// const welcomeEmail = require("../../helper/Email Template/welcomeEmail")
 
 // @desc: create account
 // @Route: /api/users/register
@@ -1150,13 +1150,13 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
         
                             <p>Follow this link to reset your shopmedia.ng password for your ${email} account.</p>
 
-<<<<<<< HEAD
+
                             <div class="mail-btn text-center pb-4">
                             <a href="https://shop-media-master-danny-flames.vercel.app/api/users/reset-password/${user.user_id}/${token}">
-=======
+
                             <div class="mail-btn text-center flex-center"  style="display: flex; align-items: center; justify-content: center">
                             <a href="https://shopmedia-api.herokuapp.com/api/users/reset-password/${user.user_id}/${token}">
->>>>>>> 2ae4270ae23188fe55f7277894f5694ea55f30ac
+
                           Reset password</a>
                                 
                             </div>

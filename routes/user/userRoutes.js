@@ -4,7 +4,7 @@ const upload = require("../.././config/upload")
 const {ensureLogin, adminAccess} = require("../.././helper/ensureLogin")
 
 let { createUser, activateUser, loginUser, logoutUser,forgetPassword, resetPassword,ChangePassword, updateProfile, uploadProfilePic, listUsers, removeUsers, createAdmin } = require("../../controllers/users/Users");
-
+let {googleLogin} = require("../../controllers/users/googleAuth")
 
 //@desc create account
 router.get("/", ensureLogin, adminAccess(["super admin", "admin"]),listUsers)
@@ -15,6 +15,7 @@ router.post("/verify/:user_id/:token", activateUser)
 //@desc login account
 
 router.route("/login").post(loginUser);
+router.post('/googlelogin', googleLogin)
 
 //@desc logout account
 router.get("/logout", ensureLogin, logoutUser)
