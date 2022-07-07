@@ -147,7 +147,7 @@ exports.listAdverts = asyncHandler(async (req, res) => {
 	
   try {
     let adverts = await advertSchema
-      .find(keyword)
+      .find()
       .limit(pageSize)
 		.skip(pageSize * (page - 1))
 		.sort('-createdAt')
