@@ -2,13 +2,13 @@ const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema")
 const orderSchema = require("../../model/order/orderSchema")
-const paginate = require("../../helper/pagination")
+// const paginate = require("../../helper/pagination")
 const ISODate = require("isodate")
 // @desc  create a new order
 // @route GET /api/orders/create
 // @access PRIVATE
 exports.createOrder = asyncHandler(async(req, res) =>{
-    const {paymentMethod, totalPrice} = req.body
+    const {paymentMethod, userId, totalPrice} = req.body
     // const usersItem = await cartSchema.find({userId:{$eq:req.user._id}}).select("-_id -__v")
     
     // if(usersItem && !usersItem.length){
@@ -17,9 +17,17 @@ exports.createOrder = asyncHandler(async(req, res) =>{
     //         res:"failed",
     //         message:"No order items"
     //     })
-    // }else{ 
+    // }
+    // else{ 
     
         // let price  = usersItem?.map(x => x.price)
+
+        if(!paymentMethod || !userId || !totalPrice){
+            return  res.status(401).json({
+                        res:"failed",
+                        message:"Enter all fields"
+                    })
+        }
         crypto.randomBytes(24, async (err, buffer) => {
             let token = buffer.toString("hex");
     
