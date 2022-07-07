@@ -4,6 +4,7 @@ require("colors");
 const DB = require("./config/db");
 const path = require("path");
 const userRoutes = require("./routes/user/userRoutes");
+const authRoutes = require("./routes/user/userAuth");
 const categoryRoutes = require("./routes/category/categoryRoutes");
 const subCategoryRoutes = require("./routes/category/subCategoryRoutes");
 const advertRoutes = require("./routes/advert/advertRoutes");
@@ -12,7 +13,7 @@ const businessRoutes = require("./routes/Bussiness/businessRoutes");
 const paymentRoutes = require("./routes/payment/paymentRoutes")
 const orderRoutes = require("./routes/order/order")
 const Agency = require("./routes/Agency/pages");
-const { errorHandler } = require("./config/errorMiddleWares");
+const { errorHandler,notFound } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
 const passport = require("passport")
@@ -48,6 +49,7 @@ require("./config/passport")(passport)
 
 //@desc: Routes
 app.use("/api/users", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/advert", advertRoutes);
@@ -57,6 +59,7 @@ app.use("/api/business", businessRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/orders", orderRoutes);
 
+app.use(notFound);
 app.use(errorHandler);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`server started on PORT ${PORT}`.red.bold));

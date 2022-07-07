@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 const orderSchema = mongoose.Schema(
   {
-    // add a reference to the corresponding user
-    userId: {
+     userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "users",
@@ -17,7 +16,7 @@ const orderSchema = mongoose.Schema(
       default:"card",
       enum:["card", "transfer"]
     },
-    // depends on if card or transfer method is used
+   
     paymentResult: {
       id: { type: String },
       reference: { type: String },
@@ -27,11 +26,6 @@ const orderSchema = mongoose.Schema(
       email_address: { type: String },
     },
    
-    // taxPrice: {
-    //   type: Number, 
-    //   required: true,
-    //   default: 0.0,
-    // },
     
     totalPrice: {
       type: Number,

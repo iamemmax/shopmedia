@@ -6,7 +6,7 @@ const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 let {createAdvert, listAdverts,  searchAdvertQuery,  getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg, updateEachImg, deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
 
 
-router.get("/",  listAdverts)
+router.route("/").get(listAdverts)
 router.post("/create", ensureLogin, adminAccess(["admin", "super admin", "vendors"]), upload.array("advertImgs", 5), createAdvert)
 router.post("/search", ensureLogin,   searchBySubTypes)
 router.get("/:slug",ensureLogin, getSingleAdvert)

@@ -5,6 +5,7 @@ const cloudinary = require("../../config/cloudinary");
 const crypto = require("crypto");
 const {search} = require("../../helper/search");
 const compressImg = require("../../helper/sharp");
+const isodate = require("isodate");
 
 // @desc: create advert
 // @Route: /api/advert/create
@@ -138,15 +139,28 @@ exports.createAdvert = asyncHandler(async (req, res) => {
 // @Acess: public
 
 exports.listAdverts = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+	const pageSize = 20; // total number of entries on a single page
+
+ 
+  const count = await advertSchema.countDocuments();
+	
   try {
     let adverts = await advertSchema
-      .find()
+      .find(keyword)
+      .limit(pageSize)
+		.skip(pageSize * (page - 1))
+		.sort('-createdAt')
+
       .populate("postedBy category sub_category", "-_id -__v -token -password")
       .select("-_id -__v");
-    if (adverts.length > 0) {
+      if (adverts.length > 0) {
+      // console.log(isodate(adverts[0].createdAt))
+      // console.log(adverts[0].createdAt.toISOString())
       return res.status(201).json({
         res: "ok",
-        total: adverts.length,
+        total: count,
+        pages: Math.ceil(count / pageSize),
         data: adverts,
       });
     } else {

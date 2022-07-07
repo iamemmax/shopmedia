@@ -5,41 +5,29 @@ const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
 const passport = require("passport");
 const fs = require("fs");
-const cloudinary = require("../../config/cloudinary")
+const cloudinary = require("../../config/cloudinary");
 const sendEmail = require("../../helper/email");
-const validateEmail = require("../../helper/emailValidate")
+const validateEmail = require("../../helper/emailValidate");
 const jwt = require("jsonwebtoken");
 const compressImg = require("../../helper/sharp");
 // const welcomeEmail = require("../../helper/Email Template/welcomeEmail")
+const {searchUser} = require("../../helper/search")
 
 // @desc: create account
 // @Route: /api/users/register
 // @Acess: publicu
 exports.createUser = asyncHandler(async (req, res) => {
-  let {
-    username,
-    email,
-    fullname,
-    password,
-    phone_no,
-    company_name,
-  } = req.body;
+  let { username, email, fullname, password, phone_no, company_name } =
+    req.body;
 
   //@desc: check if users fill all field
 
-  if (
-    !username ||
-    !email ||
-    !fullname ||
-    !password ||
-
-    !phone_no
-  ) {
+  if (!username || !email || !fullname || !password || !phone_no) {
     res.status(401);
     throw new Error("All fields are required");
   }
   // @desc check if user enter valid email
- validateEmail(res, email)
+  validateEmail(res, email);
 
   try {
     // @desc check if username already exist
@@ -48,11 +36,11 @@ exports.createUser = asyncHandler(async (req, res) => {
     if (usernameExist) {
       return res.status(401).json({
         message: "Company already exists",
-      })
+      });
     }
 
     // @desc check if email already exist
- else if (emailExist) {
+    else if (emailExist) {
       return res.status(401).json({
         message: "Email already linked to another user",
       });
@@ -64,19 +52,25 @@ exports.createUser = asyncHandler(async (req, res) => {
             if (err) console.log(err);
 
             let newUser = await new userSchema({
-              user_id:`user_id_${token}`,
+              user_id: `user_id_${token}`,
               username,
               email,
               fullname,
               password: hash,
               phone_no,
               company_name,
-
             }).save();
 
             if (newUser) {
-              let { user_id, username, email, fullname, phone_no, company_name, verified } =
-                newUser;
+              let {
+                user_id,
+                username,
+                email,
+                fullname,
+                phone_no,
+                company_name,
+                verified,
+              } = newUser;
               let user = {
                 user_id,
                 username,
@@ -84,14 +78,14 @@ exports.createUser = asyncHandler(async (req, res) => {
                 fullname,
                 phone_no,
                 company_name,
-                verified
+                verified,
               };
 
-               await new tokenSchema({
+              await new tokenSchema({
                 email,
                 token,
               }).save();
-             
+
               sendEmail(
                 email,
                 "Verify Your Email",
@@ -402,7 +396,7 @@ justify-content: center !important;
 </html>
                 `
               );
-               sendEmail(
+              sendEmail(
                 email,
                 "Welcome to ShopMedia.ng",
                 ` 
@@ -718,12 +712,12 @@ justify-content: center !important;
                 </body>
                 
                 </html>`
-              
               );
 
               return res.status(201).json({
                 res: "ok",
-                message: "Please click on the link sent to your email to complete your registration",
+                message:
+                  "Please click on the link sent to your email to complete your registration",
                 user,
               });
             }
@@ -763,11 +757,10 @@ exports.activateUser = asyncHandler(async (req, res) => {
     }
 
     let userFound = await userSchema.findOneAndUpdate(
-      {user_id: req.params.user_id },
-      { $set: { verified: true , token:''} },
+      { user_id: req.params.user_id },
+      { $set: { verified: true, token: "" } },
       { new: true }
     );
-   
 
     if (userFound.verify === true) {
       token.remove();
@@ -785,7 +778,7 @@ exports.activateUser = asyncHandler(async (req, res) => {
 // @Route: /api/users/login
 // @Acess: public
 
-exports.loginUser = asyncHandler(async(req, res) => {
+exports.loginUser = asyncHandler(async (req, res) => {
   let { email, password } = req.body;
 
   if (!email || !password) {
@@ -794,68 +787,59 @@ exports.loginUser = asyncHandler(async(req, res) => {
   }
 
   // check if user enter valid email
-  validateEmail(res, email)
+  validateEmail(res, email);
 
-const user = await userSchema.findOne({email})
-const userInfo = await userSchema.findOne({email}).select("-password -__v -token -_id")
-if(!user){
-   res.status(401)
-  throw new Error("Incorrect email or password");
-  
- 
-}
+  const user = await userSchema.findOne({ email });
+  const userInfo = await userSchema
+    .findOne({ email })
+    .select("-password -__v -token -_id");
+  if (!user) {
+    res.status(401);
+    throw new Error("Incorrect email or password");
+  }
 
-try {
-  //desc:match password
-  bcrypt.compare(password, user.password, (err, isMatch) =>{
-    if(err){
-      return res.status(401).json({
-      res:"failed",
-      message:"Incorrect email or password",
-       
-      })
-
-    }
-    if(isMatch){
-      if(user.verified === false){
-        return res.status(200).json({
-          res:"failed",
-          message:"Account not verifed.\n Please check your email for verification link.",
-         
-        })
-       
+  try {
+    //desc:match password
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) {
+        return res.status(401).json({
+          res: "failed",
+          message: "Incorrect email or password",
+        });
       }
-      const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
-        expiresIn: "12h",
-      });
-      return res.status(200).json({
-        message:"Login successful",
-        userInfo,
-        token
-      })
-    }else{
-      
-       return res.status(401).json({
-        message:"Incorrect email or password",
-      
-      })
-
-    }
-  })
-  
-} catch (error) {
-    res.status(401)
-  throw new Error(error.message);
-}
-
+      if (isMatch) {
+        if (user.verified === false) {
+          return res.status(200).json({
+            res: "failed",
+            message:
+              "Account not verifed.\n Please check your email for verification link.",
+          });
+        }
+        const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
+          expiresIn: "12h",
+        });
+        return res.status(200).json({
+          message: "Login successful",
+          userInfo,
+          token,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Incorrect email or password",
+        });
+      }
+    });
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
+  }
 });
-  
+
 // @desc: logout account
 // @Route: /api/users/logout
 // @Acess: public
 
 exports.logoutUser = (req, res) => {
-  
   req.logOut(function (err) {
     if (err) console.log(err);
 
@@ -883,34 +867,33 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   }
 
   // check if user enter valid email
-  validateEmail(res, email)
- 
-   
+  validateEmail(res, email);
 
   const user = await userSchema.findOne({ email: email });
-  if(user.verified === false){
+  if (user.verified === false) {
     return res.status(200).json({
-      res:"failed",
-      message:"Account not verified. \n Please check your email for verification link.",
-     
-    })
-   
+      res: "failed",
+      message:
+        "Account not verified. \n Please check your email for verification link.",
+    });
   }
   if (user) {
     crypto.randomBytes(48, async (err, buffer) => {
       let token = buffer.toString("hex");
       if (err) console.log(err);
 
-     let userFound = await userSchema.findOneAndUpdate({email:email}, {$set:{token:token}},{new:true})
+      let userFound = await userSchema.findOneAndUpdate(
+        { email: email },
+        { $set: { token: token } },
+        { new: true }
+      );
 
-     if(userFound){
+      if (userFound) {
+        sendEmail(
+          email,
+          "Reset your password",
 
-     
-          sendEmail(
-            email,
-            "Reset your password",
-          
-        `
+          `
     
                 
         <!doctype html>
@@ -1215,15 +1198,12 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
         
         </html>
                         `
-          );
-          res.status(201).json({
-            message:
-              " Please follow the instructions sent to your email to complete reseting your password.",
-          });
-        
-      
-        } 
-     
+        );
+        res.status(201).json({
+          message:
+            " Please follow the instructions sent to your email to complete reseting your password.",
+        });
+      }
     });
   } else {
     res.status(401);
@@ -1233,323 +1213,325 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
   }
 });
 
-
 // @desc: reset password
 // @Route: /api/users/reset-password
 // @Acess: public
 exports.resetPassword = asyncHandler(async (req, res) => {
-  let {password} = req.body
+  let { password } = req.body;
 
-  if(!password){
+  if (!password) {
     res.status(401);
     throw new Error("Enter your password");
   }
-  
-
-  
 
   try {
     const user = await userSchema.find({
-      
       $and: [
         {
           user_id: req.params.user_id,
           token: req.params.token,
         },
       ],
-   });
+    });
 
     if (user.length > 0) {
-     
-    
-    console.log(user);
-    bcrypt.genSalt(10, function (err, salt) {
-      bcrypt.hash(password, salt, async (err, hash) => {
-  
-    let resetPassword = await userSchema.findOneAndUpdate(
-      { user_id: req.params.user_id },
-      { $set: { password: hash, token:'' } },
-      { new: true }
-    );
-    if(resetPassword){
-      res.status(201).json({
-        message:
-          " Password changed successfully \n You can now sign in with your new password.", 
+      console.log(user);
+      bcrypt.genSalt(10, function (err, salt) {
+        bcrypt.hash(password, salt, async (err, hash) => {
+          let resetPassword = await userSchema.findOneAndUpdate(
+            { user_id: req.params.user_id },
+            { $set: { password: hash, token: "" } },
+            { new: true }
+          );
+          if (resetPassword) {
+            res.status(201).json({
+              message:
+                " Password changed successfully \n You can now sign in with your new password.",
+            });
+          }
+        });
       });
+    } else {
+      res.status(401);
+      throw new Error(
+        "Try resetting your password again \n Your request to reset your password has expired or the link has already been used"
+      );
     }
-  }); 
+  } catch (error) {
+    res.status(501);
+    throw new Error(error.message);
+  }
 });
-}else{
-  res.status(401);
-  throw new Error("Try resetting your password again \n Your request to reset your password has expired or the link has already been used");
-  
-}
-}
-
-
-    catch (error) {
-      res.status(501);
-      throw new Error(error.message);
-    }
-})
 
 //@desc: change password
 //@access: private
 //@method: put
 //@route: /api/users/change-password/user_id
 exports.ChangePassword = asyncHandler(async (req, res) => {
-  let { oldpassword, new_password, confirm_pass} = req.body;
+  let { oldpassword, new_password, confirm_pass } = req.body;
 
-  if(!oldpassword|| !new_password || !confirm_pass){
+  if (!oldpassword || !new_password || !confirm_pass) {
     return res.status(401).json({
-          res:"failed",
-             message: "All fields are required"
-        
-         })
+      res: "failed",
+      message: "All fields are required",
+    });
   }
-  if(new_password !== confirm_pass){
+  if (new_password !== confirm_pass) {
     return res.status(401).json({
-          res:"failed",
-             message: "Password does not match"
-        
-         })
+      res: "failed",
+      message: "Password does not match",
+    });
   }
- 
 
-  const {password} = await userSchema.findOne({ user_id: req.params.user_id }).select("password")
+  const { password } = await userSchema
+    .findOne({ user_id: req.params.user_id })
+    .select("password");
   // if (user) {
-    if(password){
-     bcrypt.compare(oldpassword, password, (err, isMatch)=>{
-      if(err){
+  if (password) {
+    bcrypt.compare(oldpassword, password, (err, isMatch) => {
+      if (err) {
         return res.status(401).json({
-          res:"failed",
-             message: "Old password does not match"
-        
-         })
+          res: "failed",
+          message: "Old password does not match",
+        });
       }
-      if(isMatch){
+      if (isMatch) {
         bcrypt.genSalt(10, function (err, salt) {
           bcrypt.hash(new_password, salt, async (err, hash) => {
-                 let update = await userSchema.findOneAndUpdate(
-                   { user_id: req.params.user_id},
-                   { $set:{password: hash || password } },
-                   { new: true }
-                 );
-                 if (!update) {
-                  res.send("unable to update pass");
-                   res.status(401).json({
-                     message: "Unable to update password ",
-                   });
-                 } else {
-                   res.status(201).json({
-                     res:"ok",
-                     message:"Password changed successfully"
-                   });
-                 }
-                })
-                })
-      }else{
+            let update = await userSchema.findOneAndUpdate(
+              { user_id: req.params.user_id },
+              { $set: { password: hash || password } },
+              { new: true }
+            );
+            if (!update) {
+              res.send("unable to update pass");
+              res.status(401).json({
+                message: "Unable to update password ",
+              });
+            } else {
+              res.status(201).json({
+                res: "ok",
+                message: "Password changed successfully",
+              });
+            }
+          });
+        });
+      } else {
         return res.status(401).json({
-          res:"failed",
-             message: "Old password does not match"
-        
-         })
+          res: "failed",
+          message: "Old password does not match",
+        });
       }
-     })
-
-    }
-    
- 
+    });
+  }
 });
 
 //@desc: update user profile img
 //@access: private
 //@method: put
 //@route: /api/users/upload-profile-img
-exports.uploadProfilePic = asyncHandler(async(req, res)=>{
-  if(!req.file){
-    res.status(401)
-    throw new Error("Please select a file")
+exports.uploadProfilePic = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    res.status(401);
+    throw new Error("Please select a file");
   }
 
-  console.log(req.file)
-  const users = await userSchema.findOne({user_id:req.params.user_id})
+  console.log(req.file);
+  const users = await userSchema.findOne({ user_id: req.params.user_id });
   //  if(users.pic.length > 0){
-    //  }
-    
+  //  }
+
   try {
-    compressImg(req.file.path, 100, 100)
-    
+    compressImg(req.file.path, 100, 100);
+
     let uploadImg = await cloudinary.uploader.upload(req.file.path, {
-      eager: [
-        { width: 100, height: 100 },
-      ],
-    })
+      eager: [{ width: 100, height: 100 }],
+    });
 
     fs.unlinkSync(req.file.path);
-    if(uploadImg){
+    if (uploadImg) {
       let profileImg = {
-        img_id:uploadImg.public_id,
-        img:uploadImg.eager[0].secure_url,
-      }
-      console.log(profileImg)
-      let updateProfile = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{pic:[profileImg]}}, {new:true}).select("-_id, -__v")
-      
-      if(updateProfile){
-        await cloudinary.uploader.destroy(users.pic[0]?.img_id)
+        img_id: uploadImg.public_id,
+        img: uploadImg.eager[0].secure_url,
+      };
+      console.log(profileImg);
+      let updateProfile = await userSchema
+        .findOneAndUpdate(
+          { user_id: req.params.user_id },
+          { $set: { pic: [profileImg] } },
+          { new: true }
+        )
+        .select("-_id, -__v");
+
+      if (updateProfile) {
+        await cloudinary.uploader.destroy(users.pic[0]?.img_id);
         res.status(201).json({
-          message:"Profile img updated successfully"
-        })
-      }else{
+          message: "Profile img updated successfully",
+        });
+      } else {
         fs.unlinkSync(req.file.path);
-        res.status(401)
-    throw new Error("Unable to update profile")
-
+        res.status(401);
+        throw new Error("Unable to update profile");
       }
-    }else{
+    } else {
       fs.unlinkSync(req.file.path);
-
     }
-        
-     
   } catch (error) {
-    res.status(401)
-    throw new Error(error.message)
+    res.status(401);
+    throw new Error(error.message);
   }
-})
+});
 
-
-
-//@desc: update user profile 
+//@desc: update user profile
 //@access: private
 //@method: put
 //@route: /api/users/profile/update
 
-exports.updateProfile = asyncHandler(async(req, res)=>{
-  let user = await userSchema.findOne({user_id:req.params.user_id}).select("-password -__v -token")
-  let {firstname, lastname, fullname,  phone_no} = req.body
+exports.updateProfile = asyncHandler(async (req, res) => {
+  let user = await userSchema
+    .findOne({ user_id: req.params.user_id })
+    .select("-password -__v -token");
+  let { firstname, lastname, fullname, phone_no } = req.body;
 
-  try{
-    if(user){
-      let updateUser = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{firstname:firstname || user.firstname, lastname:lastname || user.lastname, fullname:fullname || user.fullname, phone_no:phone_no || user.phone_no, }}, {new:true})
-      if(updateUser){
+  try {
+    if (user) {
+      let updateUser = await userSchema.findOneAndUpdate(
+        { user_id: req.params.user_id },
+        {
+          $set: {
+            firstname: firstname || user.firstname,
+            lastname: lastname || user.lastname,
+            fullname: fullname || user.fullname,
+            phone_no: phone_no || user.phone_no,
+          },
+        },
+        { new: true }
+      );
+      if (updateUser) {
         res.status(201).json({
-          res:"ok",
-          message:"Profile updated successfully",
-          data:updateUser
-        })
-      }else{
+          res: "ok",
+          message: "Profile updated successfully",
+          data: updateUser,
+        });
+      } else {
         res.status(201).json({
-          res:"failed",
-          message:"Something went wrong, try agan later."
-          
-        })
+          res: "failed",
+          message: "Something went wrong, try agan later.",
+        });
       }
-    }else{
+    } else {
       res.status(201).json({
-        res:"failed",
-        message:"User not found"
-        
-      })
+        res: "failed",
+        message: "User not found",
+      });
     }
-  }catch(error){
+  } catch (error) {
     res.status(201).json({
-      res:"failed",
-      message:error.message
-      
-    })
+      res: "failed",
+      message: error.message,
+    });
   }
-
-})
-
-
+});
 
 // @desc: list users account
 // @Route: /api/users
 // @Acess: private(admin, super admin)
 
+exports.listUsers = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  const count = await userSchema.countDocuments({});
 
+  try {
+    let users = await userSchema
+      .find({}, { __v: 0 })
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort("-createdAt");
 
-    exports.listUsers = asyncHandler(async (req, res) => {
-      try{
-        let users = await userSchema.find({},{__v:0})
-          // @desc check if username already exist
-          if(users.length > 0){
-            return res.status(201).json({
-              res: "ok",
-              total:users.length,
-              data:users,
-            });
-          }else{
-            res.status(401)
-            throw new Error("No registerd user in Database")
-          }
-        
-        } catch (error) {
-          res.status(401);
-          throw new Error(error.message);
-        }
+    // @desc check if username already exist
+    if (users.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total: count,
+        pages: Math.ceil(count / pageSize),
+        data: users,
+      });
+    } else {
+      res.status(401);
+      throw new Error("No registerd user in Database");
+    }
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
+  }
 });
-
 
 // @desc: remove users account
 // @Route: /api/users/remove/user_id
 // @Acess: private(admin, super admin)
 
 exports.removeUsers = asyncHandler(async (req, res) => {
-const remove = await userSchema.findOneAndDelete({user_id:req.params.user_id})
-if(remove){
-  return res.status(201).json({
-    res: "ok",
-    message:"User deleted successfully",
-    data:remove,
+  const remove = await userSchema.findOneAndDelete({
+    user_id: req.params.user_id,
   });
-}else{
-  res.status(401)
-  throw new Error("Unable to delete user")
-}
-
+  if (remove) {
+    return res.status(201).json({
+      res: "ok",
+      message: "User deleted successfully",
+      data: remove,
+    });
+  } else {
+    res.status(401);
+    throw new Error("Unable to delete user");
+  }
 });
-
 
 // @desc: create admin account
 // @Route: /api/users/remove/user_id
 // @Acess: private(super admin)
 
 exports.createAdmin = asyncHandler(async (req, res) => {
-  let users = await userSchema.findOne({user_id:req.params.user_id})
-  if(users){
-    if(users?.roles === "super admin"){
+  let users = await userSchema.findOne({ user_id: req.params.user_id });
+  if (users) {
+    if (users?.roles === "super admin") {
       return res.status(404).json({
         res: "failed",
-        message:"Unable to create admin",
-      
+        message: "Unable to create admin",
       });
     }
-    let addAdmin = await userSchema.findOneAndUpdate({user_id:req.params.user_id}, {$set:{roles:req.body.roles}},{new:true}).select("-password -__v")
-    if(addAdmin){
+    let addAdmin = await userSchema
+      .findOneAndUpdate(
+        { user_id: req.params.user_id },
+        { $set: { roles: req.body.roles } },
+        { new: true }
+      )
+      .select("-password -__v");
+    if (addAdmin) {
       return res.status(201).json({
         res: "ok",
-        message:"Admin created successfully",
-        data:addAdmin,
+        message: "Admin created successfully",
+        data: addAdmin,
       });
-    }else{
-      res.status(401)
-  throw new Error("Unable to add admin")
+    } else {
+      res.status(401);
+      throw new Error("Unable to add admin");
     }
-
-  }else{
-    res.status(401)
-  throw new Error("User not found")
+  } else {
+    res.status(401);
+    throw new Error("User not found");
   }
-})
-
-
+});
 
 // @desc: remove multiple users
 // @Route: /api/users/remove/user_id
 // @Acess: private(super admin, admin)
 
 exports.removeMultipleUsers = asyncHandler(async (req, res) => {
-  console.log("12345")
-})
+  console.log("12345");
+});
+
+
+exports.searchAllUser = asyncHandler(async (req, res) => {
+  searchUser(userSchema, req, res)
+});

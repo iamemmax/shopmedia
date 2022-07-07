@@ -8,7 +8,7 @@ const paginate = require("../../helper/pagination")
 // @route GET /api/orders/create
 // @access PRIVATE
 exports.createOrder = asyncHandler(async(req, res) =>{
-    const {paymentMethod} = req.body
+    const {paymentMethod, totalPrice} = req.body
     const usersItem = await cartSchema.find({userId:{$eq:req.user._id}}).select("-_id -__v")
     
     if(usersItem && !usersItem.length){
@@ -26,9 +26,11 @@ exports.createOrder = asyncHandler(async(req, res) =>{
         const order = await new orderSchema({
             userId:req.user._id,
             order_id:token, 
-            orderItems:usersItem.map(x => x),
-            paymentMethod:"card",
-            totalPrice:price?.reduce((x, y) => x + y, 0) ,
+            // orderItems:usersItem.map(x => x),
+            orderItems:[],
+            paymentMethod,
+            totalPrice,
+            //price?.reduce((x, y) => x + y, 0) ,
 
         }).save()
         if(order){
@@ -166,12 +168,20 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
 // @route GET /api/orders
 // @access PRIVATE/ADMIN
  exports.getAllOrders = asyncHandler(async (req, res) => {
+    const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  const count = await orderSchema.countDocuments({});
+
     const allOrders = await orderSchema.find().sort({'createdAt':"-1"}).populate("userId", "-_id -__v -token -password").select("-__v -_id")
+    .limit(pageSize)
+		.skip(pageSize * (page - 1))
+		.sort('-createdAt')
     // paginate(odel, postedBy,  results, sort)
     if(allOrders.length > 0){
         return  res.status(201).json({
             res:"ok",
-            total:allOrders?.length,
+            total: count,
+            pages: Math.ceil(count / pageSize),
             data:allOrders
         })
     }else{

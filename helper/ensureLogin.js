@@ -19,7 +19,7 @@ exports.ensureLogin = asyncHandler(async (req, res, next) => {
     if(req.user.verified === false){
       return res.status(200).json({
         res:"failed",
-        message:"Your account is not verified \n Check your email for verification link.",
+        message:"Your account is not verified, Check your email for verification link.",
        
       })
     }
