@@ -1,10 +1,10 @@
 const express  = require("express")
 const router = express.Router()
 
-let {searchAdvert, searchAdvertQuery} = require("../../controllers/advert/advert")
+let {searchAdvert} = require("../../controllers/advert/advert")
 
 
-router.get("/advert",  searchAdvertQuery)
+router.get("/advert",  searchAdvert)
 // router.get("/search",  searchBySubTypes)
 
 

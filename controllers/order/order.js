@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema")
 const orderSchema = require("../../model/order/orderSchema")
 const paginate = require("../../helper/pagination")
-
+const ISODate = require("isodate")
 // @desc  create a new order
 // @route GET /api/orders/create
 // @access PRIVATE
@@ -19,7 +19,7 @@ exports.createOrder = asyncHandler(async(req, res) =>{
         })
     }else{
     
-        let price  = usersItem?.map(x => x.price)
+        // let price  = usersItem?.map(x => x.price)
         crypto.randomBytes(24, async (err, buffer) => {
             let token = buffer.toString("hex");
     
@@ -188,6 +188,44 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         return  res.status(401).json({
             res:"failed",
             message:"order not found"
+        })
+    }
+});
+
+
+
+// @desc  revenue
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+
+exports.getTotalRevenue = asyncHandler(async (req, res) => {
+    try{
+        const page = Number(req.query.pageNumber) || 1;
+        const pageSize = 20; // total number of entries on a single page
+        const count = await orderSchema.countDocuments({});
+
+        let revenue = await orderSchema.find({$and:{isPaid:true, createdAt:{$gte:ISODate(req.body.startDate), $lte:ISODate(req.body.endDate)}}})
+        .limit(pageSize)
+		.skip(pageSize * (page - 1))
+		.sort('-createdAt')
+    
+    if(revenue){
+        return  res.status(201).json({
+            res:"ok",
+            total: count,
+            pages: Math.ceil(count / pageSize),
+            data:revenue
+        })
+    }else{
+        return  res.status(401).json({
+            res:"failed",
+            message:"order not found"
+        })
+    }
+    }catch(error){
+        return  res.status(401).json({
+            res:"failed",
+            message:error.message
         })
     }
 });

@@ -3,10 +3,10 @@ const router = express.Router()
 const upload = require("../../config/upload")
 const {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 
-let {createAdvert, listAdverts,  searchAdvertQuery,  getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg, updateEachImg, deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
+let {createAdvert, listAdverts, searchAdvert, searchAdvertQuery,  getSingleAdvert, updateAdvert, deleteAdvert,updateAdvertImg, updateEachImg, deleteAdvertImg,searchBySubTypes } = require("../../controllers/advert/advert")
 
 
-router.route("/").get(listAdverts)
+router.route("/").get(listAdverts).get(searchAdvert)
 router.post("/create", ensureLogin, adminAccess(["admin", "super admin", "vendors"]), upload.array("advertImgs", 5), createAdvert)
 router.post("/search", ensureLogin,   searchBySubTypes)
 router.get("/:slug",ensureLogin, getSingleAdvert)
