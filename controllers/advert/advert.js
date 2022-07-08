@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const fs = require("fs");
 const cloudinary = require("../../config/cloudinary");
 const crypto = require("crypto");
-const {search} = require("../../helper/search");
+const {search, filterHomepage} = require("../../helper/search");
 const compressImg = require("../../helper/sharp");
 const isodate = require("isodate");
 
@@ -451,63 +451,41 @@ exports.searchAdvert = asyncHandler(async (req, res) => {
   search(advertSchema, req, res);
 });
 
-exports.searchBySubTypes =  asyncHandler(async (req, res) => {
-  let order = req.body.order ?  req.body.order: "asc";
-  let sortBy = req.body.sortBy ?  req.body.sortBy: "asc";
-  let limit = req.body.limit ? parseInt(req.body.limit) : 100
-  let skip = parseInt(req.body.skip) 
+// exports.searchBySubTypes =  asyncHandler(async (req, res) => {
+//   let order = req.body.order ?  req.body.order: "asc";
+//   let sortBy = req.body.sortBy ?  req.body.sortBy: "asc";
+//   let limit = req.body.limit ? parseInt(req.body.limit) : 100
+//   let skip = parseInt(req.body.skip) 
 
-   let findArrgs = {}
+//    let findArrgs = {}
    
-    // for (let key in req.body.filters) {
-    //   if (req.body.filters[key].length > 0) {
-    //     findArrgs[key] = req.body.filters[key];
-    //     console.log(req.body.filters[key]);
+//     // for (let key in req.body.filters) {
+//     //   if (req.body.filters[key].length > 0) {
+//     //     findArrgs[key] = req.body.filters[key];
+//     //     console.log(req.body.filters[key]);
         
-    //   }
-    // }
-    // await advertSchema.find({state:req.body.state}).select("-_id").sort([[sortBy, order]]).skip(skip).limit(limit).exec((err, data)=>{
-    //   if(err)return res.status(400).send(err)
-    //   res.json({
-    //     total:data.length,
-    //     data
-    //   })
+//     //   }
+//     // }
+//     // await advertSchema.find({state:req.body.state}).select("-_id").sort([[sortBy, order]]).skip(skip).limit(limit).exec((err, data)=>{
+//     //   if(err)return res.status(400).send(err)
+//     //   res.json({
+//     //     total:data.length,
+//     //     data
+//     //   })
 
-    // })
+//     // })
 
-})
+// })
 
 
-// exports.searchAdvertQuery = asyncHandler(async (req, res) => {
-//   const keyword = req.query.search
-//   ? {
-//         $or:[
-//           { address: { $regex: req.query.search, $options: "i" } },
-//           {state: { $regex: req.query.search, $options: "i" } },
-//           { city: { $regex: req.query.search, $options: "i" } },
-//           { category: { $regex: req.query.search, $options: "i" } },
-//           { landmark: { $regex: req.query.search, $options: "i" } },
-//           { size: { $regex: req.query.search, $options: "i" } },
-//           { sub_category : { $regex: req.query.search, $options: "i" } },
-//           { interest: { $regex: req.query.search, $options: "i" } },
-//           { ageGroup: { $regex: req.query.search, $options: "i" } },
 
-//         ],
-//       }
-//     : {};
-//   try {
-//     const search = await advertSchema.find(keyword);
-//     if (!search) {
-//       res.status(400);
-//       throw new Error("advert not found");
-//     }
-//     res.status(201).json({
-//       count: search.length,
-//       results:search,
-//     });
-//   } catch (error) {
-//     res.status(501);
-//     throw new Error(error.message);
-//   }
-//   console.log(req.query)
-// });
+
+
+
+
+
+
+exports.searchAdvertQuery = asyncHandler(async (req, res) => {
+  filterHomepage(req, res, advertSchema)
+
+});

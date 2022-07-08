@@ -1,6 +1,9 @@
-exports.search = async (model, req, res) => {
+const isodate = require("isodate")
+const asyncHandler = require("express-async-handler");
+
+exports.search = asyncHandler(async (model, req, res) => {
   let { search, page = 1, limit = 50, order_by } = req.query;
-console.log(search)
+
   const filterOptions = {
     $or: [
       { address: { $regex: search, $options: "i" } },
@@ -12,7 +15,8 @@ console.log(search)
       { ageGroup: { $regex: search, $options: "i" } },
     ],
   };
-  const results = await model.find(filterOptions).populate("category sub_category")
+  try{
+    const results = await model.find(filterOptions).populate("category sub_category").collation({locale: "en", strength: 2})
     .select("-_id -__v")
     .limit(limit * 1) //limit search result
     .skip((page - 1) * limit) // skip docs
@@ -20,54 +24,71 @@ console.log(search)
   // count total posts
   const count = await model.countDocuments(results);
   // response
-  res.status(200).json({
+ return res.status(200).json({
     count: results.length,
     page,
     totalPages: Math.ceil(count / limit),
     results: results,
   });
-};
+  }catch(error){
+    res.status(401)
+    throw new Error(error.message)
+  }
+});
 
 
 
 
+// @desc:homepage search
+exports.filterHomepage = asyncHandler(async (req, res, model) => {
+  let { category, state,start_date,  page = 1, limit = 50, order_by } = req.body;
 
-exports.filterPages = async (req, res, model) => {
-  let { name, page = 1, limit = 50, order_by } = req.body;
-
-  let { category } = req.params;
 
   const filterOptions = {
     $and: [
       {
-        $or: [{ name: { $regex: name, $options: "i" } }],
+        category,
       },
       {
-        category: { $eq: category },
+        state: { $in: [...state] },
+        
       },
+      {
+        createdAt:{$gte:isodate(start_date)}
+      }
     ],
   };
 
-  const results = await model
-    .find(filterOptions)
-    .select("-_id, -__v")
+  try{
+    const results = await model.find(filterOptions).select("-_id, -__v").populate("category").collation({locale: "en", strength: 2})
     .limit(limit * 1) //limit search result
     .skip((page - 1) * limit) // skip docs
     .sort({ createdAt: order_by === "createdAt" && "asc" }); // sort order
   // count total posts
-  const count = await model.countDocuments(filterOptions);
+  const count = await model.countDocuments(results);
   // response
-  res.status(200).json({
+ return res.status(200).json({
     count: results.length,
     page,
     totalPages: Math.ceil(count / limit),
     results: results,
   });
-};
+  }catch(error){
+   res.status(401)
+   throw new Error(error.message)
+  }
+});
 
 
 
-exports.searchUser = async (model, req, res) => {
+
+
+
+
+
+// @desc:search users by admin
+
+exports.searchUser = asyncHandler(async (model, req, res) => {
   let { search, page = 1, limit = 50, order_by } = req.query;
 
   console.log(search)
@@ -84,20 +105,26 @@ exports.searchUser = async (model, req, res) => {
      
     ],
   };
-  const results = await model.find(filterOptions)
+  try{
+
+    const results = await model.find(filterOptions).collation({locale: "en", strength: 2})
     .select("-_id -__v")
     .limit(limit * 1) //limit search result
     .skip((page - 1) * limit) // skip docs
     .sort({ createdAt: order_by === "createdAt" && "asc" }); // sort order
-  // count total posts
-  const count = await model.countDocuments(results);
-  // response
-  res.status(200).json({
+    // count total posts
+    const count = await model.countDocuments(results);
+    // response
+   return  res.status(200).json({
     count: results.length,
     page,
     totalPages: Math.ceil(count / limit),
     results: results,
   });
-};
+}catch(error){
+  res.status(401)
+  throw new Error(error.message)
+}
+});
 
 
