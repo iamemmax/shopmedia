@@ -1528,9 +1528,44 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 // @Acess: private(super admin, admin)
 
 exports.removeMultipleUsers = asyncHandler(async (req, res) => {
-  console.log("12345");
+  try{
+ const removeMultipleUsers = await userSchema.deleteMany({
+
+   $or:[
+    {"user_id":{$in:[...req.body.user]}},
+    {"username":{$in:[...req.body.user]}}
+
+
+    
+  ]}
+,{ collation: { locale: "en", strength: 1 } } 
+  
+  
+  )
+ if(removeMultipleUsers){
+  return res.status(201).json({
+    res: "ok",
+    message: "users deleted successfully",
+    data: removeMultipleUsers,
+  });
+ }else {
+  res.status(401);
+  throw new Error("Unable to delete users");
+}
+
+  }catch(error){
+    res.status(401);
+    throw new Error(error.message);
+  }
 });
 
+
+
+
+
+// @desc: search for users
+// @Route: /api/users//search
+// @Acess: private(super admin, admin)
 
 exports.searchAllUser = asyncHandler(async (req, res) => {
   searchUser(userSchema, req, res)

@@ -9,12 +9,20 @@ const asyncHandler = require("express-async-handler");
 // @Route: /api/category
 // @Acess: private
 exports.listCategories = asyncHandler(async(req, res) =>{
+    const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  
     try {
         let categories = await categorySchema.find()
+        .limit(pageSize)
+        .skip(pageSize * (page - 1))
+        .sort("-createdAt");
     if(categories.length > 0){
         return res.status(201).json({
             res: "ok",
-            categories,
+            total:categories.length,
+            pages: Math.ceil(categories?.length / pageSize),
+            data:categories,
           });
     }else{
         res.status(401);
@@ -115,39 +123,3 @@ exports.deleteCategory = asyncHandler(async(req, res) =>{
 })
 
 
-// // @desc: create subCategory
-// // @Route: /api/category/add-subTypes/:id
-// // @Acess: private
-
-
-// exports.addSubCategory = asyncHandler(async(req, res) =>{
-//     let {subCategory} = req.body
-    
-//     if(!subCategory){
-//         res.status(401);
-//         throw new Error("please select sub category type");
-//     }
-//     const findCategory = await categorySchema.findById(req.params.id)
-    
-//     if(findCategory){
-//            try {
-//             let addSubTypes = await categorySchema.findByIdAndUpdate({_id:req.params.id}, {$push:{subTypes:subCategory}},{new:true})
-//             if(addSubTypes){
-
-//                 return res.status(201).json({
-//                     res: "ok",
-//                     message: "category added successfully",
-//                     addSubTypes,
-//                   });
-//             }else{
-//                 return res.status(401).json({
-//                     message: "unable to add sub-category",
-//                   });
-//             }
-//            } catch (error) {
-//             res.status(401);
-//             throw new Error(error.message);
-//            }
-        
-//     }
-// })

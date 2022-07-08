@@ -212,7 +212,6 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
     .select("-__v -_id")
     .limit(pageSize)
     .skip(pageSize * (page - 1))
-    .sort("-createdAt");
   // paginate(odel, postedBy,  results, sort)
   if (allOrders.length > 0) {
     return res.status(201).json({

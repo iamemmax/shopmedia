@@ -8,14 +8,27 @@ const crypto = require("crypto")
 // @Route: /api/
 // @Acess: private
 exports.listSubCategories = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  
   try {
-    let subCat = await subCategorySchema.find({categoryId:req.params.categoryId}).populate("categoryId", "-_id -__v ").select("-__v");
+    // const count = await subCategorySchema.countDocuments({});
+    let subCat = await subCategorySchema.find({categoryId:req.params.categoryId}).populate("categoryId", "-_id -__v ")
+    .select("-__v")
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort("-createdAt");
+
     if (subCat.length > 0) {
       return res.status(201).json({
         res: "ok",
         total:subCat.length,
+        pages: Math.ceil(subCat?.length / pageSize),
         data:subCat,
       });
+    }else{
+      res.status(401);
+      throw new Error("category not found");
     }
   } catch (error) {
     res.status(401);
