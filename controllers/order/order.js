@@ -21,7 +21,7 @@ const ISODate = require("isodate");
 // let price  = usersItem?.map(x => x.price)
 
 exports.createOrder = asyncHandler(async (req, res) => {
-  const { paymentMethod, userId, totalPrice } = req.body;
+  const { paymentMethod, userId, orderItems, totalPrice } = req.body;
 
   if (!paymentMethod || !userId || !totalPrice) {
     return res.status(401).json({
