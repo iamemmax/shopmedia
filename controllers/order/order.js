@@ -21,9 +21,9 @@ const ISODate = require("isodate");
 // let price  = usersItem?.map(x => x.price)
 
 exports.createOrder = asyncHandler(async (req, res) => {
-  const { paymentMethod, userId, orderItems, totalPrice } = req.body;
+  const { paymentMethod,  orderItems, totalPrice } = req.body;
 
-  if (!paymentMethod || !userId || !totalPrice) {
+  if (!paymentMethod ||  !totalPrice) {
     return res.status(401).json({
       res: "failed",
       message: "Enter all fields",
@@ -33,7 +33,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
     let token = buffer.toString("hex");
 
     const order = await new orderSchema({
-      userId,
+      userId:req.user._id,
       order_id: token,
       // orderItems:usersItem.map(x => x),
       orderItems,
