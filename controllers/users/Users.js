@@ -661,7 +661,7 @@ justify-content: center !important;
                                         Chidi Onwumere</p>
                 
                                     <div class="mail-btn text-center"  style="text-align: center">
-                                         <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a>
+                                         <a href="https://shopmedia.ng">Get Started</a>
                                     </div>
                                 </div>
                             </div>
@@ -812,7 +812,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
           return res.status(200).json({
             res: "failed",
             message:
-              "Account not verifed.\n Please check your email for verification link.",
+              "Account not verifed.\n Please check your email(promotions folder) for verification link.",
           });
         }
         const token = jwt.sign({ user }, process.env.JWT_SECRETE, {
@@ -874,7 +874,7 @@ exports.forgetPassword = asyncHandler(async (req, res) => {
     return res.status(200).json({
       res: "failed",
       message:
-        "Account not verified. \n Please check your email for verification link.",
+        "Account not verified. \n Please check your email (promotions folder) for verification link.",
     });
   }
   if (user) {
