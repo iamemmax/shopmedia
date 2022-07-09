@@ -337,7 +337,7 @@ justify-content: center !important;
                     </p>
 
                     <div class="mail-btn text-center " style="text-align: center">
-                    <a href="https://shop-media-master-danny-flames.vercel.app/${user_id}/${token}"> Verify your email</a> 
+                    <a href="https://shopmedia.ng/${user_id}/${token}"> Verify your email</a> 
                     </div>
 
                     <p>If you did not create an account, no further action is required.</p>
