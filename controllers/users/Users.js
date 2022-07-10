@@ -1529,24 +1529,16 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 
 exports.removeMultipleUsers = asyncHandler(async (req, res) => {
   try{
- const removeMultipleUsers = await userSchema.deleteMany({
+ const multipleUsers = await userSchema.deleteMany(
+    {username:req.body.user})
 
-   $or:[
-    {"user_id":{$in:[...req.body.user]}},
-    {"username":{$in:[...req.body.user]}}
-
-
-    
-  ]}
-,{ collation: { locale: "en", strength: 1 } } 
-  
-  
-  )
- if(removeMultipleUsers){
+console.log(req.body.user)
+ 
+ if(multipleUsers){
   return res.status(201).json({
     res: "ok",
     message: "users deleted successfully",
-    data: removeMultipleUsers,
+    data: multipleUsers,
   });
  }else {
   res.status(401);

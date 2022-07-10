@@ -170,7 +170,16 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
 exports.getMyOrders = asyncHandler(async (req, res) => {
   try {
     const allOrders = await orderSchema
-      .find({ userId: { $eq: req.user._id } })
+      .find({
+        $and:[
+          { userId: { $eq: req.user._id } }, 
+          {isPaid:true}
+
+        ]
+      }
+        
+        
+        )
       .sort({ createdAt: "-1" })
       .populate("userId", "-_id -__v -token -password")
       .select("-__v -_id");
@@ -219,6 +228,37 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
       total: count,
       pages: Math.ceil(count / pageSize),
       data: allOrders,
+    });
+  } else {
+    return res.status(401).json({
+      res: "failed",
+      message: "order not found",
+    });
+  }
+});
+
+// @desc  fetch all orders
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.getTransfer= asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  const count = await orderSchema.countDocuments({});
+
+  const allTransfer = await orderSchema
+    .find({paymentMethod:"transfer"})
+    .sort({ createdAt: "-1" })
+    .populate("userId", "-_id -__v -token -password")
+    .select("-__v -_id")
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+  // paginate(odel, postedBy,  results, sort)
+  if (allTransfer.length > 0) {
+    return res.status(201).json({
+      res: "ok",
+      total: count,
+      pages: Math.ceil(count / pageSize),
+      data: allTransfer,
     });
   } else {
     return res.status(401).json({
