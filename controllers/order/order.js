@@ -29,7 +29,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
       message: "Enter all fields",
     });
   }
-  crypto.randomBytes(24, async (err, buffer) => {
+  crypto.randomBytes(10, async (err, buffer) => {
     let token = buffer.toString("hex");
 
     const order = await new orderSchema({
@@ -243,7 +243,7 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
 exports.getTransfer= asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
   const pageSize = 20; // total number of entries on a single page
-  const count = await orderSchema.countDocuments({});
+  // const count = await orderSchema.countDocuments({});
 
   const allTransfer = await orderSchema
   
@@ -263,8 +263,8 @@ exports.getTransfer= asyncHandler(async (req, res) => {
   if (allTransfer.length > 0) {
     return res.status(201).json({
       res: "ok",
-      total: count,
-      pages: Math.ceil(count / pageSize),
+      total: allTransfer.length,
+      pages: Math.ceil(allTransfer.length / pageSize),
       data: allTransfer,
     });
   } else {
@@ -283,7 +283,7 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
   try {
     const page = Number(req.query.pageNumber) || 1;
     const pageSize = 20; // total number of entries on a single page
-    const count = await orderSchema.countDocuments({});
+    // const count = await orderSchema.countDocuments({});
 
     let revenue = await orderSchema
       .find({
@@ -302,8 +302,8 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
     if (revenue) {
       return res.status(201).json({
         res: "ok",
-        total: count,
-        pages: Math.ceil(count / pageSize),
+        total: revenue.length,
+        pages: Math.ceil(revenue.length / pageSize),
         data: revenue,
       });
     } else {
@@ -318,4 +318,65 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
       message: error.message,
     });
   }
+});
+
+
+// @desc  fetch all orders with isPaid:false
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.getUnpaidOrders = asyncHandler(async (req, res) => {
+  
+
+      let miliSeconds = 1000
+      let seconds = 60
+      let minutes = 60
+      let hours =  24
+      let day  = 7
+
+      let week = miliSeconds * seconds * minutes * hours *  day
+      console.log(Date.now())
+      console.log(week)
+      
+      let date = await orderSchema.find()
+      
+      
+      
+      try {
+        const allOrders = await orderSchema.find({
+        $and:[
+          {isPaid:false}, 
+        {createdAt:{$gte:new Date(Date.now() - week)}}
+      ]})
+        .sort({ createdAt: "-1" })
+        .populate("userId", "-_id -__v -token -password")
+        .select("-__v -_id");
+
+    if (allOrders) {
+      return res.status(201).json({
+        res: "ok",
+        total: allOrders?.length,
+        data: allOrders,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "order not found",
+      });
+    }
+  } catch (error) {
+    if (error) {
+      return res.status(401).json({
+        res: "failed",
+        message: error.message,
+      });
+    }
+  }
+});
+
+
+// @desc  fetch all orders with isPaid:false
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.deleteOrders = asyncHandler(async (req, res) => {
+
 });
