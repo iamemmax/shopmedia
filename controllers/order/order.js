@@ -246,7 +246,14 @@ exports.getTransfer= asyncHandler(async (req, res) => {
   const count = await orderSchema.countDocuments({});
 
   const allTransfer = await orderSchema
-    .find({paymentMethod:"transfer"})
+  
+  .find({
+    $and:[
+      { paymentMethod: "transfer"}, 
+      {isPaid:false}
+
+    ]
+  })
     .sort({ createdAt: "-1" })
     .populate("userId", "-_id -__v -token -password")
     .select("-__v -_id")
