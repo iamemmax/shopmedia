@@ -52,8 +52,14 @@ facebookId:{type: String},
     type: Boolean,
     default: false,
   },
+
   token: {
     type: String,
+    
+  },
+  email_subcriber: {
+    type: String,
+    default: false,
     
   },
   createdAt: {

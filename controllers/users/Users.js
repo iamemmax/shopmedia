@@ -1439,7 +1439,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
 exports.listUsers = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
-  const pageSize = 20; // total number of entries on a single page
+  const pageSize = 15; // total number of entries on a single page
   const count = await userSchema.countDocuments({});
 
   try {
@@ -1493,6 +1493,9 @@ exports.removeUsers = asyncHandler(async (req, res) => {
 
 exports.createAdmin = asyncHandler(async (req, res) => {
   let users = await userSchema.findOne({ user_id: req.params.user_id });
+  try{
+
+  
   if (users) {
     if (users?.roles === "super admin") {
       return res.status(404).json({
@@ -1500,6 +1503,7 @@ exports.createAdmin = asyncHandler(async (req, res) => {
         message: "Unable to create admin",
       });
     }
+    
     let addAdmin = await userSchema
       .findOneAndUpdate(
         { user_id: req.params.user_id },
@@ -1521,6 +1525,10 @@ exports.createAdmin = asyncHandler(async (req, res) => {
     res.status(401);
     throw new Error("User not found");
   }
+}catch(error){
+  res.status(401);
+    throw new Error(error.message);
+}
 });
 
 // @desc: remove multiple users
@@ -1561,4 +1569,49 @@ console.log(req.body.user)
 
 exports.searchAllUser = asyncHandler(async (req, res) => {
   searchUser(userSchema, req, res)
+});
+
+
+
+
+// @desc: email subscribers
+// @Route: /api/users/email_subcriber
+// @Acess:public
+
+
+exports.emailSubcriber = asyncHandler(async (req, res) => {
+  const user = await userSchema
+    .findOne({ _id: req.user_id })
+   
+ try{
+  if (user) {
+    const subcribe = await userSchema
+      .findOneAndUpdate(
+        { _id:req.user._id },
+        {
+          $set: {
+            email_subcriber: true,
+            
+          },
+        },
+        { new: true }
+      )
+     
+      .select("-_id -__v");
+    if (subcribe) {
+      res.status(201).json({
+        res: "ok",
+        data: subcribe,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message:"unable to subcribe to email",
+      });
+    }
+  }
+ }catch(error){
+  res.status(401)
+  throw new Error(error.message)
+ }
 });

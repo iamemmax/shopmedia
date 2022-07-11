@@ -91,39 +91,44 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
     .populate("userId");
   let { id, reference } = req.body;
   console.log(order);
-  if (order) {
-    const updateOrder = await orderSchema
-      .findOneAndUpdate(
-        { order_id: req.params.order_id },
-        {
-          $set: {
-            isPaid: true,
-            paidAt: Date.now(),
-            paymentResult: {
-              email_address: order.userId.email,
-              update_time: new Date(),
-              status: "success",
-              type: "card",
-              id,
-              reference,
+  try{
+    if (order) {
+      const updateOrder = await orderSchema
+        .findOneAndUpdate(
+          { order_id: req.params.order_id },
+          {
+            $set: {
+              isPaid: true,
+              paidAt: Date.now(),
+              paymentResult: {
+                email_address: order.userId.email,
+                update_time: new Date(),
+                status: "success",
+                type: "card",
+                id,
+                reference,
+              },
             },
           },
-        },
-        { new: true }
-      )
-      .populate("userId", "-_id -__v -token -password")
-      .select("-_id -__v");
-    if (updateOrder) {
-      res.status(201).json({
-        res: "ok",
-        data: updateOrder,
-      });
-    } else {
-      return res.status(401).json({
-        res: "failed",
-        message: error.message,
-      });
+          { new: true }
+        )
+        .populate("userId", "-_id -__v -token -password")
+        .select("-_id -__v");
+      if (updateOrder) {
+        res.status(201).json({
+          res: "ok",
+          data: updateOrder,
+        });
+      } else {
+        return res.status(401).json({
+          res: "failed",
+          message: "something went wrong",
+        });
+      }
     }
+  }catch(error){
+    res.status(401)
+  throw new Error(error.message)
   }
 });
 
@@ -214,7 +219,10 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   const pageSize = 20; // total number of entries on a single page
   const count = await orderSchema.countDocuments({});
 
-  const allOrders = await orderSchema
+
+  try{
+
+    const allOrders = await orderSchema
     .find()
     .sort({ createdAt: "-1" })
     .populate("userId", "-_id -__v -token -password")
@@ -235,6 +243,10 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
       message: "order not found",
     });
   }
+}catch(error){
+  res.status(401)
+  throw new Error(error.message)
+}
 });
 
 // @desc  fetch all orders
@@ -245,8 +257,10 @@ exports.getTransfer= asyncHandler(async (req, res) => {
   const pageSize = 20; // total number of entries on a single page
   // const count = await orderSchema.countDocuments({});
 
-  const allTransfer = await orderSchema
-  
+  try{
+
+    const allTransfer = await orderSchema
+    
   .find({
     $and:[
       { paymentMethod: "transfer"}, 
@@ -273,6 +287,10 @@ exports.getTransfer= asyncHandler(async (req, res) => {
       message: "order not found",
     });
   }
+}catch(error){
+   res.status(401)
+  throw new Error(error.message)
+}
 });
 
 // @desc  revenue
@@ -312,40 +330,26 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
         message: "order not found",
       });
     }
-  } catch (error) {
-    return res.status(401).json({
-      res: "failed",
-      message: error.message,
-    });
+  } catch(error){
+    res.status(401)
+    throw new Error(error.message)
   }
 });
 
 
-// @desc  fetch all orders with isPaid:false
+// @desc  fetch all orders with isPaid:false and less than 1 week
 // @route GET /api/orders
 // @access PRIVATE/ADMIN
 exports.getUnpaidOrders = asyncHandler(async (req, res) => {
   
 
-      let miliSeconds = 1000
-      let seconds = 60
-      let minutes = 60
-      let hours =  24
-      let day  = 7
-
-      let week = miliSeconds * seconds * minutes * hours *  day
-      console.log(Date.now())
-      console.log(week)
-      
-      let date = await orderSchema.find()
-      
       
       
       try {
         const allOrders = await orderSchema.find({
         $and:[
           {isPaid:false}, 
-        {createdAt:{$gte:new Date(Date.now() - week)}}
+        {createdAt:{$lte:new Date(), $gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)}}
       ]})
         .sort({ createdAt: "-1" })
         .populate("userId", "-_id -__v -token -password")
