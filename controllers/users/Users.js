@@ -1580,13 +1580,11 @@ exports.searchAllUser = asyncHandler(async (req, res) => {
 
 
 exports.emailSubcriber = asyncHandler(async (req, res) => {
-  const user = await userSchema
-    .findOne({ _id: req.user_id })
+ 
    
  try{
-  if (user) {
-    const subcribe = await userSchema
-      .findOneAndUpdate(
+
+    const subcribe = await userSchema .findOneAndUpdate(
         { _id:req.user._id },
         {
           $set: {
@@ -1609,7 +1607,7 @@ exports.emailSubcriber = asyncHandler(async (req, res) => {
         message:"unable to subcribe to email",
       });
     }
-  }
+  
  }catch(error){
   res.status(401)
   throw new Error(error.message)
