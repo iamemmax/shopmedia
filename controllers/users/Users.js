@@ -19,12 +19,15 @@ const {searchUser} = require("../../helper/search")
 exports.createUser = asyncHandler(async (req, res) => {
   let { username, email, fullname, password, phone_no, company_name } =
     req.body;
+    console.log(company_name)
 
   //@desc: check if users fill all field
 
-  if (!username || !email || !fullname || !password || !phone_no) {
-    res.status(401);
-    throw new Error("All fields are required");
+  if (!username || !email || !fullname || !password || !phone_no || !companyName) {
+   
+    return res.status(401).json({
+      message: "all fields are required",
+    });
   }
   // @desc check if user enter valid email
   validateEmail(res, email);
@@ -33,9 +36,14 @@ exports.createUser = asyncHandler(async (req, res) => {
     // @desc check if username already exist
     const usernameExist = await userSchema.findOne({ username: username });
     const emailExist = await userSchema.findOne({ email: email });
+    // const companyExist = await userSchema.findOne({companyName:companyName });
+    
+
+    
+
     if (usernameExist) {
       return res.status(401).json({
-        message: "Company already exists",
+        message: "username already exists",
       });
     }
 
@@ -43,7 +51,9 @@ exports.createUser = asyncHandler(async (req, res) => {
     else if (emailExist) {
       return res.status(401).json({
         message: "Email already linked to another user",
-      });
+      })
+    
+    
     } else {
       bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async (err, hash) => {
@@ -58,7 +68,7 @@ exports.createUser = asyncHandler(async (req, res) => {
               fullname,
               password: hash,
               phone_no,
-              company_name,
+              companyName,
             }).save();
 
             if (newUser) {
@@ -68,7 +78,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 fullname,
                 phone_no,
-                company_name,
+                companyName,
                 verified,
               } = newUser;
               let user = {
@@ -77,7 +87,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 fullname,
                 phone_no,
-                company_name,
+                companyName,
                 verified,
               };
 
@@ -90,7 +100,6 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 "Verify Your Email",
                 `
-          
                 
 <!doctype html>
 <html lang="en">
@@ -395,7 +404,7 @@ justify-content: center !important;
 
 </html>
                 `
-              );
+ );
               sendEmail(
                 email,
                 "Welcome to ShopMedia.ng",
@@ -1439,7 +1448,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
 exports.listUsers = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
-  const pageSize = 15; // total number of entries on a single page
+  const pageSize = 20; // total number of entries on a single page
   const count = await userSchema.countDocuments({});
 
   try {

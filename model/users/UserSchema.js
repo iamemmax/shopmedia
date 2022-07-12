@@ -27,9 +27,8 @@ facebookId:{type: String},
     required: true,
     trim: true,
   },
-  company_name: {
+  companyName: {
     type: String,
-
     trim: true,
   },
   phone_no: {

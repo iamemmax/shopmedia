@@ -60,8 +60,13 @@ exports.createOrder = asyncHandler(async (req, res) => {
 exports.getOrderById = asyncHandler(async (req, res) => {
   try {
     const order = await orderSchema
-      .findOne({ order_id: req.params.order_id })
-      .select("-__v -_id");
+      .findOne({ order_id: req.params.order_id }).populate("userId ", "-_id -__v -token -password")
+      .populate({
+        path:"orderItems.itemsId",
+        select:"-__v -_id"
+      
+      })
+      
     if (order) {
       res.status(201).json({
         res: "ok",
@@ -112,7 +117,12 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           },
           { new: true }
         )
-        .populate("userId", "-_id -__v -token -password")
+        .populate("userId ", "-_id -__v -token -password")
+        .populate({
+          path:"orderItems.itemsId",
+          select:"-__v -_id"
+        
+        })
         .select("-_id -__v");
       if (updateOrder) {
         res.status(201).json({
@@ -145,7 +155,12 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
           { $set: { isDelivered: true, deliveredAt: Date.now() } },
           { new: true }
         )
-        .populate("userId", "-_id -__v -token -password")
+        .populate("userId ", "-_id -__v -token -password")
+        .populate({
+          path:"orderItems.itemsId",
+          select:"-__v -_id"
+        
+        })
         .select("-_id -__v ");
       if (updateOrder) {
         res.status(201).json({
@@ -186,8 +201,13 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
         
         )
       .sort({ createdAt: "-1" })
-      .populate("userId", "-_id -__v -token -password")
-      .select("-__v -_id");
+      .populate("userId", " -_id -__v -token -password")
+      .populate({
+        path:"orderItems.itemsId",
+        select:"-__v -_id"
+      
+      })
+     
 
     if (allOrders) {
 
@@ -228,7 +248,7 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
     const allOrders = await orderSchema
     .find()
     .sort({ createdAt: "-1" })
-    .populate("userId", "-_id -__v -token -password")
+    .populate("userId itemsId", "-_id -__v -token -password")
     .select("-__v -_id")
     .limit(pageSize)
     .skip(pageSize * (page - 1))
@@ -272,8 +292,13 @@ exports.getTransfer= asyncHandler(async (req, res) => {
     ]
   })
     .sort({ createdAt: "-1" })
-    .populate("userId", "-_id -__v -token -password")
-    .select("-__v -_id")
+    .populate("userId ", "-_id -__v -token -password")
+    .populate({
+      path:"orderItems.itemsId",
+      select:"-__v -_id"
+    
+    })
+   
     .limit(pageSize)
     .skip(pageSize * (page - 1))
   // paginate(odel, postedBy,  results, sort)
@@ -316,6 +341,11 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
           },
         },
       })
+      .populate({
+        path:"orderItems.itemsId",
+        select:"-__v -_id"
+      
+      })
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort("-createdAt");
@@ -356,6 +386,11 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
       ]})
         .sort({ createdAt: "-1" })
         .populate("userId", "-_id -__v -token -password")
+        .populate({
+          path:"orderItems.itemsId",
+          select:"-__v -_id"
+        
+        })
         .select("-__v -_id");
 
     if (allOrders) {

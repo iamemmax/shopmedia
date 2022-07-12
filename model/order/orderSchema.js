@@ -7,8 +7,26 @@ const orderSchema = mongoose.Schema(
       ref: "users",
     },
    
+   
+   
    order_id:{ type: String },
-    orderItems: [],
+    orderItems: [{
+
+      itemsId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "adverts",
+      
+    },
+
+    advert_id:{ type: String } ,
+         start_date:{type:Date},
+         end_date:{type:Date},
+         advert_qty:{ type: String } ,
+                   remark:{ type: String },
+              price:{ type: Number }
+                   
+                
+    }],
      
     paymentMethod: {
       type: String,
