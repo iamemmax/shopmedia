@@ -9,17 +9,6 @@ const ISODate = require("isodate");
 // @access PRIVATE
 // const usersItem = await cartSchema.find({userId:{$eq:req.user._id}}).select("-_id -__v")
 
-// if(usersItem && !usersItem.length){
-
-//     return  res.status(401).json({
-//         res:"failed",
-//         message:"No order items"
-//     })
-// }
-// else{
-
-// let price  = usersItem?.map(x => x.price)
-
 exports.createOrder = asyncHandler(async (req, res) => {
   const { paymentMethod,  orderItems, totalPrice } = req.body;
 
@@ -155,7 +144,7 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
           { $set: { isDelivered: true, deliveredAt: Date.now() } },
           { new: true }
         )
-        .populate("userId ", "-_id -__v -token -password")
+        .populate("userId", "-_id -__v -token -password")
         .populate({
           path:"orderItems.itemsId",
           select:"-__v -_id"
@@ -240,15 +229,20 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
 exports.getAllOrders = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
   const pageSize = 20; // total number of entries on a single page
-  const count = await orderSchema.countDocuments({});
+  // const count = await orderSchema.countDocuments({});
 
 
   try{
 
     const allOrders = await orderSchema
-    .find()
+    .find({isPaid:true})
     .sort({ createdAt: "-1" })
-    .populate("userId itemsId", "-_id -__v -token -password")
+    .populate("userId", "-_id -__v -token -password")
+    .populate({
+      path:"orderItems.itemsId",
+      select:"-__v -_id"
+    
+    })
     .select("-__v -_id")
     .limit(pageSize)
     .skip(pageSize * (page - 1))
@@ -256,8 +250,8 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   if (allOrders.length > 0) {
     return res.status(201).json({
       res: "ok",
-      total: count,
-      pages: Math.ceil(count / pageSize),
+      total: allOrders?.length,
+      pages: Math.ceil(allOrders?.length / pageSize),
       data: allOrders,
     });
   } else {
@@ -271,6 +265,105 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   throw new Error(error.message)
 }
 });
+
+
+// @desc  fetch all orders to deliver
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.getOrdersToDeliver = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  // const count = await orderSchema.countDocuments({});
+
+
+  try{
+
+    const allOrders = await orderSchema
+    .find({ $and:[
+      { isDelivered:false }, 
+      {isPaid:true}
+
+    ]})
+    .sort({ createdAt: "-1" })
+    .populate("userId", "-_id -__v -token -password")
+    .populate({
+      path:"orderItems.itemsId",
+      select:"-__v -_id"
+    
+    })
+    .select("-__v -_id")
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+  // paginate(odel, postedBy,  results, sort)
+  if (allOrders.length > 0) {
+    return res.status(201).json({
+      res: "ok",
+      total: allOrders?.length,
+      pages: Math.ceil(allOrders?.length / pageSize),
+      data: allOrders,
+    });
+  } else {
+    return res.status(401).json({
+      res: "failed",
+      message: "order not found",
+    });
+  }
+}catch(error){
+  res.status(401)
+  throw new Error(error.message)
+}
+});
+
+// @desc  fetch all  delivered orders
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.getDeliveredOrders = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  // const count = await orderSchema.countDocuments({});
+
+
+  try{
+
+    const allOrders = await orderSchema
+    .find({ $and:[
+      { isDelivered:true }, 
+      {isPaid:true}
+
+    ]})
+    .sort({ createdAt: "-1" })
+    .populate("userId", "-_id -__v -token -password")
+    .populate({
+      path:"orderItems.itemsId",
+      select:"-__v -_id"
+    
+    })
+    .select("-__v -_id")
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+  // paginate(odel, postedBy,  results, sort)
+  if (allOrders.length > 0) {
+    return res.status(201).json({
+      res: "ok",
+      total: allOrders?.length,
+      pages: Math.ceil(allOrders?.length / pageSize),
+      data: allOrders,
+    });
+  } else {
+    return res.status(401).json({
+      res: "failed",
+      message: "order not found",
+    });
+  }
+}catch(error){
+  res.status(401)
+  throw new Error(error.message)
+}
+});
+
+
+
+
 
 // @desc  fetch all orders
 // @route GET /api/orders
@@ -400,6 +493,7 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
         data: allOrders,
       });
     } else {
+      console.log(allOrders)
       return res.status(401).json({
         res: "failed",
         message: "order not found",
