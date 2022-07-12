@@ -27,7 +27,7 @@ facebookId:{type: String},
     required: true,
     trim: true,
   },
-  companyName: {
+  company_name: {
     type: String,
     trim: true,
   },

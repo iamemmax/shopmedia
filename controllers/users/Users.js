@@ -23,7 +23,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 
   //@desc: check if users fill all field
 
-  if (!username || !email || !fullname || !password || !phone_no || !companyName) {
+  if (!username || !email || !fullname || !password || !phone_no || !company_name) {
    
     return res.status(401).json({
       message: "all fields are required",
@@ -36,7 +36,7 @@ exports.createUser = asyncHandler(async (req, res) => {
     // @desc check if username already exist
     const usernameExist = await userSchema.findOne({ username: username });
     const emailExist = await userSchema.findOne({ email: email });
-    // const companyExist = await userSchema.findOne({companyName:companyName });
+    // const companyExist = await userSchema.findOne({company_name:company_name });
     
 
     
@@ -68,7 +68,7 @@ exports.createUser = asyncHandler(async (req, res) => {
               fullname,
               password: hash,
               phone_no,
-              companyName,
+              company_name,
             }).save();
 
             if (newUser) {
@@ -78,7 +78,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 fullname,
                 phone_no,
-                companyName,
+                company_name,
                 verified,
               } = newUser;
               let user = {
@@ -87,7 +87,7 @@ exports.createUser = asyncHandler(async (req, res) => {
                 email,
                 fullname,
                 phone_no,
-                companyName,
+                company_name,
                 verified,
               };
 
@@ -1452,8 +1452,7 @@ exports.listUsers = asyncHandler(async (req, res) => {
   const count = await userSchema.countDocuments({});
 
   try {
-    let users = await userSchema
-      .find({}, { __v: 0 })
+    let users = await userSchema.find({verified:true}, { __v: 0 })
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort("-createdAt");
