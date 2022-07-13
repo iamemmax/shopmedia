@@ -82,7 +82,7 @@ exports.getOrderById = asyncHandler(async (req, res) => {
 exports.updateOrderToPay = asyncHandler(async (req, res) => {
   const order = await orderSchema
     .findOne({ order_id: req.params.order_id })
-    .populate("userId");
+   
   let { id, reference } = req.body;
   console.log(order);
   try{
@@ -106,12 +106,12 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           },
           { new: true }
         )
-        .populate("userId ", "-_id -__v -token -password")
-        .populate({
-          path:"orderItems.itemsId",
-          select:"-__v -_id"
+        // .populate("userId ", "-_id -__v -token -password")
+        // .populate({
+        //   path:"orderItems.itemsId",
+        //   select:"-__v -_id"
         
-        })
+        // })
       
       if (updateOrder) {
         res.status(201).json({
