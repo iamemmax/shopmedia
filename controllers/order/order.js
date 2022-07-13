@@ -112,7 +112,7 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           select:"-__v -_id"
         
         })
-        .select("-_id -__v");
+      
       if (updateOrder) {
         res.status(201).json({
           res: "ok",
