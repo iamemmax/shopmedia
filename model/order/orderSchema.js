@@ -15,10 +15,23 @@ const orderSchema = mongoose.Schema(
       itemsId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "adverts",
-      
+     
+       
     },
+   
 
     advert_id:{ type: String } ,
+    categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      
+      ref:"category",
+  },
+  sub_categoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      
+      ref:"sub-category",
+      required: true
+  },
          start_date:{type:Date},
          end_date:{type:Date},
          advert_qty:{ type: String } ,
