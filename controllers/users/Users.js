@@ -1576,7 +1576,15 @@ console.log(req.body.user)
 // @Acess: private(super admin, admin)
 
 exports.searchAllUser = asyncHandler(async (req, res) => {
-  searchUser(userSchema, req, res)
+  
+  try{
+    searchUser(userSchema, req, res)
+
+  }catch(error){
+    res.status(401);
+    throw new Error(error.message);
+
+  }
 });
 
 
