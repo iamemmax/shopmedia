@@ -30,7 +30,6 @@ const orderSchema = mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       
       ref:"sub-category",
-      required: true
   },
          start_date:{type:Date},
          end_date:{type:Date},

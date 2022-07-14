@@ -1291,9 +1291,10 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       message: "Password does not match",
     });
   }
+ try{
 
-  const { password } = await userSchema
-    .findOne({ user_id: req.params.user_id })
+   const { password } = await userSchema
+   .findOne({ user_id: req.params.user_id })
     .select("password");
   // if (user) {
   if (password) {
@@ -1333,6 +1334,11 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       }
     });
   }
+}catch(error){
+  res.status(401);
+  throw new Error(error.message);
+}
+
 });
 
 //@desc: update user profile img
@@ -1435,11 +1441,9 @@ exports.updateProfile = asyncHandler(async (req, res) => {
       });
     }
   } catch (error) {
-    res.status(201).json({
-      res: "failed",
-      message: error.message,
-    });
-  }
+    res.status(401);
+    throw new Error(error.message);
+}
 });
 
 // @desc: list users account
@@ -1480,18 +1484,25 @@ exports.listUsers = asyncHandler(async (req, res) => {
 // @Acess: private(admin, super admin)
 
 exports.removeUsers = asyncHandler(async (req, res) => {
-  const remove = await userSchema.findOneAndDelete({
-    user_id: req.params.user_id,
-  });
-  if (remove) {
-    return res.status(201).json({
-      res: "ok",
-      message: "User deleted successfully",
-      data: remove,
+  try{
+
+    const remove = await userSchema.findOneAndDelete({
+      user_id: req.params.user_id,
     });
-  } else {
+    if (remove) {
+      return res.status(201).json({
+        res: "ok",
+        message: "User deleted successfully",
+        data: remove,
+      });
+    } else {
+      res.status(401);
+      throw new Error("Unable to delete user");
+    }
+  }catch(error){
     res.status(401);
-    throw new Error("Unable to delete user");
+    throw new Error(error.message);
+
   }
 });
 
