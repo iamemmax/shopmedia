@@ -2,7 +2,9 @@ const asyncHandler = require("express-async-handler");
 const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema");
 const orderSchema = require("../../model/order/orderSchema");
-// const paginate = require("../../helper/pagination")
+const moment = require('moment');
+
+
 const ISODate = require("isodate");
 // @desc  create a new order
 // @route GET /api/orders/create
@@ -10,9 +12,9 @@ const ISODate = require("isodate");
 // const usersItem = await cartSchema.find({userId:{$eq:req.user._id}}).select("-_id -__v")
 
 exports.createOrder = asyncHandler(async (req, res) => {
-  const { paymentMethod,  orderItems, totalPrice } = req.body;
+  const { paymentMethod, orderItems, totalPrice } = req.body;
 
-  if (!paymentMethod ||  !totalPrice) {
+  if (!paymentMethod || !totalPrice) {
     return res.status(401).json({
       res: "failed",
       message: "Enter all fields",
@@ -22,7 +24,7 @@ exports.createOrder = asyncHandler(async (req, res) => {
     let token = buffer.toString("hex");
 
     const order = await new orderSchema({
-      userId:req.user._id,
+      userId: req.user._id,
       order_id: token,
       // orderItems:usersItem.map(x => x),
       orderItems,
@@ -51,12 +53,12 @@ exports.getOrderById = asyncHandler(async (req, res) => {
     const order = await orderSchema
       .findOne({ order_id: req.params.order_id }).populate("userId ", "-_id -__v -token -password")
       .populate({
-                path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-        select:"-__v -_id"
-      
+        select: "-__v -_id"
+
       })
-      
+
     if (order) {
       res.status(201).json({
         res: "ok",
@@ -83,10 +85,10 @@ exports.getOrderById = asyncHandler(async (req, res) => {
 exports.updateOrderToPay = asyncHandler(async (req, res) => {
   const order = await orderSchema
     .findOne({ order_id: req.params.order_id })
-   
+
   let { id, reference } = req.body;
   console.log(order);
-  try{
+  try {
     if (order) {
       const updateOrder = await orderSchema
         .findOneAndUpdate(
@@ -107,14 +109,14 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           },
           { new: true }
         )
-        // .populate("userId ", "-_id -__v -token -password")
-        // .populate({
-        //           path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+      // .populate("userId ", "-_id -__v -token -password")
+      // .populate({
+      //           path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
 
-        //   select:"-__v -_id"
-        
-        // })
-      
+      //   select:"-__v -_id"
+
+      // })
+
       if (updateOrder) {
         res.status(201).json({
           res: "ok",
@@ -127,9 +129,9 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
         });
       }
     }
-  }catch(error){
+  } catch (error) {
     res.status(401)
-  throw new Error(error.message)
+    throw new Error(error.message)
   }
 });
 
@@ -148,12 +150,12 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         )
         .populate("userId", "-_id -__v -token -password")
         .populate({
-                  path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
+          path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-          select:"-__v -_id"
-        
+          select: "-__v -_id"
+
         })
-        
+
       if (updateOrder) {
         res.status(201).json({
           res: "ok",
@@ -183,25 +185,25 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
   try {
     const allOrders = await orderSchema
       .find({
-        $and:[
-          { userId: { $eq: req.user._id } }, 
-          {isPaid:true}
+        $and: [
+          { userId: { $eq: req.user._id } },
+          { isPaid: true }
 
         ]
       }
-        
-        
-        )
+
+
+      )
       .sort({ createdAt: "-1" })
       .populate("userId", " -_id -__v -token -password")
       .populate({
-        path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
-        select:"-__v "
-      
-      })
-     
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
+        select: "-__v "
 
-     
+      })
+
+
+
 
     if (allOrders) {
 
@@ -211,7 +213,7 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
         data: allOrders,
       });
     } else {
-     
+
 
       return res.status(401).json({
         res: "failed",
@@ -237,39 +239,39 @@ exports.getAllOrders = asyncHandler(async (req, res) => {
   // const count = await orderSchema.countDocuments({});
 
 
-  try{
+  try {
 
     const allOrders = await orderSchema
-    .find({isPaid:true})
-    .sort({ createdAt: "-1" })
-    .populate("userId", "-_id -__v -token -password")
-    .populate({
-              path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+      .find({ isPaid: true })
+      .sort({ createdAt: "-1" })
+      .populate("userId", "-_id -__v -token -password")
+      .populate({
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-      select:"-__v -_id"
-    
-    })
-    .select("-__v -_id")
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-  // paginate(odel, postedBy,  results, sort)
-  if (allOrders.length > 0) {
-    return res.status(201).json({
-      res: "ok",
-      total: allOrders?.length,
-      pages: Math.ceil(allOrders?.length / pageSize),
-      data: allOrders,
-    });
-  } else {
-    return res.status(401).json({
-      res: "failed",
-      message: "order not found",
-    });
+        select: "-__v -_id"
+
+      })
+      .select("-__v -_id")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+    // paginate(odel, postedBy,  results, sort)
+    if (allOrders.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total: allOrders?.length,
+        pages: Math.ceil(allOrders?.length / pageSize),
+        data: allOrders,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "order not found",
+      });
+    }
+  } catch (error) {
+    res.status(401)
+    throw new Error(error.message)
   }
-}catch(error){
-  res.status(401)
-  throw new Error(error.message)
-}
 });
 
 
@@ -282,43 +284,45 @@ exports.getOrdersToDeliver = asyncHandler(async (req, res) => {
   // const count = await orderSchema.countDocuments({});
 
 
-  try{
+  try {
 
     const allOrders = await orderSchema
-    .find({ $and:[
-      { isDelivered:false }, 
-      {isPaid:true}
+      .find({
+        $and: [
+          { isDelivered: false },
+          { isPaid: true }
 
-    ]})
-    .sort({ createdAt: "-1" })
-    .populate("userId", "-_id -__v -token -password")
-    .populate({
-              path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+        ]
+      })
+      .sort({ createdAt: "-1" })
+      .populate("userId", "-_id -__v -token -password")
+      .populate({
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-      select:"-__v -_id"
-    
-    })
-    .select("-__v -_id")
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-  // paginate(odel, postedBy,  results, sort)
-  if (allOrders.length > 0) {
-    return res.status(201).json({
-      res: "ok",
-      total: allOrders?.length,
-      pages: Math.ceil(allOrders?.length / pageSize),
-      data: allOrders,
-    });
-  } else {
-    return res.status(401).json({
-      res: "failed",
-      message: "order not found",
-    });
+        select: "-__v -_id"
+
+      })
+      .select("-__v -_id")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+    // paginate(odel, postedBy,  results, sort)
+    if (allOrders.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total: allOrders?.length,
+        pages: Math.ceil(allOrders?.length / pageSize),
+        data: allOrders,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "order not found",
+      });
+    }
+  } catch (error) {
+    res.status(401)
+    throw new Error(error.message)
   }
-}catch(error){
-  res.status(401)
-  throw new Error(error.message)
-}
 });
 
 // @desc  fetch all  delivered orders
@@ -330,43 +334,45 @@ exports.getDeliveredOrders = asyncHandler(async (req, res) => {
   // const count = await orderSchema.countDocuments({});
 
 
-  try{
+  try {
 
     const allOrders = await orderSchema
-    .find({ $and:[
-      { isDelivered:true }, 
-      {isPaid:true}
+      .find({
+        $and: [
+          { isDelivered: true },
+          { isPaid: true }
 
-    ]})
-    .sort({ createdAt: "-1" })
-    .populate("userId", "-_id -__v -token -password")
-    .populate({
-              path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+        ]
+      })
+      .sort({ createdAt: "-1" })
+      .populate("userId", "-_id -__v -token -password")
+      .populate({
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-      select:"-__v -_id"
-    
-    })
-    .select("-__v -_id")
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-  // paginate(odel, postedBy,  results, sort)
-  if (allOrders.length > 0) {
-    return res.status(201).json({
-      res: "ok",
-      total: allOrders?.length,
-      pages: Math.ceil(allOrders?.length / pageSize),
-      data: allOrders,
-    });
-  } else {
-    return res.status(401).json({
-      res: "failed",
-      message: "order not found",
-    });
+        select: "-__v -_id"
+
+      })
+      .select("-__v -_id")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+    // paginate(odel, postedBy,  results, sort)
+    if (allOrders.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total: allOrders?.length,
+        pages: Math.ceil(allOrders?.length / pageSize),
+        data: allOrders,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "order not found",
+      });
+    }
+  } catch (error) {
+    res.status(401)
+    throw new Error(error.message)
   }
-}catch(error){
-  res.status(401)
-  throw new Error(error.message)
-}
 });
 
 
@@ -376,51 +382,52 @@ exports.getDeliveredOrders = asyncHandler(async (req, res) => {
 // @desc  fetch all orders
 // @route GET /api/orders
 // @access PRIVATE/ADMIN
-exports.getTransfer= asyncHandler(async (req, res) => {
+exports.getTransfer = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
   const pageSize = 20; // total number of entries on a single page
   // const count = await orderSchema.countDocuments({});
 
-  try{
+  try {
 
-    const allTransfer = await orderSchema
-    
-  .find({
-    $and:[
-      { paymentMethod: "transfer"}, 
-      {isPaid:false}
-
-    ]
-  })
-    .sort({ createdAt: "-1" })
-    .populate("userId ", "-_id -__v -token -password")
-    .populate({
-              path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
-
-      select:"-__v -_id"
-    
-    })
    
-    .limit(pageSize)
-    .skip(pageSize * (page - 1))
-  // paginate(odel, postedBy,  results, sort)
-  if (allTransfer.length > 0) {
-    return res.status(201).json({
-      res: "ok",
-      total: allTransfer.length,
-      pages: Math.ceil(allTransfer.length / pageSize),
-      data: allTransfer,
-    });
-  } else {
-    return res.status(401).json({
-      res: "failed",
-      message: "order not found",
-    });
+    const allTransfer = await orderSchema
+
+      .find({
+        $and: [
+          { paymentMethod: "transfer" },
+          { isPaid: false }
+
+        ]
+      })
+      .sort({ createdAt: "-1" })
+      .populate("userId ", "-_id -__v -token -password")
+      .populate({
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
+
+        select: "-__v -_id"
+
+      })
+
+      .limit(pageSize)
+      .skip(pageSize * (page - 1))
+    // paginate(odel, postedBy,  results, sort)
+    if (allTransfer.length > 0) {
+      return res.status(201).json({
+        res: "ok",
+        total: allTransfer.length,
+        pages: Math.ceil(allTransfer.length / pageSize),
+        data: allTransfer,
+      });
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "order not found",
+      });
+    }
+  } catch (error) {
+    res.status(401)
+    throw new Error(error.message)
   }
-}catch(error){
-   res.status(401)
-  throw new Error(error.message)
-}
 });
 
 // @desc  revenue
@@ -444,10 +451,10 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
         },
       })
       .populate({
-                path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-        select:"-__v -_id"
-      
+        select: "-__v -_id"
+
       })
       .limit(pageSize)
       .skip(pageSize * (page - 1))
@@ -466,7 +473,7 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
         message: "order not found",
       });
     }
-  } catch(error){
+  } catch (error) {
     res.status(401)
     throw new Error(error.message)
   }
@@ -477,34 +484,34 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
 // @route GET /api/orders
 // @access PRIVATE/ADMIN
 exports.getUnpaidOrders = asyncHandler(async (req, res) => {
-  
+  const today = moment().startOf('day')
+ 
 
-      
-      
-      try {
-        const allOrders = await orderSchema.find({
-        $and:[
-          {isPaid:false}, 
-        {createdAt:{$lte:new Date(), $gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000)}}
-      ]})
-        .sort({ createdAt: "-1" })
-        .populate("userId", "-_id -__v -token -password")
-        .populate({
-                  path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+  try {
+    const allOrders = await orderSchema.find({ $and: [
+      { isPaid: false },
+      { createdAt:{$lte:new Date(), $gte: new Date().getTime() - 7*24*60*60*1000}}
+  ]}) 
+      .sort({ createdAt: "-1" })
+      .populate("userId", "-_id -__v -token -password")
+      .populate({
+        path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
-          select:"-__v -_id"
-        
-        })
-        .select("-__v -_id");
+        select: "-__v -_id"
+
+      })
+      .select("-__v -_id");
 
     if (allOrders) {
+      console.log(allOrders.map(x => x.userId.email))
+      
       return res.status(201).json({
         res: "ok",
         total: allOrders?.length,
         data: allOrders,
       });
     } else {
-      console.log(allOrders)
+      console.log("ISODate(allOrders?.createdAt)  - 7 * 24 * 60 * 60 * 1000")
       return res.status(401).json({
         res: "failed",
         message: "order not found",

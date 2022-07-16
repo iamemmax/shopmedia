@@ -16,7 +16,7 @@ const orderSchema = mongoose.Schema(
         required: true,
         ref: "users",
       },
-      
+
       itemsId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "adverts",
@@ -36,7 +36,7 @@ const orderSchema = mongoose.Schema(
       
       ref:"sub-category",
   },
-         start_date:{type:Date},
+         start_date:{type:Date, default:Date.now()},
          end_date:{type:Date},
          advert_qty:{ type: String } ,
                    remark:{ type: String },
