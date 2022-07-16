@@ -195,7 +195,7 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
       .sort({ createdAt: "-1" })
       .populate("userId", " -_id -__v -token -password")
       .populate({
-        path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId, orderItems.userId",
+        path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
         select:"-__v "
       
       })
