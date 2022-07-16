@@ -801,7 +801,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
   const user = await userSchema.findOne({ email });
   const userInfo = await userSchema
     .findOne({ email })
-    .select("-password -__v -token -_id");
+    .select("-password -__v -token ");
   if (!user) {
     res.status(401);
     throw new Error("Incorrect email or password");

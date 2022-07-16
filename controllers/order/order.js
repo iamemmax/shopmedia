@@ -51,7 +51,7 @@ exports.getOrderById = asyncHandler(async (req, res) => {
     const order = await orderSchema
       .findOne({ order_id: req.params.order_id }).populate("userId ", "-_id -__v -token -password")
       .populate({
-                path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+                path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
         select:"-__v -_id"
       
@@ -148,7 +148,7 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         )
         .populate("userId", "-_id -__v -token -password")
         .populate({
-                  path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
+                  path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
 
           select:"-__v -_id"
         
