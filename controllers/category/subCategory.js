@@ -46,8 +46,8 @@ exports.listSubCategories = asyncHandler(async (req, res) => {
 // @Route: /api/category/create
 // @Acess: private
 exports.createSubCategory = asyncHandler(async (req, res) => {
-  let { sub_category, sub_category_id ,categoryId} = req.body;
-  const cartFound = await subCategorySchema.findOne({sub_category}, {__v: 0 });
+  let { sub_category, sub_category_id , categoryId} = req.body;
+  const cartFound = await subCategorySchema.findOne({_id:req.params.id}, {__v: 0 });
   // console.log( sub_id?.pop());
   if (!sub_category, sub_category_id) {
     res.status(401);
@@ -58,7 +58,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
    
     
    
-      if(cartFound){
+      if(cartFound && cartFound.sub_category === sub_category){
         return res.status(401).json({
           message: "Sub-category already exist",
         });

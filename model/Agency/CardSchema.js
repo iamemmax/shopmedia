@@ -13,11 +13,10 @@ const cardSchema = new mongoose.Schema({
     required:true
 
   },
-  category:{
-    type: String,
-    required:true
-
-  },
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"category",
+},
   email:{
     type: String,
     required:true

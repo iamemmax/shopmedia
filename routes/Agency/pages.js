@@ -6,10 +6,10 @@ let {ensureLogin, adminAccess} = require("../../helper/ensureLogin")
 
 
 
-router.get("/", ensureLogin, listPages)
-router.get("/:category", ensureLogin, listPagesByCategory)
 router.post("/create", ensureLogin,  adminAccess(["admin", "super admin"]), upload.single('logo'), AddPages)
+router.get("/", ensureLogin, listPages)
 router.get("/:page_id", ensureLogin, getSinglePage)
+router.get("/:category", ensureLogin, listPagesByCategory)
 router.put("/update/:page_id", ensureLogin,   adminAccess(["admin", "super admin"]), updatePages)
 router.put("/update/img/:page_id",  ensureLogin,  adminAccess(["admin", "super admin"]),  upload.single("logo"), updateLogoImg)
 router.delete("/remove/:page_id", ensureLogin, adminAccess(["admin", "super admin"]), removeAdPage)

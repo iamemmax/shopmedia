@@ -11,7 +11,12 @@ const orderSchema = mongoose.Schema(
    
    order_id:{ type: String },
     orderItems: [{
-
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "users",
+      },
+      
       itemsId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "adverts",
@@ -35,7 +40,8 @@ const orderSchema = mongoose.Schema(
          end_date:{type:Date},
          advert_qty:{ type: String } ,
                    remark:{ type: String },
-              price:{ type: Number }
+              price:{ type: Number },
+              datePaid:{ type: Date , default:Date.now()},
                    
                 
     }],

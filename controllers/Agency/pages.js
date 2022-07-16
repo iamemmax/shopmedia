@@ -11,10 +11,10 @@ const compressImg = require("../../helper/sharp");
 //@method: post
 //@route: /api/adpage/create
 exports.AddPages = asyncHandler(async (req, res) => {
-  let {company_name, category, email,location, phone, page_id } = req.body;
+  let {company_name, categoryId, email,location, phone, page_id } = req.body;
   let fileArray = [];
- console.log(company_name, category, email,location, phone)
-  if(!company_name || !category  ||!email || !phone || !location) {
+ console.log(company_name, categoryId, email,  location, phone)
+  if(!company_name || !categoryId   || !email || !phone || !location) {
     res.status(401);
     throw new Error("all field are require");
   }
@@ -47,7 +47,7 @@ exports.AddPages = asyncHandler(async (req, res) => {
  
  let cretePage = await new cardSchema({
   page_id:`adpage_${id}`,  
-  company_name, category, email,location, phone,
+  company_name, categoryId, email, location, phone,
   logo: fileArray,
   }).save()
   
@@ -82,12 +82,22 @@ exports.AddPages = asyncHandler(async (req, res) => {
 //@method: get
 //@route: /api/adpage
 exports.listPages = asyncHandler(async(req, res) =>{
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20; // total number of entries on a single page
+  const count = await cardSchema.countDocuments({});
+
   try {
-    let getPages = await cardSchema.find({}, {_id:0, __v:0})
+    let getPages = await cardSchema.find({}, {_id:0, __v:0}).populate("categoryId", "-__v -_id")
+    .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort("-createdAt");
+
   if(getPages){
     res.status(201).json({
       res:"ok",
-      total:getPages.length,
+      total:count,
+      pages: Math.ceil(count / pageSize),
+
       message:"success",
       data:getPages
     })
@@ -107,11 +117,17 @@ exports.listPages = asyncHandler(async(req, res) =>{
 //@route: /api/adpage/update/page_id
 exports.getSinglePage =  asyncHandler(async(req, res) =>{
   try {
-    let single = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id -__v")
+    let single = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id -__v").populate("categoryId", "-__v -_id")
     if(single){
       res.status(201).json({
         res:"ok",
          data:single
+      })
+    }else{
+      res.status(401).json({
+        res:"error",
+        message:"not found",
+       
       })
     }
   } catch (error) {
@@ -137,7 +153,7 @@ exports.updatePages = asyncHandler(async(req, res) =>{
 
   
   try {
-    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id -__v")
+    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id -__v").populate("categoryId", "-__v -_id")
       if(!update){
         res.status(401).json({message:"something went wrong"})
       }
