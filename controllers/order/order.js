@@ -810,6 +810,7 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
 )
         })
        
+        await orderSchema.deleteMany({createdAt:{$lte:new Date(Date.now() -  7*24*60*60*1000).toISOString()}}, {isPaid:false})
       
           return res.status(201).json({
             res: "ok",
@@ -817,10 +818,10 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
             data: allOrders,
           });
         } else {
-      console.log("ISODate(allOrders?.createdAt)  - 7 * 24 * 60 * 60 * 1000")
+    
       return res.status(401).json({
         res: "failed",
-        message: "order not found",
+        message: "No order found",
       });
     }
   } catch (error) {

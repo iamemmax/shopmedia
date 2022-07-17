@@ -1,5 +1,5 @@
 const asyncHandler = require("express-async-handler");
-const { filterPages } = require('../../helper/search');
+const { searchAgency } = require('../../helper/search');
 const fs = require("fs");
 const crypto = require("crypto");
 const cloudinary = require("../../config/cloudinary");
@@ -13,15 +13,16 @@ const compressImg = require("../../helper/sharp");
 exports.AddPages = asyncHandler(async (req, res) => {
   let {company_name, categoryId, email,location, phone, page_id } = req.body;
   let fileArray = [];
- console.log(company_name, categoryId, email,  location, phone)
   if(!company_name || !categoryId   || !email || !phone || !location) {
     res.status(401);
     throw new Error("all field are require");
   }
+
   if (!req.file) {
     res.status(401);
     throw new Error("choose a photo");
   }
+
   //@desc : check if company_name exist
   let pageExist = await cardSchema.findOne({ company_name });
   if (pageExist) {
@@ -87,7 +88,7 @@ exports.listPages = asyncHandler(async(req, res) =>{
   const count = await cardSchema.countDocuments({});
 
   try {
-    let getPages = await cardSchema.find({}, {_id:0, __v:0}).populate("categoryId", "-__v -_id")
+    let getPages = await cardSchema.find({}, {_id:0, __v:0}).populate("categoryId", "-__v ")
     .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort("-createdAt");
@@ -131,11 +132,9 @@ exports.getSinglePage =  asyncHandler(async(req, res) =>{
       })
     }
   } catch (error) {
-    res.status(401).json({
-      res:"error",
-      message:error.message,
-     
-    })
+    res.status(401)
+    throw new Error(error.message)
+  
   }
 })
 
@@ -146,14 +145,14 @@ exports.getSinglePage =  asyncHandler(async(req, res) =>{
 //@route: /api/adpage/update/page_id
 
 exports.updatePages = asyncHandler(async(req, res) =>{
-  let {name, category} = req.body
+  let {company_name, email, phone, location} = req.body
 
   
   const getPages = await cardSchema.findOne({page_id:req.params.page_id}).select("-_id -__v")
 
   
   try {
-    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{name:name || getPages.name, category:category || getPages.category}},{new:true}).select("-_id -__v").populate("categoryId", "-__v -_id")
+    let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{company_name:company_name || getPages.company_name, email:email || getPages.email, phone:phone || getPages.phone, location:location || getPages.location}},{new:true}).select("-_id -__v").populate("categoryId", "-__v -_id")
       if(!update){
         res.status(401).json({message:"something went wrong"})
       }
@@ -166,7 +165,9 @@ exports.updatePages = asyncHandler(async(req, res) =>{
       }
     
   } catch (error) {
-   return res.status(401).json({message:error.message})
+    res.status(401)
+    throw new Error(error.message)
+  
   }
 
   
@@ -212,9 +213,11 @@ exports.updateLogoImg =  asyncHandler(async(req, res) =>{
      }
     
   } catch (error) {
-   return res.status(401).json({message:error.message})
-    
+    res.status(401)
+    throw new Error(error.message)
   }
+    
+  
 
 })
 
@@ -227,7 +230,7 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
 
     let removePage = await cardSchema.findOneAndDelete({page_id:req.params.page_id}).select("-_id -__v")
     if(removePage){
-      await cloudinary.uploader.destroy(pages.pic[0]?.img_id)
+      await cloudinary.uploader.destroy(pages?.logo[0]?.img_id)
       return  res.status(201).json({
         res:"ok",
         message:"pages deleted successfully",
@@ -246,15 +249,12 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
 
 
   exports.searchPages = asyncHandler(async(req, res)=>{
-   let {name} = req.body
-   let pages = await cardSchema.find({category:req.params.category})
-   if(pages){
-    if(pages){
-      filterPages(req, res, cardSchema)
-
-    }else{
-      res.status(401).json({res:"err", message:`${name} not found`})
-    }
+    try{
+    searchAgency(req, res, cardSchema)
+   
+  }catch(error){
+    res.status(401)
+    throw new Error(error.message)
   }
   })
   
@@ -266,7 +266,7 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
 
 exports.listPagesByCategory = asyncHandler(async(req, res) =>{
   try {
-    let getPages = await cardSchema.find({category:req.params.category}, {_id:0, __v:0})
+    let getPages = await cardSchema.find({categoryId:req.params.categoryId}, {_id:0, __v:0})
   if(getPages){
     res.status(201).json({
       res:"ok",
@@ -291,7 +291,10 @@ exports.listPagesByCategory = asyncHandler(async(req, res) =>{
 exports.updateStatus = asyncHandler(async (req, res) => {
   let statusUpt = await cardSchema.findOne({page_id:req.params.page_id})
  
-  if(statusUpt){
+  try {
+    
+    
+    if(statusUpt){
     let updatedStatus = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{status:req.body.status}},{new:true}).select("-__v")
     if(updatedStatus){
       return res.status(201).json({
@@ -306,6 +309,10 @@ exports.updateStatus = asyncHandler(async (req, res) => {
 
   }else{
     res.status(401)
-  throw new Error("media agency not found")
+    throw new Error("media agency not found")
   }
+} catch (error) {
+  res.status(401)
+  throw new Error(error.message)
+}
 })
