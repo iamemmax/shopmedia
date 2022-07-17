@@ -13,6 +13,7 @@ const businessRoutes = require("./routes/Bussiness/businessRoutes");
 const paymentRoutes = require("./routes/payment/paymentRoutes")
 const orderRoutes = require("./routes/order/order")
 const Agency = require("./routes/Agency/pages");
+const subcribe = require("./routes/subcribe/subcribe");
 const { errorHandler,notFound } = require("./config/errorMiddleWares");
 const cors = require("cors");
 const session = require("express-session")
@@ -58,6 +59,7 @@ app.use("/api/adpages", Agency);
 app.use("/api/business", businessRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/subcribe", subcribe);
 
 app.use(notFound);
 app.use(errorHandler);

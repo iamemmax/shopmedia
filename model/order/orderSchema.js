@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 const orderSchema = mongoose.Schema(
   {
-     userId: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "users",
     },
-   
-   
-   
-   order_id:{ type: String },
+
+
+
+    order_id: { type: String },
     orderItems: [{
       userId: {
         type: mongoose.Schema.Types.ObjectId,
@@ -20,39 +20,39 @@ const orderSchema = mongoose.Schema(
       itemsId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "adverts",
-     
-       
-    },
-   
 
-    advert_id:{ type: String } ,
-    categoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      
-      ref:"category",
-  },
-  sub_categoryId: {
-      type: mongoose.Schema.Types.ObjectId,
-      
-      ref:"sub-category",
-  },
-         start_date:{type:Date, default:Date.now()},
-         end_date:{type:Date},
-         advert_qty:{ type: String } ,
-                   remark:{ type: String },
-              price:{ type: Number },
-              datePaid:{ type: Date , default:Date.now()},
-                   
-                
+
+      },
+
+
+      advert_id: { type: String },
+      categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+
+        ref: "category",
+      },
+      sub_categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+
+        ref: "sub-category",
+      },
+      start_date: { type: Date, default: Date.now() },
+      end_date: { type: Date },
+      advert_qty: { type: String },
+      remark: { type: String },
+      price: { type: Number },
+      datePaid: { type: Date, default: Date.now() },
+
+
     }],
-     
+
     paymentMethod: {
       type: String,
       required: true,
       // default:"card",
-      enum:["card", "transfer"]
+      enum: ["card", "transfer"]
     },
-   
+
     paymentResult: {
       id: { type: String },
       reference: { type: String },
@@ -61,8 +61,8 @@ const orderSchema = mongoose.Schema(
       update_time: { type: String },
       email_address: { type: String },
     },
-   
-    
+
+
     totalPrice: {
       type: Number,
       required: true,
@@ -82,12 +82,12 @@ const orderSchema = mongoose.Schema(
     deliveredAt: {
       type: Date,
     },
-    createdAt:{
-        type:Date,
-        default:Date.now()
+    createdAt: {
+      type: Date,
+      default: Date.now()
     }
   }
- 
+
 );
 
 module.exports = mongoose.model("Order", orderSchema);
