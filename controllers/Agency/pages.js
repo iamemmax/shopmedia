@@ -1,10 +1,10 @@
 const asyncHandler = require("express-async-handler");
-const { searchAgency } = require('../../helper/search');
 const fs = require("fs");
 const crypto = require("crypto");
 const cloudinary = require("../../config/cloudinary");
 const cardSchema = require("../../model/Agency/CardSchema");
 const compressImg = require("../../helper/sharp");
+const { searchAgency, agency } = require('../../helper/search');
 
 //@desc: add advert pages
 //@access: private
@@ -248,10 +248,26 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
   })
 
 
-  exports.searchAgency = asyncHandler(async(req, res)=>{
-    try{
-      searchAgency(req, res, cardSchema)
-   
+  exports.searchAgencyByCompany = asyncHandler(async(req, res)=>{
+    let { search, page = 1, limit = 20, order_by } = req.query;
+
+
+  console.log(req.query.search)
+  try{
+    const results = await cardSchema.find({company_name: { $regex: search, $options: "i" }}).populate("categoryId")
+    .select("-_id -__v")
+    .limit(limit * 1) //limit search result
+    .skip((page - 1) * limit) // skip docs
+    .sort({ createdAt: order_by === "createdAt" && "asc" }); // sort order
+  // count total posts
+  // const count = await model.countDocuments(results);
+  // response
+ return res.status(200).json({
+    count: results.length,
+    page,
+    totalPages: Math.ceil(results.length / limit),
+    data: results,
+  });
   }catch(error){
     res.status(401)
     throw new Error(error.message)
