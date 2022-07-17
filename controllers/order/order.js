@@ -825,10 +825,8 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     if (error) {
-      return res.status(401).json({
-        res: "failed",
-        message: error.message,
-      });
+      res.status(401)
+      throw new Error(error.message)
     }
   }
 });

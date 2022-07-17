@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler")
 const validateEmail = require("../../helper/emailValidate")
 const subcribeSchema = require("../../model/subscribe/subcribe")
 const crypto = require("crypto")
+const sendBulkEmail = require("../../helper/bulkEmail")
 
 
 //@desc:create email subcriber,
@@ -118,4 +119,41 @@ exports.unsubcribe =  asyncHandler(async(req, res) =>{
         throw new Error(error.message)
     }
 
+})
+
+//@desc:contact  email subcriber,
+//@method:post
+exports.contactSubcribers = asyncHandler(async(req, res) =>{
+    try{
+        let emailSubcribers = await subcribeSchema.find({}, {__v:0, _id:0})
+        
+        let {text, subject, email} = req.body
+        if(emailSubcribers){
+         emailSubcribers.map(x =>{
+
+        //contact all email subcribers
+        sendBulkEmail(
+            x.email,
+           subject,
+           text,
+           x.email,
+           x.subcriber_id
+           
+           )
+        })
+        return res.status(201).json({
+            res: "ok",
+            message: "message sent successfully",
+          });
+    }else{
+        return res.status(401).json({
+            res: "failed",
+            message: "unable to contact subcribers",
+          });
+    }
+        
+    }catch(error){
+        res.status(401)
+        throw new Error(error.message)
+    }
 })
