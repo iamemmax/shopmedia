@@ -136,7 +136,7 @@ exports.searchAgency = asyncHandler(async (model, req, res) => {
 
 
  
-    console.log(search)
+    console.log(req.query)
       
       
       

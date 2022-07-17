@@ -181,7 +181,7 @@ exports.updatePages = asyncHandler(async(req, res) =>{
 //@route: /api/adpage/update/img/page_id
 
 exports.updateLogoImg =  asyncHandler(async(req, res) =>{
-  let {pic} = await cardSchema.findOne({page_id:req.params.page_id})
+  let {logo} = await cardSchema.findOne({page_id:req.params.page_id})
   let fileArray = []
   if(req.file){
     compressImg(req.file.path, 200, 200)
@@ -198,9 +198,9 @@ exports.updateLogoImg =  asyncHandler(async(req, res) =>{
     fileArray.push(pageImg);
   }
   try {
-          let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{pic:fileArray }},{new:true}).select("-_id, -__v")
+          let update = await cardSchema.findOneAndUpdate({page_id:req.params.page_id}, {$set:{logo:fileArray }},{new:true}).select("-_id, -__v")
     if(update){
-      await cloudinary.uploader.destroy(pic[0]?.img_id)
+      await cloudinary.uploader.destroy(logo[0]?.img_id)
       
       return  res.status(201).json({
           res:"ok",
@@ -248,9 +248,9 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
   })
 
 
-  exports.searchPages = asyncHandler(async(req, res)=>{
+  exports.searchAgency = asyncHandler(async(req, res)=>{
     try{
-    searchAgency(req, res, cardSchema)
+      searchAgency(req, res, cardSchema)
    
   }catch(error){
     res.status(401)
@@ -266,12 +266,20 @@ exports.removeAdPage =  asyncHandler(async(req, res) =>{
 
 exports.listPagesByCategory = asyncHandler(async(req, res) =>{
   try {
-    let getPages = await cardSchema.find({categoryId:req.params.categoryId}, {_id:0, __v:0})
+    const page = Number(req.query.pageNumber) || 1;
+    const pageSize = 20; // total number of entries on a single page
+   
+    let getPages = await cardSchema.find({categoryId:req.params.categoryId}).populate("categoryId", "-__v")
+    .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort("-createdAt");
+
   if(getPages){
     res.status(201).json({
       res:"ok",
       total:getPages.length,
-      message:"success",
+      pages: Math.ceil(getPages.length / pageSize),
+
       data:getPages
     })
   }
