@@ -152,7 +152,7 @@ exports.listAdverts = asyncHandler(async (req, res) => {
 		.skip(pageSize * (page - 1))
 		.sort('-createdAt')
 
-      .populate("postedBy category sub_category", " -__v -token -password")
+      .populate("postedBy category sub_category", " -__v -token -password -notification")
       .select("-__v");
       if (adverts.length > 0) {
       // console.log(isodate(adverts[0].createdAt))
