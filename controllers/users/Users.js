@@ -1599,3 +1599,49 @@ exports.searchAllUser = asyncHandler(async (req, res) => {
 
 
 
+// @desc: search for users
+// @Route: /api/users/notication
+// @Acess: public
+
+exports.listNotification = asyncHandler(async (req, res) => {
+  const page = Number(req.query.pageNumber) || 1;
+  const pageSize = 20;
+  const {notification} = await userSchema.findOne({_id:req.user._id})
+  .limit(pageSize)
+      .skip(pageSize * (page - 1))
+      .sort("-createdAt");
+       
+  try{
+   
+    res.status(201).json({
+    res:"ok",
+    total: notification.length,
+    pages: Math.ceil(notification.length / pageSize),
+    data:notification
+   })
+  }catch(error){
+    res.status(401);
+    throw new Error(error.message);
+
+  }
+});
+
+
+// @desc: remove notification when users clicked 
+exports.removeNotification = asyncHandler(async (req, res) => {
+  try {
+    removeNotification = await userSchema.findByIdAndUpdate({_id:req.user._id}, {$pull:{notification:{_id:req.params.id}}},{new:true}).select("notification")
+   if(removeNotification){
+    res.status(201).json({
+      res:"ok",
+      message:"notification removed successfully",
+      data:removeNotification
+   })
+  }
+   
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
+
+  }
+})

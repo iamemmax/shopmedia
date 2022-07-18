@@ -112,10 +112,10 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           },
           { new: true }
         )
-   
+
 
       if (updateOrder) {
-         res.status(201).json({
+        res.status(201).json({
           res: "ok",
           data: updateOrder,
         });
@@ -124,17 +124,17 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
 
         let users = await UserSchema?.find()
 
-        if(users){
-        //@desc: notify admin of new payment received
-        await  UserSchema.updateMany({roles:"super admin"}, {$push:{notification:{message:`${req.user.fullname} just  pay in the sum of #${updateOrder.totalPrice}`}}},{new:true})
-       
-        //@desc: notify users that their payment has been received
-        await  UserSchema.findOneAndUpdate({_id:req.user._id}, {$push:{notification:{message:` hi ${req.user.fullname} your payment of #${updateOrder.totalPrice} has been received`}}},{new:true})
-       
+        if (users) {
+          //@desc: notify admin of new payment received
+          await UserSchema.updateMany({ roles: "super admin" }, { $push: { notification: { message: `${req.user.fullname} just  pay in the sum of #${updateOrder.totalPrice}`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
 
-       }
-      
-      
+          //@desc: notify users that their payment has been received
+          await UserSchema.findOneAndUpdate({ _id: req.user._id }, { $push: { notification: { message: ` hi ${req.user.fullname} your payment of #${updateOrder.totalPrice} has been received`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
+
+
+        }
+
+
       } else {
         return res.status(401).json({
           res: "failed",
@@ -164,15 +164,20 @@ exports.updateOrderToDeliver = asyncHandler(async (req, res) => {
         .populate("userId", "-_id -__v -token -password")
         .populate({
           path: "orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId orderItems.userId",
-  
+
           select: "-__v -_id -notification"
-  
+
         })
 
       if (updateOrder) {
+        //@desc: notify users that their orders has been delivered
+        let orders = updateOrder.orderItems.map(x => x.itemsId)
+        orderAddr = orders.map(x => x.address)
+        await UserSchema.findOneAndUpdate({ userId: updateOrder.userId }, { $push: { notification: { message: ` hi ${req.user.fullname} your orders with order_id ${updateOrder.order_id} and your advert at ${orderAddr} has been delivered`, notifiedAt: Date.now() } } }, { new: true })
+
         res.status(201).json({
           res: "ok",
-          data: updateOrder,
+          message: "orders delivered successfully"
         });
       } else {
         return res.status(401).json({
@@ -200,7 +205,8 @@ exports.getMyOrders = asyncHandler(async (req, res) => {
       .find({
         $and: [
           { userId: { $eq: req.user._id } },
-          { isPaid: true }
+          { isPaid: true },
+          { isDelivered: false }
 
         ]
       }
@@ -402,7 +408,7 @@ exports.getTransfer = asyncHandler(async (req, res) => {
 
   try {
 
-   
+
     const allTransfer = await orderSchema
 
       .find({
@@ -498,13 +504,15 @@ exports.getTotalRevenue = asyncHandler(async (req, res) => {
 // @access PRIVATE/ADMIN
 exports.getUnpaidOrders = asyncHandler(async (req, res) => {
   const today = moment().startOf('day')
- 
+
 
   try {
-    const allOrders = await orderSchema.find({ $and: [
-      { isPaid: false },
-      { createdAt:{$lte:new Date(), $gte: new Date(new Date().getTime() - 7*24*60*60*1000)}}
-  ]}) 
+    const allOrders = await orderSchema.find({
+      $and: [
+        { isPaid: false },
+        { createdAt: { $lte: new Date(), $gte: new Date(new Date().getTime() - 7 * 24 * 60 * 60 * 1000) } }
+      ]
+    })
       .sort({ createdAt: "-1" })
       .populate("userId", "-_id -__v -token -password -notification")
       .populate({
@@ -516,11 +524,11 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
       .select("-__v -_id");
 
     if (allOrders) {
-   allOrders.map(x => {
-  
-     sendBulkEmail(x.userId.email,
-      "Reminder for shopmedia pending orders",
-          
+      allOrders.map(x => {
+
+        sendBulkEmail(x.userId.email,
+          "Reminder for shopmedia pending orders",
+
           ` 
           <!doctype html>
           <html lang="en">
@@ -819,18 +827,18 @@ exports.getUnpaidOrders = asyncHandler(async (req, res) => {
           </html>`,
           x.userId.username,
           x.userId.user_id
-)
-        })
-       
-        await orderSchema.deleteMany({createdAt:{$lte:new Date(Date.now() -  7*24*60*60*1000).toISOString()}}, {isPaid:false})
-      
-          return res.status(201).json({
-            res: "ok",
-            total: allOrders?.length,
-            data: allOrders,
-          });
-        } else {
-    
+        )
+      })
+
+      await orderSchema.deleteMany({ createdAt: { $lte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString() } }, { isPaid: false })
+
+      return res.status(201).json({
+        res: "ok",
+        total: allOrders?.length,
+        data: allOrders,
+      });
+    } else {
+
       return res.status(401).json({
         res: "failed",
         message: "No order found",

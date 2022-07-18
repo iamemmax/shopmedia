@@ -11,7 +11,7 @@ router.get("/delivered", ensureLogin, adminAccess(["admin", "super admin"]), get
 router.get("/unpaid", ensureLogin, adminAccess(["admin", "super admin"]), getUnpaidOrders)
 router.get("/:order_id", ensureLogin, getOrderById)
 router.put("/:order_id/pay", ensureLogin, updateOrderToPay)
-router.put("/deliver/:order_id/pay", ensureLogin, adminAccess(["admin", "super admin"]), updateOrderToDeliver)
+router.put("/deliver/:order_id", ensureLogin, adminAccess(["admin", "super admin"]), updateOrderToDeliver)
 router.post("/revenue", ensureLogin, adminAccess(["admin", "super admin"]), getTotalRevenue)
 
 module.exports = router
