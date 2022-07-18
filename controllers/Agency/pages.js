@@ -60,7 +60,7 @@ exports.AddPages = asyncHandler(async (req, res) => {
     }else{
       res.status(200).json({
         res:"ok",
-        message:"pages created successfully",
+        message:"Agency created successfully",
         data:cretePage
       })
 
@@ -127,7 +127,7 @@ exports.getSinglePage =  asyncHandler(async(req, res) =>{
     }else{
       res.status(401).json({
         res:"error",
-        message:"not found",
+        message:"Agency not found",
        
       })
     }
@@ -159,7 +159,7 @@ exports.updatePages = asyncHandler(async(req, res) =>{
       if(update){
         res.status(201).json({
           res:"ok",
-          message:"pages updated successfully",
+          message:"Agency updated successfully",
           data:update
         })
       }

@@ -3,10 +3,12 @@ const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema");
 const orderSchema = require("../../model/order/orderSchema");
 const moment = require('moment');
+const adminNotifySchema = require("../../model/notification/adminNotification")
 
 
 const ISODate = require("isodate");
 const sendBulkEmail = require("../../helper/bulkEmail");
+const UserSchema = require("../../model/users/UserSchema");
 // @desc  create a new order
 // @route GET /api/orders/create
 // @access PRIVATE
@@ -110,7 +112,7 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
           },
           { new: true }
         )
-      // .populate("userId ", "-_id -__v -token -password")
+      .populate("userId ", "-_id -__v -token -password")
       // .populate({
       //           path:"orderItems.itemsId orderItems.categoryId orderItems.sub_categoryId",
 
@@ -119,6 +121,8 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
       // })
 
       if (updateOrder) {
+       let oo= await  UserSchema.findOneAndUpdate({roles:"super admin"}, {$push:{notification:{message:`${userId.username} just for items of ${updateOrder.totalPrice}`}}},{new:true})
+       console.log(oo)
         res.status(201).json({
           res: "ok",
           data: updateOrder,

@@ -56,11 +56,7 @@ facebookId:{type: String},
     type: String,
     
   },
-  email_subcriber: {
-    type: String,
-    default: false,
-    
-  },
+  notification:[{message:{type:String}}],
   createdAt: {
     type: Date,
     default: Date.now(),
