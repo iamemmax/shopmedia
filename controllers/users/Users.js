@@ -801,7 +801,7 @@ exports.loginUser = asyncHandler(async (req, res) => {
   const user = await userSchema.findOne({ email });
   const userInfo = await userSchema
     .findOne({ email })
-    .select("-password -__v -token ");
+    .select("-password -__v -token -notification");
   if (!user) {
     res.status(401);
     throw new Error("Incorrect email or password");
@@ -1405,7 +1405,7 @@ exports.uploadProfilePic = asyncHandler(async (req, res) => {
 exports.updateProfile = asyncHandler(async (req, res) => {
   let user = await userSchema
     .findOne({ user_id: req.params.user_id })
-    .select("-password -__v -token");
+    .select("-password -__v -token -notification");
   let { firstname, lastname, fullname, phone_no } = req.body;
 
   try {
@@ -1456,7 +1456,7 @@ exports.listUsers = asyncHandler(async (req, res) => {
   const count = await userSchema.countDocuments({});
 
   try {
-    let users = await userSchema.find({verified:true}, { __v: 0 })
+    let users = await userSchema.find({verified:true}, { __v: 0 , notification:0})
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort("-createdAt");
@@ -1529,7 +1529,7 @@ exports.createAdmin = asyncHandler(async (req, res) => {
         { $set: { roles: req.body.roles } },
         { new: true }
       )
-      .select("-password -__v");
+      .select("-password -__v -notification");
     if (addAdmin) {
       return res.status(201).json({
         res: "ok",
@@ -1556,10 +1556,9 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 
 exports.removeMultipleUsers = asyncHandler(async (req, res) => {
   try{
- const multipleUsers = await userSchema.deleteMany(
-    {username:req.body.user})
+ const multipleUsers = await userSchema.deleteMany({username:{$in:[req.body.username]}})
 
-console.log(req.body.user)
+
  
  if(multipleUsers){
   return res.status(201).json({
