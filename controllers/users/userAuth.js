@@ -31,18 +31,18 @@ const passportLoginFailure = asyncHandler(async (req, res) => {
 
 const facebookLoginSuccess = asyncHandler(async (req, res) => {
 	
-  // // if(req.user){
-  // //   let{user}  = req
-  // //   const token = jwt.sign({user }, process.env.JWT_SECRETE, {
-  // //     expiresIn: "12h",
-  // //   });
-  // //   return res.status(200).json({
-  // //     message: "Login successful",
-  // //     user,
-  // //     token,
-  // //   });
+  if(req.user){
+    let{user}  = req
+    const token = jwt.sign({user }, process.env.JWT_SECRETE, {
+      expiresIn: "12h",
+    });
+    return res.status(200).json({
+      message: "Login successful",
+      user,
+      token,
+    });
   
-  // }
+  }
 });
 
 // controller for the routes that handle the failure redirects from all 4 passport strategies

@@ -3,7 +3,6 @@ const crypto = require("crypto");
 const cartSchema = require("../../model/Business/cartSchema");
 const orderSchema = require("../../model/order/orderSchema");
 const moment = require('moment');
-const adminNotifySchema = require("../../model/notification/adminNotification")
 
 
 const ISODate = require("isodate");
@@ -126,7 +125,19 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
 
         if (users) {
           //@desc: notify admin of new payment received
-          await UserSchema.updateMany({ roles: "super admin" }, { $push: { notification: { message: `${req.user.fullname} just  pay in the sum of #${updateOrder.totalPrice}`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
+          await UserSchema.updateMany({
+            $and:[
+              
+              { roles: "admin"},
+              { roles: "super admin" },
+            ]
+          },
+          
+            
+            
+            
+            
+             { $push: { notification: { message: `${req.user.fullname} just  pay in the sum of #${updateOrder.totalPrice}`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
 
           //@desc: notify users that their payment has been received
           await UserSchema.findOneAndUpdate({ _id: req.user._id }, { $push: { notification: { message: ` hi ${req.user.fullname} your payment of #${updateOrder.totalPrice} has been received`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")

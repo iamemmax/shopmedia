@@ -12,8 +12,9 @@ const { searchAgency, agency } = require('../../helper/search');
 //@route: /api/adpage/create
 exports.AddPages = asyncHandler(async (req, res) => {
   let {company_name, categoryId, email,location, phone, page_id } = req.body;
+
   let fileArray = [];
-  if(!company_name || !categoryId   || !email || !phone || !location) {
+  if(!company_name ||!categoryId  ||!email ||!location ||!phone) {
     res.status(401);
     throw new Error("all field are require");
   }

@@ -252,8 +252,7 @@ exports.updateAdvert = asyncHandler(async (req, res) => {
     }
   } catch (error) {
     res.status(401);
-    // throw new Error(error.message);
-    console.log(error.message);
+    throw new Error(error.message);
   }
 });
 
@@ -281,29 +280,34 @@ exports.updateAdvertImg = asyncHandler(async (req, res) => {
     }
     fs.unlinkSync(file.path);
   }
+ try{
   fileArray.map(async (data) => {
-   await advertSchema
-      .findOneAndUpdate(
-        { advert_id: req.params.advert_id },
-        { $push: { advertImgs: data } },
-        { new: true }
-      )
-      .select("-_id, -__v")
-      .exec((err) => {
-        if (err) {
-          return res.status(401).json({
-            res: "ok",
-            message: "something went wrong",
-          });
-        } 
-      });
-    });
-           res.status(201).json({
-            res: "ok",
-            message: "advert image(s) updated successfully",
-           
-          });
-        
+    await advertSchema
+       .findOneAndUpdate(
+         { advert_id: req.params.advert_id },
+         { $push: { advertImgs: data } },
+         { new: true }
+       )
+       .select("-_id, -__v")
+       .exec((err) => {
+         if (err) {
+           return res.status(401).json({
+             res: "ok",
+             message: "something went wrong",
+           });
+         } 
+       });
+     });
+            res.status(201).json({
+             res: "ok",
+             message: "advert image(s) updated successfully",
+            
+           });
+         
+ }catch(error){
+  res.status(401);
+  throw new Error(error.message);
+ }
 
 
 
@@ -341,19 +345,20 @@ exports.updateEachImg = asyncHandler(async (req, res) => {
         img:uploadImg.eager[0].secure_url,
       }
       console.log(adImg)
-      
-      if(updatedImg){
-        let oldeImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$set:{advertImgs:updatedImg}}, {new:true})
-        let OverrideImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$push:{advertImgs:adImg}}, {new:true})
-        if(OverrideImg){
-           await cloudinary.uploader.destroy(req.body.img_id);
-           res.status(201).json({
+      try{
+
+        if(updatedImg){
+          let oldeImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$set:{advertImgs:updatedImg}}, {new:true})
+          let OverrideImg = await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$push:{advertImgs:adImg}}, {new:true})
+          if(OverrideImg){
+            await cloudinary.uploader.destroy(req.body.img_id);
+            res.status(201).json({
             res: "ok",
             message: "advert image updated successfully",
             data:OverrideImg
-           
+            
           });
-        
+          
         }else{
           return res.status(401).json({
             res: "ok",
@@ -361,16 +366,13 @@ exports.updateEachImg = asyncHandler(async (req, res) => {
           });
         }
       }
-    }
-   
-  try {
-   
-  } catch (error) {
-    
+    }catch(error) {
+    res.status(401);
+    throw new Error(error.message);
   }
-
 }
-})
+
+}})
 
 
 
@@ -425,24 +427,29 @@ exports.deleteAdvertImg = asyncHandler(async (req, res) => {
     let {advertImgs} = deleteAvertImg
 
    let updatedImg = advertImgs.filter(img => img.img_id != req.body.img_id )
-   
-   
-   if(updatedImg){
-    await cloudinary.uploader.destroy(req.body.img_id);
-    
+   try{
+
+     
+     if(updatedImg){
+       await cloudinary.uploader.destroy(req.body.img_id);
+       
      await advertSchema.findOneAndUpdate({advert_id:req.params.advert_id}, {$set:{advertImgs:updatedImg}},{new:true})
     return res.status(201).json({
       res:"ok",
       message:"advert image removed successfully",
       data:updatedImg
     })
-   }else{
+  }else{
     return res.status(401).json({
       res:"error",
       message:"unable to delete advert image ",
-     
+      
     })
-   }
+  }
+}catch(error){
+  res.status(401);
+    throw new Error(error.message);
+}
   }
   
 });

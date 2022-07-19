@@ -56,7 +56,7 @@ facebookId:{type: String},
     type: String,
     
   },
-  notification:[{message:{type:String}},{createdAt:{type:Date}}],
+  notification:[{message:{type:String}},{notifiedAt:{type:Date}}],
   createdAt: {
     type: Date,
     default: Date.now(),

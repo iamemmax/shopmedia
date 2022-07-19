@@ -11,7 +11,7 @@ const validateEmail = require("../../helper/emailValidate");
 const jwt = require("jsonwebtoken");
 const compressImg = require("../../helper/sharp");
 // const welcomeEmail = require("../../helper/Email Template/welcomeEmail")
-const {searchUser} = require("../../helper/search")
+const { searchUser } = require("../../helper/search")
 
 // @desc: create account
 // @Route: /api/users/register
@@ -19,12 +19,12 @@ const {searchUser} = require("../../helper/search")
 exports.createUser = asyncHandler(async (req, res) => {
   let { username, email, fullname, password, phone_no, company_name } =
     req.body;
-    console.log(company_name)
+  console.log(company_name)
 
   //@desc: check if users fill all field
 
   if (!username || !email || !fullname || !password || !phone_no || !company_name) {
-   
+
     return res.status(401).json({
       message: "all fields are required",
     });
@@ -37,9 +37,9 @@ exports.createUser = asyncHandler(async (req, res) => {
     const usernameExist = await userSchema.findOne({ username: username });
     const emailExist = await userSchema.findOne({ email: email });
     // const companyExist = await userSchema.findOne({company_name:company_name });
-    
 
-    
+
+
 
     if (usernameExist) {
       return res.status(401).json({
@@ -52,8 +52,8 @@ exports.createUser = asyncHandler(async (req, res) => {
       return res.status(401).json({
         message: "Email already linked to another user",
       })
-    
-    
+
+
     } else {
       bcrypt.genSalt(10, function (err, salt) {
         bcrypt.hash(password, salt, async (err, hash) => {
@@ -404,7 +404,7 @@ justify-content: center !important;
 
 </html>
                 `
- );
+              );
               sendEmail(
                 email,
                 "Welcome to ShopMedia.ng",
@@ -773,9 +773,21 @@ exports.activateUser = asyncHandler(async (req, res) => {
 
     if (userFound.verify === true) {
       token.remove();
-      return res.status(201).json({
+      res.status(201).json({
         message: "Email verified successfully",
       });
+
+      //@desc:notify admin of new user
+      await userSchema.updateMany({
+        $and: [
+
+          { roles: "admin" },
+          { roles: "super admin" },
+        ]
+      },
+
+        { $push: { notification: { message: `${req.user.fullname} just  joined shopmedia`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
+
     }
   } catch (error) {
     res.status(501);
@@ -1291,53 +1303,53 @@ exports.ChangePassword = asyncHandler(async (req, res) => {
       message: "Password does not match",
     });
   }
- try{
+  try {
 
-   const { password } = await userSchema
-   .findOne({ user_id: req.params.user_id })
-    .select("password");
-  // if (user) {
-  if (password) {
-    bcrypt.compare(oldpassword, password, (err, isMatch) => {
-      if (err) {
-        return res.status(401).json({
-          res: "failed",
-          message: "Old password does not match",
-        });
-      }
-      if (isMatch) {
-        bcrypt.genSalt(10, function (err, salt) {
-          bcrypt.hash(new_password, salt, async (err, hash) => {
-            let update = await userSchema.findOneAndUpdate(
-              { user_id: req.params.user_id },
-              { $set: { password: hash || password } },
-              { new: true }
-            );
-            if (!update) {
-              res.send("unable to update pass");
-              res.status(401).json({
-                message: "Unable to update password ",
-              });
-            } else {
-              res.status(201).json({
-                res: "ok",
-                message: "Password changed successfully",
-              });
-            }
+    const { password } = await userSchema
+      .findOne({ user_id: req.params.user_id })
+      .select("password");
+    // if (user) {
+    if (password) {
+      bcrypt.compare(oldpassword, password, (err, isMatch) => {
+        if (err) {
+          return res.status(401).json({
+            res: "failed",
+            message: "Old password does not match",
           });
-        });
-      } else {
-        return res.status(401).json({
-          res: "failed",
-          message: "Old password does not match",
-        });
-      }
-    });
+        }
+        if (isMatch) {
+          bcrypt.genSalt(10, function (err, salt) {
+            bcrypt.hash(new_password, salt, async (err, hash) => {
+              let update = await userSchema.findOneAndUpdate(
+                { user_id: req.params.user_id },
+                { $set: { password: hash || password } },
+                { new: true }
+              );
+              if (!update) {
+                res.send("unable to update pass");
+                res.status(401).json({
+                  message: "Unable to update password ",
+                });
+              } else {
+                res.status(201).json({
+                  res: "ok",
+                  message: "Password changed successfully",
+                });
+              }
+            });
+          });
+        } else {
+          return res.status(401).json({
+            res: "failed",
+            message: "Old password does not match",
+          });
+        }
+      });
+    }
+  } catch (error) {
+    res.status(401);
+    throw new Error(error.message);
   }
-}catch(error){
-  res.status(401);
-  throw new Error(error.message);
-}
 
 });
 
@@ -1443,7 +1455,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(401);
     throw new Error(error.message);
-}
+  }
 });
 
 // @desc: list users account
@@ -1456,7 +1468,7 @@ exports.listUsers = asyncHandler(async (req, res) => {
   const count = await userSchema.countDocuments({});
 
   try {
-    let users = await userSchema.find({verified:true}, { __v: 0 , notification:0})
+    let users = await userSchema.find({ verified: true }, { __v: 0, notification: 0 })
       .limit(pageSize)
       .skip(pageSize * (page - 1))
       .sort("-createdAt");
@@ -1484,7 +1496,7 @@ exports.listUsers = asyncHandler(async (req, res) => {
 // @Acess: private(admin, super admin)
 
 exports.removeUsers = asyncHandler(async (req, res) => {
-  try{
+  try {
 
     const remove = await userSchema.findOneAndDelete({
       user_id: req.params.user_id,
@@ -1499,7 +1511,7 @@ exports.removeUsers = asyncHandler(async (req, res) => {
       res.status(401);
       throw new Error("Unable to delete user");
     }
-  }catch(error){
+  } catch (error) {
     res.status(401);
     throw new Error(error.message);
 
@@ -1512,42 +1524,42 @@ exports.removeUsers = asyncHandler(async (req, res) => {
 
 exports.createAdmin = asyncHandler(async (req, res) => {
   let users = await userSchema.findOne({ user_id: req.params.user_id });
-  try{
+  try {
 
-  
-  if (users) {
-    if (users?.roles === "super admin") {
-      return res.status(404).json({
-        res: "failed",
-        message: "Unable to create admin",
-      });
-    }
-    
-    let addAdmin = await userSchema
-      .findOneAndUpdate(
-        { user_id: req.params.user_id },
-        { $set: { roles: req.body.roles } },
-        { new: true }
-      )
-      .select("-password -__v -notification");
-    if (addAdmin) {
-      return res.status(201).json({
-        res: "ok",
-        message: "Admin created successfully",
-        data: addAdmin,
-      });
+
+    if (users) {
+      if (users?.roles === "super admin") {
+        return res.status(404).json({
+          res: "failed",
+          message: "Unable to create admin",
+        });
+      }
+
+      let addAdmin = await userSchema
+        .findOneAndUpdate(
+          { user_id: req.params.user_id },
+          { $set: { roles: req.body.roles } },
+          { new: true }
+        )
+        .select("-password -__v -notification");
+      if (addAdmin) {
+        return res.status(201).json({
+          res: "ok",
+          message: "Admin created successfully",
+          data: addAdmin,
+        });
+      } else {
+        res.status(401);
+        throw new Error("Unable to add admin");
+      }
     } else {
       res.status(401);
-      throw new Error("Unable to add admin");
+      throw new Error("User not found");
     }
-  } else {
+  } catch (error) {
     res.status(401);
-    throw new Error("User not found");
-  }
-}catch(error){
-  res.status(401);
     throw new Error(error.message);
-}
+  }
 });
 
 // @desc: remove multiple users
@@ -1555,23 +1567,23 @@ exports.createAdmin = asyncHandler(async (req, res) => {
 // @Acess: private(super admin, admin)
 
 exports.removeMultipleUsers = asyncHandler(async (req, res) => {
-  try{
- const multipleUsers = await userSchema.deleteMany({username:{$in:[req.body.username]}})
+  try {
+    const multipleUsers = await userSchema.deleteMany({ username: { $in: [req.body.username] } })
 
 
- 
- if(multipleUsers){
-  return res.status(201).json({
-    res: "ok",
-    message: "users deleted successfully",
-    data: multipleUsers,
-  });
- }else {
-  res.status(401);
-  throw new Error("Unable to delete users");
-}
 
-  }catch(error){
+    if (multipleUsers) {
+      return res.status(201).json({
+        res: "ok",
+        message: "users deleted successfully",
+        data: multipleUsers,
+      });
+    } else {
+      res.status(401);
+      throw new Error("Unable to delete users");
+    }
+
+  } catch (error) {
     res.status(401);
     throw new Error(error.message);
   }
@@ -1586,11 +1598,11 @@ exports.removeMultipleUsers = asyncHandler(async (req, res) => {
 // @Acess: private(super admin, admin)
 
 exports.searchAllUser = asyncHandler(async (req, res) => {
-  
-  try{
+
+  try {
     searchUser(userSchema, req, res)
 
-  }catch(error){
+  } catch (error) {
     res.status(401);
     throw new Error(error.message);
 
@@ -1606,20 +1618,20 @@ exports.searchAllUser = asyncHandler(async (req, res) => {
 exports.listNotification = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
   const pageSize = 20;
-  const {notification} = await userSchema.findOne({_id:req.user._id})
-  .limit(pageSize)
-      .skip(pageSize * (page - 1))
-      .sort("-createdAt");
-       
-  try{
-   
+  const { notification } = await userSchema.findOne({ _id: req.user._id })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1))
+    .sort("-createdAt");
+
+  try {
+
     res.status(201).json({
-    res:"ok",
-    total: notification.length,
-    pages: Math.ceil(notification.length / pageSize),
-    data:notification
-   })
-  }catch(error){
+      res: "ok",
+      total: notification.length,
+      pages: Math.ceil(notification.length / pageSize),
+      data: notification
+    })
+  } catch (error) {
     res.status(401);
     throw new Error(error.message);
 
@@ -1630,15 +1642,15 @@ exports.listNotification = asyncHandler(async (req, res) => {
 // @desc: remove notification when users clicked 
 exports.removeNotification = asyncHandler(async (req, res) => {
   try {
-    removeNotification = await userSchema.findByIdAndUpdate({_id:req.user._id}, {$pull:{notification:{_id:req.params.id}}},{new:true}).select("notification")
-   if(removeNotification){
-    res.status(201).json({
-      res:"ok",
-      message:"notification removed successfully",
-      data:removeNotification
-   })
-  }
-   
+    removeNotification = await userSchema.findByIdAndUpdate({ _id: req.user._id }, { $pull: { notification: { _id: req.params.id } } }, { new: true }).select("notification")
+    if (removeNotification) {
+      res.status(201).json({
+        res: "ok",
+        message: "notification removed successfully",
+        data: removeNotification
+      })
+    }
+
   } catch (error) {
     res.status(401);
     throw new Error(error.message);
