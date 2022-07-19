@@ -30,7 +30,6 @@ exports.createAdvert = asyncHandler(async (req, res) => {
     !address ||
     !city ||
     !state ||
-    !landmark ||
     !price ||
     !size ||
     !category ||
