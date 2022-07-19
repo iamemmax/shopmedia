@@ -23,7 +23,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 
   //@desc: check if users fill all field
 
-  if (!username || !email || !fullname || !password || !phone_no || !company_name) {
+  if (!username || !email || !fullname || !password || !phone_no) {
 
     return res.status(401).json({
       message: "all fields are required",

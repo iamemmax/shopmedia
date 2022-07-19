@@ -3,7 +3,6 @@ const orderSchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "users",
     },
 
@@ -13,7 +12,6 @@ const orderSchema = mongoose.Schema(
     orderItems: [{
       userId: {
         type: mongoose.Schema.Types.ObjectId,
-        required: true,
         ref: "users",
       },
 
