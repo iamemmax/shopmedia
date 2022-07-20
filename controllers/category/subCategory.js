@@ -77,18 +77,13 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
       }).save()
      
   
-      if (addSubCategory) 
-      {
+    
         return res.status(201).json({
           res: "ok",
           message: "sub-category added successfully",
           data:addSubCategory,
         });
-      } else {
-        return res.status(401).json({
-          message: "Unable to add category",
-        });
-      }
+      
     })
   }
     } catch (error) {
