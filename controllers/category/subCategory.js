@@ -58,41 +58,45 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
 
   try {
    
-    
    
-      if(cartFound && cartFound.sub_category === sub_category){
+
+      
+      if(cartFound.sub_category === sub_category){
         return res.status(401).json({
           message: "Sub-category already exist",
         });
+      
+    }else{
+      crypto.randomBytes(10, async (err, buffer) => {
+        let token = buffer.toString("hex");
+  
+      let addSubCategory = await new subCategorySchema({
+        categoryId:req.params.id,
+        sub_category,
+        sub_category_id: `sub_id${token}`,
+      }).save()
+     
+  
+      if (addSubCategory) 
+      {
+        return res.status(201).json({
+          res: "ok",
+          message: "sub-category added successfully",
+          data:addSubCategory,
+        });
+      } else {
+        return res.status(401).json({
+          message: "Unable to add category",
+        });
       }
-   
-    crypto.randomBytes(10, async (err, buffer) => {
-      let token = buffer.toString("hex");
-
-    let addSubCategory = await new subCategorySchema({
-      categoryId:req.params.id,
-      sub_category,
-      sub_category_id: `sub_id${token}`,
-    }).save()
-   
-
-    if (addSubCategory) 
-    {
-      return res.status(201).json({
-        res: "ok",
-        message: "sub-category added successfully",
-        data:addSubCategory,
-      });
-    } else {
-      return res.status(401).json({
-        message: "Unable to add category",
-      });
-    }
-  })
-  } catch (error) {
-    res.status(401);
-    throw new Error(error.message);
+    })
   }
+    } catch (error) {
+      res.status(401);
+      throw new Error(error.message);
+    }
+   
+    
 });
 
 // @desc: update category types
