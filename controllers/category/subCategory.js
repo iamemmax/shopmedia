@@ -43,7 +43,7 @@ exports.listSubCategories = asyncHandler(async (req, res) => {
 // @Route: /api/category/create
 // @Acess: private
 exports.createSubCategory = asyncHandler(async (req, res) => {
-  let { sub_category, sub_category_id , categoryId} = req.body;
+  let { sub_category } = req.body;
 
   if (!sub_category) {
     res.status(401);

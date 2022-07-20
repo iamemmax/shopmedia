@@ -1,4 +1,5 @@
 const categorySchema = require("../../model/category/categorySchema");
+const subCategorySchema = require("../../model/category/sub_category");
 const asyncHandler = require("express-async-handler");
 
 
@@ -43,6 +44,12 @@ exports.createCategory = asyncHandler(async(req, res) =>{
         res.status(401);
         throw new Error("select category ");
     }
+    const cartFound = await categorySchema.findOne({category});
+    if(cartFound){
+        res.status(401);
+        throw new Error("category already exist");
+    }
+
 
     try {
         let addCategory = await  new categorySchema({
@@ -75,6 +82,15 @@ exports.updateCategory = asyncHandler(async(req, res) =>{
     
     let {category, category_type } = req.body
     
+
+    const cartExist = await categorySchema.find()
+    cartExist?.map(x =>{
+        if(x.category === category){
+            res.status(401);
+            throw new Error(`${category} already exist`);
+        }
+    })
+
 
     const regCategory = await categorySchema.findById(req.params.id)
     
@@ -109,6 +125,8 @@ exports.updateCategory = asyncHandler(async(req, res) =>{
 exports.deleteCategory = asyncHandler(async(req, res) =>{
  
     let deleteCart = await categorySchema.findByIdAndDelete(req.params.id)
+    await subCategorySchema.deleteMany({categoryId:{$eq:req.params.id}})
+    
     if(deleteCart){
         return res.status(201).json({
             res: "ok",
