@@ -57,10 +57,10 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
   }
 
   try {
-   
+   console.log("success")
    
 
-      
+  
       if(cartFound.sub_category === sub_category){
         return res.status(401).json({
           message: "Sub-category already exist",
