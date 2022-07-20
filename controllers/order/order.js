@@ -89,7 +89,6 @@ exports.updateOrderToPay = asyncHandler(async (req, res) => {
     .findOne({ order_id: req.params.order_id })
 
   let { id, reference } = req.body;
-  console.log(order);
   try {
     if (order) {
       const updateOrder = await orderSchema
@@ -410,7 +409,7 @@ exports.getDeliveredOrders = asyncHandler(async (req, res) => {
 
 
 // @desc  fetch all orders
-// @route GET /api/orders
+// @route GET /api/orders/transfer
 // @access PRIVATE/ADMIN
 exports.getTransfer = asyncHandler(async (req, res) => {
   const page = Number(req.query.pageNumber) || 1;
@@ -458,6 +457,71 @@ exports.getTransfer = asyncHandler(async (req, res) => {
     res.status(401)
     throw new Error(error.message)
   }
+});
+
+
+// @desc  update transfer payment
+// @route GET /api/orders
+// @access PRIVATE/ADMIN
+exports.updateTransferOrder = asyncHandler(async (req, res) => {
+
+  const order = await orderSchema
+  .findOne({ order_id: req.params.order_id })
+
+try {
+  if (order) {
+    const updateOrder = await orderSchema
+      .findOneAndUpdate(
+        { order_id: req.params.order_id },
+        {
+          $set: {
+            isPaid: true,
+            paidAt: Date.now(),
+            paymentResult: {
+              email_address: order.userId.email,
+              update_time: new Date(),
+              status: "success",
+              type: "transfer",
+              
+            },
+          },
+        },
+        { new: true }
+      )
+
+
+    if (updateOrder) {
+      res.status(201).json({
+        res: "ok",
+        data: updateOrder,
+      });
+
+
+
+      let users = await UserSchema?.find()
+
+      if (users) {
+        //@desc: notify admin of new payment received
+       
+        //@desc: notify users that their payment has been received
+        await UserSchema.findOneAndUpdate({ _id: req.user._id }, { $push: { notification: { message: ` hi ${req.user.fullname} your payment of #${updateOrder.totalPrice} has been received`, notifiedAt: Date.now() } } }, { new: true }).sort("asc")
+
+
+      }
+
+
+    } else {
+      return res.status(401).json({
+        res: "failed",
+        message: "something went wrong",
+      });
+    }
+  }
+} catch (error) {
+  res.status(401)
+  throw new Error(error.message)
+}
+
 });
 
 // @desc  revenue
