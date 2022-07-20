@@ -109,16 +109,14 @@ exports.updateSubCart = asyncHandler(async(req, res) =>{
   const findExistingSubCart =  await subCategorySchema.findOne({sub_category})
     const findSubCart = await subCategorySchema.findOne({sub_category_id:req.params.sub_category_id})
     if(findExistingSubCart?.sub_category === sub_category){
-      return res.status(401).json({
-        res:"failed",
-            message: "sub-category already exist",
-          });
+    res.status(401)
+      throw new Error("sub-category already exist")
     }
 
     try{
 
       if(findSubCart){
-        let updateSubCart = await subCategorySchema.findOneAndUpdate({ub_category_id:req.params.sub_category_id}, {$set:{sub_category:sub_category ||findSubCart.sub_category }}, {new:true})
+        let updateSubCart = await subCategorySchema.findOneAndUpdate({sub_category_id:req.params.sub_category_id}, {$set:{sub_category:sub_category ||findSubCart.sub_category }}, {new:true})
 
         if(updateSubCart){
           return res.status(201).json({
