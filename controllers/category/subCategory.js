@@ -51,7 +51,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
   
   const cartFound = await subCategorySchema.findOne({_id:req.params.id}, {__v: 0 });
   // console.log( sub_id?.pop());
-  if (!sub_category || !sub_category_id) {
+  if (!sub_category) {
     res.status(401);
     throw new Error("All field are required");
   }
