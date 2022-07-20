@@ -19,17 +19,14 @@ exports.listSubCategories = asyncHandler(async (req, res) => {
     .skip(pageSize * (page - 1))
     .sort("-createdAt");
 
-    if (subCat.length > 0) {
+   
       return res.status(201).json({
         res: "ok",
         total:subCat.length,
         pages: Math.ceil(subCat?.length / pageSize),
         data:subCat,
       });
-    }else{
-      res.status(401);
-      throw new Error("category not found");
-    }
+    
   } catch (error) {
     res.status(401);
     throw new Error(error.message);
@@ -48,44 +45,51 @@ exports.listSubCategories = asyncHandler(async (req, res) => {
 exports.createSubCategory = asyncHandler(async (req, res) => {
   let { sub_category, sub_category_id , categoryId} = req.body;
 
-  
-  const cartFound = await subCategorySchema.find({_id:req.params.id}, {__v: 0 });
-  // console.log( sub_id?.pop());
   if (!sub_category) {
     res.status(401);
-    throw new Error("All field are required");
+    throw new Error("Enter sub-category");
   }
+  
+  const cartFound = await subCategorySchema.find({categoryId:{$eq:req.params.id}});
+  console.log(cartFound[0]);
+  console.log(req.params.id);
 
   try {
-   console.log("success")
+  
    
+          cartFound?.map(x =>{
+            console.log(typeof x.sub_category)
+            if(x.sub_category === sub_category){
+              res.status(401)
+              throw new Error("Sub-category already exist")
+            }
+            })
 
+              crypto.randomBytes(10, async (err, buffer) => {
+                let token = buffer.toString("hex");
+          
+              let addSubCategory = await new subCategorySchema({
+                categoryId:req.params.id,
+                sub_category,
+                sub_category_id: `sub_id${token}`,
+              }).save()
+             
+          
+            
+                return res.status(201).json({
+                  res: "ok",
+                  message: "sub-category added successfully",
+                  data:addSubCategory,
+                });
+              
+            })
+            
+            
+        
   
-      if(cartFound.sub_category === sub_category){
-        return res.status(401).json({
-          message: "Sub-category already exist",
-        });
-      
-    }else{
-      crypto.randomBytes(10, async (err, buffer) => {
-        let token = buffer.toString("hex");
-  
-      let addSubCategory = await new subCategorySchema({
-        categoryId:req.params.id,
-        sub_category,
-        sub_category_id: `sub_id${token}`,
-      }).save()
-     
-  
-    
-        return res.status(201).json({
-          res: "ok",
-          message: "sub-category added successfully",
-          data:addSubCategory,
-        });
-      
-    })
-  }
+    // }else{
+   
+  // }
     } catch (error) {
       res.status(401);
       throw new Error(error.message);

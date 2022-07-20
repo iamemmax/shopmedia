@@ -15,7 +15,7 @@ type:String
   },
   
   sub_category:{
-type:String
+type:String,
   },
   
   createdAt: {
