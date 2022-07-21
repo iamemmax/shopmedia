@@ -9,7 +9,7 @@ let {createAdvert, listAdverts, searchAdvert, searchAdvertQuery,  getSingleAdver
 router.route("/").get(listAdverts).get(searchAdvert)
 router.post("/create", ensureLogin, adminAccess(["admin", "super admin", "vendors"]), upload.array("advertImgs", 5), createAdvert)
 router.get("/search", ensureLogin,   searchAdvertQuery)
-router.get("/:slug",ensureLogin, getSingleAdvert)
+router.get("/:slug", getSingleAdvert)
 router.put("/update/:advert_id", ensureLogin,  adminAccess(["admin", "super admin"]), updateAdvert)
 router.put("/update/img/:advert_id", ensureLogin,  adminAccess(["admin", "super admin", "vendors"]), upload.array("advertImgs", 5), updateAdvertImg)
 router.put("/update/single-img/:advert_id", ensureLogin,  adminAccess(["admin", "super admin", "vendors"]), upload.single("advertImgs"), updateEachImg)

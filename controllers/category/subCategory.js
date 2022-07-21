@@ -51,8 +51,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
   }
   
   const cartFound = await subCategorySchema.find({categoryId:{$eq:req.params.id}});
-  console.log(cartFound[0]);
-  console.log(req.params.id);
+ 
 
   try {
   
