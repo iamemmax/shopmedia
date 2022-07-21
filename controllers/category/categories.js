@@ -1,5 +1,6 @@
 const categorySchema = require("../../model/category/categorySchema");
 const subCategorySchema = require("../../model/category/sub_category");
+const advertSchema = require("../../model/advert/advertSchema");
 const asyncHandler = require("express-async-handler");
 
 
@@ -126,6 +127,7 @@ exports.deleteCategory = asyncHandler(async(req, res) =>{
  
     let deleteCart = await categorySchema.findByIdAndDelete(req.params.id)
     await subCategorySchema.deleteMany({categoryId:{$eq:req.params.id}})
+    await advertSchema.deleteMany({category:{$eq:req.params.id}})
     
     if(deleteCart){
         return res.status(201).json({

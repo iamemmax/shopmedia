@@ -1,6 +1,8 @@
 const subCategorySchema = require("../../model/category/sub_category");
 const asyncHandler = require("express-async-handler");
 const categorySchema = require("../../model/category/categorySchema");
+const advertSchema = require("../../model/advert/advertSchema");
+
 const crypto = require("crypto")
 
 
@@ -102,7 +104,7 @@ exports.createSubCategory = asyncHandler(async (req, res) => {
 // @Acess: private
 
 exports.updateSubCart = asyncHandler(async(req, res) =>{
-
+consle.log("sub")
     const {sub_category} = req.body
 
   const findExistingSubCart =  await subCategorySchema.findOne({sub_category})
@@ -148,8 +150,11 @@ exports.updateSubCart = asyncHandler(async(req, res) =>{
 // @Acess: private
 exports.deleteSubCategory = asyncHandler(async(req, res) =>{
 
-    let deleteCart = await subCategorySchema.findOneAndDelete({sub_category_id:req.params.sub_category_id}).select("-_id -__v")
+    let deleteCart = await subCategorySchema.findOneAndDelete({sub_category_id:req.params.sub_category_id}).select("-__v")
+    
+    
     if(deleteCart){
+      await advertSchema.deleteMany({sub_category:{$eq:deleteCart_.id}})
         return res.status(201).json({
             res: "ok",
             message: "Sub-category deleted successfully",
