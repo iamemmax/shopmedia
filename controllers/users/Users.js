@@ -26,7 +26,7 @@ exports.createUser = asyncHandler(async (req, res) => {
   if (!username || !email || !fullname || !password || !phone_no) {
 
     return res.status(401).json({
-      message: "all fields are required",
+      message: "All fields are required",
     });
   }
   // @desc check if user enter valid email
@@ -43,7 +43,7 @@ exports.createUser = asyncHandler(async (req, res) => {
 
     if (usernameExist) {
       return res.status(401).json({
-        message: "username already exists",
+        message: "Company already exists",
       });
     }
 
@@ -647,7 +647,7 @@ justify-content: center !important;
                                         <img src="https://tomal.dev/shopMedia/images/email-thumb.png" alt="">
                                     </div>
                                     <p>Hi ${username},</p>
-                                    <p>My name is Chidi Onwumere, the CEO of ShopMedia. Thank you for signing up on the Shopmedia
+                                    <p>Here's a big hug from all of us at ShopMedia. We want to thank you for signing up on the Shopmedia
                                         platform, we’re delighted to have you on board.</p>
                                     <p>You join thousands of Companies across Africa, using our digital platform and infrastructure to
                                         enable their businesses access seamless advertisement services from all over Africa.</p>
@@ -667,7 +667,7 @@ justify-content: center !important;
                                     <p>We are taking your business beyond borders.</p>
                                     <p>Warmest Regards, <br>
                 
-                                        Chidi Onwumere</p>
+                                        ShopMedia Team</p>
                 
                                     <div class="mail-btn text-center"  style="text-align: center">
                                          <a href="https://shopmedia.ng">Get Started</a>
