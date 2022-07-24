@@ -341,7 +341,7 @@ justify-content: center !important;
                 <div class="mail-wrapper">
 		
                     
-                    <p>Hi ${username},</p>
+                    <p>Hi ${fullname},</p>
                     <p>Please click the button below to verify your email address.
                     </p>
 
@@ -646,7 +646,7 @@ justify-content: center !important;
                                     <div class="email-thumb">
                                         <img src="https://tomal.dev/shopMedia/images/email-thumb.png" alt="">
                                     </div>
-                                    <p>Hi ${username},</p>
+                                    <p>Hi ${fullname},</p>
                                     <p>Here's a big hug from all of us at ShopMedia. We want to thank you for signing up on the Shopmedia
                                         platform, we’re delighted to have you on board.</p>
                                     <p>You join thousands of Companies across Africa, using our digital platform and infrastructure to
